@@ -2,9 +2,9 @@
 
 let inspect = require('inspect.js');
 let sinon = require('sinon');
-inspect.useSinon(sinon);
+let Loader = require('../src/loader');
 
-let  = require('');
+inspect.useSinon(sinon);
 
 describe('Loader', function() {
   describe('writes files', function() {
