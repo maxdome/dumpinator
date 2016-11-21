@@ -40,7 +40,7 @@ describe('Stash', function() {
       inspect(fetchedFile).isPromise();
 
       return fetchedFile.then((content) => {
-        inspect(JSON.parse(content)).isEql(data);
+        inspect(content).isEql(data);
       });
     });
   });

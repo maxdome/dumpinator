@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
+const jsonSortify = require('json.sortify');
 
 class Stash {
   constructor(stashFile) {
@@ -28,7 +29,11 @@ class Stash {
           return reject(err);
         }
 
-        resolve(content);
+        try {
+          resolve(jsonSortify(content, null, '  '));
+        } catch (parseError) {
+          reject(parseError);
+        }
       });
     });
   }
