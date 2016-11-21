@@ -43,6 +43,7 @@
   "dependencies": {
     "commander": "^2.9.0",
     "lodash": "^4.17.2",
+    "mkdirp": "^0.5.1",
     "superagent": "^2.3.0"
   },
   "devDependencies": {
