@@ -1,24 +1,18 @@
-'use strict';
-
 const path = require('path');
 const fs = require('fs');
 const inspect = require('inspect.js');
 
 const Stash = require('../src/stash');
 
-describe('Stash', function() {
+describe('Stash', () => {
   before((done) => {
-    try {
-      fs.unlink(path.join(__dirname, 'tmp/left.json'), done);
-    } catch (err) {
-      // nothing to do here
-    }
+    fs.unlink(path.join(__dirname, 'tmp', 'left.json'), () => done());
   });
 
-  describe('add()', function() {
-    it('adds a file into the stash', function() {
+  describe('add()', () => {
+    it('adds a file into the stash', () => {
       const data = { a: 'b' };
-      const stashFile = path.join(__dirname, 'tmp/left.json');
+      const stashFile = path.join(__dirname, 'tmp', 'left.json');
 
       const stash = new Stash(stashFile);
       const writtenFile = stash.add(typeof data === 'string' ? data : JSON.stringify(data));
@@ -30,10 +24,10 @@ describe('Stash', function() {
     });
   });
 
-  describe('fetch()', function() {
-    it('fetchs a file from stash', function() {
+  describe('fetch()', () => {
+    it('fetchs a file from stash', () => {
       const data = { a: 'b' };
-      const stashFile = path.join(__dirname, 'tmp/left.json');
+      const stashFile = path.join(__dirname, 'tmp', 'left.json');
 
       const stash = new Stash(stashFile);
       const fetchedFile = stash.fetch(data);
