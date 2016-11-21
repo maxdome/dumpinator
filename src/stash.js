@@ -3,10 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const jsonSortify = require('json.sortify');
 
 class Stash {
   constructor(stashFile) {
+    if (!stashFile) {
+      throw new Error('Stash file argument required!');
+    }
+
     this.stashFile = stashFile;
   }
 
@@ -30,7 +33,7 @@ class Stash {
         }
 
         try {
-          resolve(jsonSortify(content, null, '  '));
+          resolve(JSON.parse(content));
         } catch (parseError) {
           reject(parseError);
         }
