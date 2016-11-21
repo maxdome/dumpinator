@@ -1,14 +1,12 @@
-'use strict';
-
 const inspect = require('inspect.js');
 const sinon = require('sinon');
 const Request = require('../src/request');
 
 inspect.useSinon(sinon);
 
-describe('Request', function() {
-  describe('load()', function() {
-    it('returns a correct output', function(done) {
+describe('Request', () => {
+  describe('load()', () => {
+    it('returns a correct output', function (done) {
       this.timeout(5000);
       const req = new Request();
       const options = {

@@ -1,5 +1,3 @@
-'use strict';
-
 const lodash = require('lodash');
 const superagent = require('superagent');
 
