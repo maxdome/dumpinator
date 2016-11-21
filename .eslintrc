@@ -19,9 +19,14 @@
     "func-names": 0,              // http://eslint.org/docs/rules/func-names.html
     "strict": 0,
     "generator-star-spacing": 0,
-    "no-unused-vars": [2, { "args": "none" }]
+    "no-unused-vars": [2, { "args": "none" }],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.spec.js"]}]
   },
   "ecmaFeatures": {
     "generators": true
+  },
+  "env": {
+    "node": true,
+    "mocha": true
   }
 }
