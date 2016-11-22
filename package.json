@@ -41,6 +41,7 @@
   },
   "homepage": "https://github.com/maxdome/dumpinator#readme",
   "dependencies": {
+    "co": "^4.6.0",
     "commander": "^2.9.0",
     "lodash": "^4.17.2",
     "superagent": "^2.3.0"
