@@ -1,3 +1,3 @@
 {
-  "extends": "mxd/node-test"
+  "extends": "maxdome/node-test"
 }
