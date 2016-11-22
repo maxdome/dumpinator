@@ -1,3 +1,5 @@
+'use strict';
+
 const co = require('co');
 const config = {};
 
@@ -15,7 +17,7 @@ class Dumpinator {
 
   runOne(test) {
     return co(function *() {
-      
+
     });
   }
 }
