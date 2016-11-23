@@ -1,6 +1,10 @@
 'use strict';
 
 const inspect = require('inspect.js');
+const sinon = require('sinon');
+
+inspect.useSinon(sinon);
+
 const Dumpinator = require('../src/dumpinator');
 
 describe('Dumpinator', function() {
@@ -23,7 +27,7 @@ describe('Dumpinator', function() {
 
       inspect(paralize).isPromise();
       paralize.then((res) => {
-        inspect(res).hasSubset(['one', 'three', 'four', 'five', 'zwoa']);
+        inspect(res).isEql(['one', 'three', 'four', 'five', 'zwo']);
       });
 
       setTimeout(() => resolve('two'));
@@ -35,6 +39,15 @@ describe('Dumpinator', function() {
   describe('run()', function() {
     it('crawls n pages paralel', function() {
       inspect(Dumpinator).hasMethod('run');
+
+      sinon.stub(Dumpinator, 'paralize');
+
+      const result = Dumpinator.run();
+      inspect(result).isPromise();
+
+      return result.then((res) => {
+        inspect(res).isEql({});
+      });
     });
   });
 });

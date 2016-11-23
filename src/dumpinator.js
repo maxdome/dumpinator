@@ -1,32 +1,24 @@
 'use strict';
 
 const co = require('co');
+const Request = require('./request');
 const config = {};
 
 class Dumpinator {
   static run() {
     const tests = config.tests;
     const paralelRequests = 2;
+    const jobs = [];
 
-    return co(function *() {
-      const jobs = [];
-      for (const i = 0; i < paralelRequests; i++) {
-        jobs.push(new Promise((resolve, reject) => {
-          const test = tests.shift();
-          if (!test) {
-            resolve();
-          }
-        }));
-      }
+    for (const test in tests) {
+      jobs.push(co(function *() {
+        const request = new Request();
+        const response = request.load(test);
+        console.log(response);
+      }));
+    }
 
-      yield Promise.all(jobs);
-    });
-  }
-
-  runOne(test) {
-    return co(function *() {
-
-    });
+    return this.paralize(jobs, paralelRequests);
   }
 
   /**
