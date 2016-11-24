@@ -5,8 +5,6 @@ const co = require('co');
 const Request = require('./request');
 const Stash = require('./stash');
 
-const config = {};
-
 const headers = {
   accept: 'application/json',
   platform: 'web',
@@ -18,9 +16,10 @@ const headers = {
 class Dumpinator {
   static run() {
     const tests = [
-      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, slug: 'assets-left' },
-      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, slug: 'assets-right' }
+      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, id: 'assets-left' },
+      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, id: 'assets-right' }
     ];
+
     const paralelRequests = 2;
     const jobs = [];
 
@@ -29,7 +28,7 @@ class Dumpinator {
         const request = new Request();
         const response = yield request.load(test);
 
-        const stash = new Stash(path.join(__dirname, `../tmp/${test.slug}.json`));
+        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
         yield stash.add(response);
       }));
     });
