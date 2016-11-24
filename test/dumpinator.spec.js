@@ -7,9 +7,9 @@ inspect.useSinon(sinon);
 
 const Dumpinator = require('../src/dumpinator');
 
-describe('Dumpinator', function() {
-  describe('paralize()', function() {
-    it('runs n promises paralel', function() {
+describe('Dumpinator', () => {
+  describe('paralize()', () => {
+    it('runs n promises paralel', () => {
       inspect(Dumpinator).hasMethod('paralize');
 
       let resolve;
@@ -27,7 +27,7 @@ describe('Dumpinator', function() {
 
       inspect(paralize).isPromise();
       paralize.then((res) => {
-        inspect(res).isEql(['one', 'three', 'four', 'five', 'zwo']);
+        inspect(res).isEql(['one', 'three', 'four', 'five', 'two']);
       });
 
       setTimeout(() => resolve('two'));
@@ -36,17 +36,18 @@ describe('Dumpinator', function() {
     });
   });
 
-  describe('run()', function() {
-    it('crawls n pages paralel', function() {
+  describe('run()', () => {
+    it('crawls n pages paralel', () => {
       inspect(Dumpinator).hasMethod('run');
 
-      sinon.stub(Dumpinator, 'paralize');
+      const paralizeStub = sinon.spy(Dumpinator, 'paralize');
 
       const result = Dumpinator.run();
       inspect(result).isPromise();
 
       return result.then((res) => {
-        inspect(res).isEql({});
+        inspect(paralizeStub).wasCalledOnce();
+        inspect(res).isEql([]);
       });
     });
   });

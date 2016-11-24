@@ -1,24 +1,41 @@
 'use strict';
 
+const path = require('path');
 const co = require('co');
 const Request = require('./request');
+const Stash = require('./stash');
+
 const config = {};
+
+const headers = {
+  accept: 'application/json',
+  platform: 'web',
+  device_type: 'webportal',
+  client: 'mxd_package',
+  language: 'de_DE'
+};
 
 class Dumpinator {
   static run() {
-    const tests = config.tests;
+    const tests = [
+      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, slug: 'assets-left' },
+      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, slug: 'assets-right' }
+    ];
     const paralelRequests = 2;
     const jobs = [];
 
-    for (const test in tests) {
-      jobs.push(co(function *() {
+    tests.forEach((test) => {
+      jobs.push(co(function* task() {
         const request = new Request();
-        const response = request.load(test);
-        console.log(response);
-      }));
-    }
+        const response = yield request.load(test);
 
-    return this.paralize(jobs, paralelRequests);
+        const stash = new Stash(path.join(__dirname, `../tmp/${test.slug}.json`));
+        yield stash.add(response);
+      }));
+    });
+
+    const p = this.paralize(jobs, paralelRequests);
+    return p;
   }
 
   /**
@@ -38,8 +55,8 @@ class Dumpinator {
     const results = [];
     const beer = 'full';
 
-    for (let i = 0; i < numParalel; i++) {
-      slots.push(co(function *() {
+    for (let i = 0; i < numParalel; i += 1) {
+      slots.push(co(function* slotGenerator() {
         while (beer !== 'empty') { // it never gets empty ;)
           const next = jobs.shift();
           if (!next) {
@@ -52,9 +69,7 @@ class Dumpinator {
       }));
     }
 
-    return Promise.all(slots).then((r) => {
-      return results;
-    });
+    return Promise.all(slots).then(() => results);
   }
 }
 
