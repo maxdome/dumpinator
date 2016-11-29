@@ -6,18 +6,14 @@ const Request = require('./request');
 const Stash = require('./stash');
 
 const headers = {
-  accept: 'application/json',
-  platform: 'web',
-  device_type: 'webportal',
-  client: 'mxd_package',
-  language: 'de_DE'
+  accept: 'application/json'
 };
 
 class Dumpinator {
   static run() {
     const tests = [
-      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, id: 'assets-left' },
-      { url: 'http://localhost:3000/api/v1/assets/1629266', headers, id: 'assets-right' }
+      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-left' },
+      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-right' }
     ];
 
     const paralelRequests = 2;
