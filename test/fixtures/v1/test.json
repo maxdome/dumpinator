@@ -1,0 +1,9 @@
+{
+  "name": "Test",
+  "descrition": "This is just a text with some funy chars .æſaſ¢ææſ„€„ł„@„ſ»„€€“”",
+  "data": [
+    { "item": "one" },
+    { "item": "two" },
+  ]
+  "num": 42
+}
