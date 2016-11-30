@@ -8,9 +8,9 @@ inspect.useSinon(sinon);
 const Dumpinator = require('../src/dumpinator');
 
 describe('Dumpinator', () => {
-  describe('paralize()', () => {
-    it('runs n promises parallel', () => {
-      inspect(Dumpinator).hasMethod('paralize');
+  describe('parallelize()', () => {
+    it('runs n promises in parallel', () => {
+      inspect(Dumpinator).hasMethod('parallelize');
 
       let resolve;
       const task1 = Promise.resolve('one');
@@ -21,32 +21,32 @@ describe('Dumpinator', () => {
       const task4 = Promise.resolve('four');
       const task5 = Promise.resolve('five');
 
-      const paralize = Dumpinator.paralize([
+      const parallelize = Dumpinator.parallelize([
         task1, task2, task3, task4, task5
       ], 2);
 
-      inspect(paralize).isPromise();
-      paralize.then((res) => {
+      inspect(parallelize).isPromise();
+      parallelize.then((res) => {
         inspect(res).isEql(['one', 'three', 'four', 'five', 'two']);
       });
 
       setTimeout(() => resolve('two'));
 
-      return paralize;
+      return parallelize;
     });
   });
 
   describe('run()', () => {
-    it('crawls n pages parallel', () => {
+    it('crawls n pages in parallel', () => {
       inspect(Dumpinator).hasMethod('run');
 
-      const paralizeStub = sinon.spy(Dumpinator, 'paralize');
+      const parallelizeStub = sinon.spy(Dumpinator, 'parallelize');
 
       const result = Dumpinator.run();
       inspect(result).isPromise();
 
       return result.then((res) => {
-        inspect(paralizeStub).wasCalledOnce();
+        inspect(parallelizeStub).wasCalledOnce();
         inspect(res).isEql([]);
       });
     });

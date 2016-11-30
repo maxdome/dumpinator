@@ -29,7 +29,7 @@ class Dumpinator {
       }));
     });
 
-    const p = this.paralize(jobs, parallelRequests);
+    const p = this.parallelize(jobs, parallelRequests);
     return p;
   }
 
@@ -37,14 +37,14 @@ class Dumpinator {
    *
    * Runs n promises parallel
    *
-   * @method paralize
+   * @method parallelize
    *
    * @param  {array} jobs Promise queue. Must be an array of promises
    * @param  {number} numParallel Number of parallel jobs
    *
    * @return {Object} Returns a promise after last job hast been done
    */
-  static paralize(jobs, numParallel) {
+  static parallelize(jobs, numParallel) {
     numParallel = numParallel || 2;
     const slots = [];
     const results = [];
