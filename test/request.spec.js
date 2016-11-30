@@ -1,3 +1,5 @@
+'use strict';
+
 const inspect = require('inspect.js');
 const sinon = require('sinon');
 const Request = require('../src/request');
