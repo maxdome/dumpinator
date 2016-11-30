@@ -1,4 +1,7 @@
+/* eslint strict: [2, global] */
+
 'use strict';
+
 
 const path = require('path');
 const co = require('co');
