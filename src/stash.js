@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
@@ -16,7 +18,7 @@ class Stash {
 
     return new Promise((resolve, reject) => {
       mkdirp(dir, () => {
-        fs.writeFile(this.stashFile, content, (err, stat) => {
+        fs.writeFile(this.stashFile, typeof content === 'object' ? JSON.stringify(content) : content, (err, stat) => {
           resolve();
         });
       });

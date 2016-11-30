@@ -1,3 +1,10 @@
 {
-  "extends": "maxdome/node"
+  "extends": "maxdome/node",
+  "rules": {
+    "strict": [2, "safe"]
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script"
+  }
 }

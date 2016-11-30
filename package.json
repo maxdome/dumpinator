@@ -41,6 +41,7 @@
   },
   "homepage": "https://github.com/maxdome/dumpinator#readme",
   "dependencies": {
+    "co": "^4.6.0",
     "commander": "^2.9.0",
     "lodash": "^4.17.2",
     "mkdirp": "^0.5.1",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "eslint": "^3.10.2",
+    "eslint-config-maxdome": "^2.0.0",
     "eslint-config-airbnb-base": "^10.0.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-config-maxdome": "^2.0.0",
