@@ -1,16 +1,67 @@
+'use strict';
+
 const lodash = require('lodash');
 const crypto = require('crypto');
 
-function parseSide(name, data) {
+const validMethods = ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'];
+
+function validateSide(name, data) {
   if (data) {
     if (!lodash.isObject(data)) {
       throw new Error(`Config invalid: "${name}" must be an object!`);
     }
     lodash.each(data, (val, key) => {
-      if (!lodash.includes(['hostname', 'header', 'query'], key)) {
-        throw new Error(`Config invalid: "${name}.${key}" is not allowed!`);
+      if (!lodash.includes(['method', 'hostname', 'header', 'query'], key)) {
+        throw new Error(`Config invalid: Key "${key}" in "${name}" is not allowed!`);
       }
     });
+    if (lodash.get(data, 'method')) {
+      if (!lodash.includes(validMethods, data.method)) {
+        throw new Error(`Config invalid: Method "${data.method}" in "${name}.method" is invalid!`);
+      }
+    }
+    if (lodash.get(data, 'hostname')) {
+      if (!data.hostname.match(/^https?:\/\//)) {
+        throw new Error(`Config invalid: Hostname "${data.hostname}" in "${name}.hostname" is invalid!`);
+      }
+    }
+    if (lodash.get(data, 'header')) {
+      if (!lodash.isObject(data.header)) {
+        throw new Error(`Config invalid: "${name}.header" is invalid!`);
+      }
+    }
+    if (lodash.get(data, 'query')) {
+      if (!lodash.isObject(data.query)) {
+        throw new Error(`Config invalid: "${name}.query" is invalid!`);
+      }
+    }
+  }
+}
+
+function validateRoute(data, i) {
+  const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
+  lodash.each(data, (val, key) => {
+    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query'], key)) {
+      throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
+    }
+  });
+  if (lodash.get(data, 'name')) {
+    if (!lodash.isString(data.name) && !lodash.isNumber(data.name)) {
+      throw new Error(`Config invalid: Name in "routes[${i}]"${url} is invalid!`);
+    }
+  }
+  if (lodash.get(data, 'tag')) {
+    if (!lodash.isString(data.tag) && !lodash.isNumber(data.tag)) {
+      throw new Error(`Config invalid: Tag in "routes[${i}]"${url} is invalid!`);
+    }
+  }
+  if (!lodash.isString(data.url)) {
+    throw new Error(`Config invalid: "routes[${i}]" must contain a "url" (string)!`);
+  }
+  if (lodash.get(data, 'method')) {
+    if (!lodash.includes(validMethods, data.method)) {
+      throw new Error(`Config invalid: Method "${data.method}" in "routes[${i}]"${url} is invalid!`);
+    }
   }
 }
 
@@ -19,7 +70,7 @@ function extendRoute(side, route) {
   if (lodash.get(side, 'hostname')) {
     out.url = side.hostname + route.url;
   }
-  if (!route.method) {
+  if (!out.method) {
     out.method = 'GET';
   }
   out.name = `${out.method} ${route.name || route.url}`;
@@ -38,8 +89,8 @@ class Config {
     const left = lodash.get(input, 'left');
     const right = lodash.get(input, 'right');
 
-    parseSide('left', left);
-    parseSide('right', right);
+    validateSide('left', left);
+    validateSide('right', right);
 
     if (!Array.isArray(routes)) {
       throw new Error('Config invalid: "routes" must be an array!');
@@ -47,15 +98,15 @@ class Config {
 
     routes.forEach((route, i) => {
       if (!lodash.isString(route) && !lodash.isObject(route)) {
-        throw new Error(`Config invalid: Route ${i + 1} (${route.url || route}) must must be a string or an object!`);
+        throw new Error(`Config invalid: "routes[${i}]" (${route.url || route}) must must be a string or an object!`);
+      }
+
+      if (lodash.isObject(route)) {
+        validateRoute(route, i);
       }
 
       if (lodash.isString(route)) {
         route = { url: route };
-      }
-
-      if (!lodash.isString(route.url)) {
-        throw new Error(`Config invalid: Route ${i} must contain a "url" (string)!`);
       }
 
       const leftRoute = extendRoute(input.left, lodash.clone(route));
