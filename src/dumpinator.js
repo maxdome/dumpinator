@@ -35,12 +35,12 @@ class Dumpinator {
 
   /**
    *
-   * Runs n promises parallel
+   * Runs n promises in parallel
    *
    * @method parallelize
    *
    * @param  {array} jobs Promise queue. Must be an array of promises
-   * @param  {number} numParallel Number of parallel jobs
+   * @param  {number} numParallel Number of jobs in parallel
    *
    * @return {Object} Returns a promise after last job hast been done
    */
