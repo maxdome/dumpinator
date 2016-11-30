@@ -16,7 +16,7 @@ class Dumpinator {
       { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-right' }
     ];
 
-    const paralelRequests = 2;
+    const parallelRequests = 2;
     const jobs = [];
 
     tests.forEach((test) => {
@@ -29,28 +29,28 @@ class Dumpinator {
       }));
     });
 
-    const p = this.paralize(jobs, paralelRequests);
+    const p = this.paralize(jobs, parallelRequests);
     return p;
   }
 
   /**
    *
-   * Runs n promises paralel
+   * Runs n promises parallel
    *
    * @method paralize
    *
    * @param  {array} jobs Promise queue. Must be an array of promises
-   * @param  {number} numParalel Number of paralel jobs
+   * @param  {number} numParallel Number of parallel jobs
    *
    * @return {Object} Returns a promise after last job hast been done
    */
-  static paralize(jobs, numParalel) {
-    numParalel = numParalel || 2;
+  static paralize(jobs, numParallel) {
+    numParallel = numParallel || 2;
     const slots = [];
     const results = [];
     const beer = 'full';
 
-    for (let i = 0; i < numParalel; i += 1) {
+    for (let i = 0; i < numParallel; i += 1) {
       slots.push(co(function* slotGenerator() {
         while (beer !== 'empty') { // it never gets empty ;)
           const next = jobs.shift();

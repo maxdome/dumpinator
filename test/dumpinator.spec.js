@@ -9,7 +9,7 @@ const Dumpinator = require('../src/dumpinator');
 
 describe('Dumpinator', () => {
   describe('paralize()', () => {
-    it('runs n promises paralel', () => {
+    it('runs n promises parallel', () => {
       inspect(Dumpinator).hasMethod('paralize');
 
       let resolve;
@@ -37,7 +37,7 @@ describe('Dumpinator', () => {
   });
 
   describe('run()', () => {
-    it('crawls n pages paralel', () => {
+    it('crawls n pages parallel', () => {
       inspect(Dumpinator).hasMethod('run');
 
       const paralizeStub = sinon.spy(Dumpinator, 'paralize');
