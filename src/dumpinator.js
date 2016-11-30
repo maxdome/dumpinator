@@ -29,8 +29,7 @@ class Dumpinator {
       }));
     });
 
-    const p = this.parallelize(jobs, parallelRequests);
-    return p;
+    return this.parallelize(jobs, parallelRequests);
   }
 
   /**
