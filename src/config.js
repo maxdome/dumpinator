@@ -85,9 +85,26 @@ class Config {
   }
 
   parse(input) {
+    const defaults = lodash.get(input, 'defaults');
     const routes = lodash.get(input, 'routes');
-    const left = lodash.get(input, 'left');
-    const right = lodash.get(input, 'right');
+    const left = lodash.get(defaults, 'left');
+    const right = lodash.get(defaults, 'right');
+
+    lodash.each(input, (val, key) => {
+      if (!lodash.includes(['defaults', 'routes'], key)) {
+        throw new Error(`Config invalid: Key "${key}" is not allowed!`);
+      }
+    });
+
+    if (defaults && !lodash.isObject(defaults)) {
+      throw new Error('Config invalid: "defaults" must be an object!');
+    }
+
+    lodash.each(defaults, (val, key) => {
+      if (!lodash.includes(['left', 'right', 'rateLimit'], key)) {
+        throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
+      }
+    });
 
     validateSide('left', left);
     validateSide('right', right);
@@ -109,8 +126,8 @@ class Config {
         route = { url: route };
       }
 
-      const leftRoute = extendRoute(input.left, lodash.clone(route));
-      const rightRoute = extendRoute(input.right, lodash.clone(route));
+      const leftRoute = extendRoute(left, lodash.clone(route));
+      const rightRoute = extendRoute(right, lodash.clone(route));
       const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
 
       leftRoute.id = routeHash;
