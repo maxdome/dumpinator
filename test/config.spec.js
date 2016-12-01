@@ -18,28 +18,38 @@ describe('Config', () => {
       config = new Config();
     });
 
+    it('fails if properties are invalid', () => {
+      const fn = () => config.parse({ foo: {} });
+      inspect(fn).doesThrow('Config invalid: Key "foo" is not allowed!');
+    });
+
+    it('fails if defaults\'s properties are invalid', () => {
+      const fn = () => config.parse({ defaults: { foo: {} } });
+      inspect(fn).doesThrow('Config invalid: Key "foo" in "defaults" is not allowed!');
+    });
+
     it('fails if either side\'s properties are invalid', () => {
-      const fn = () => config.parse({ left: { foo: 'bar' } });
+      const fn = () => config.parse({ defaults: { left: { foo: 'bar' } } });
       inspect(fn).doesThrow('Config invalid: Key "foo" in "left" is not allowed!');
     });
 
     it('fails if either side\'s method is invalid', () => {
-      const fn = () => config.parse({ right: { method: 'BAR' } });
+      const fn = () => config.parse({ defaults: { right: { method: 'BAR' } } });
       inspect(fn).doesThrow('Config invalid: Method "BAR" in "right.method" is invalid!');
     });
 
     it('fails if either side\'s hostname is invalid', () => {
-      const fn = () => config.parse({ right: { hostname: 'htp://foo.com' } });
+      const fn = () => config.parse({ defaults: { right: { hostname: 'htp://foo.com' } } });
       inspect(fn).doesThrow('Config invalid: Hostname "htp://foo.com" in "right.hostname" is invalid!');
     });
 
     it('fails if either side\'s header is invalid', () => {
-      const fn = () => config.parse({ left: { header: 'foo' } });
+      const fn = () => config.parse({ defaults: { left: { header: 'foo' } } });
       inspect(fn).doesThrow('Config invalid: "left.header" is invalid!');
     });
 
     it('fails if either side\'s query is invalid', () => {
-      const fn = () => config.parse({ left: { query: 'foo' } });
+      const fn = () => config.parse({ defaults: { left: { query: 'foo' } } });
       inspect(fn).doesThrow('Config invalid: "left.query" is invalid!');
     });
 
@@ -119,8 +129,10 @@ describe('Config', () => {
 
     it('merges global data into the routes', () => {
       config.parse({
-        left: { hostname: 'https://my.api.com/v1/', query: globalQueries, header: globalHeaders },
-        right: { hostname: 'http://localhost/v1/', query: globalQueries, header: globalHeaders },
+        defaults: {
+          left: { hostname: 'https://my.api.com/v1/', query: globalQueries, header: globalHeaders },
+          right: { hostname: 'http://localhost/v1/', query: globalQueries, header: globalHeaders }
+        },
         routes: ['pages', 'assets', 'components']
       });
       const expectedResult = {
@@ -140,7 +152,9 @@ describe('Config', () => {
 
     it('overrides global properties with local ones', () => {
       config.parse({
-        left: { method: 'POST', query: globalQueries },
+        defaults: {
+          left: { method: 'POST', query: globalQueries }
+        },
         routes: [{ url: 'bundle', query: { globalQuery: 456 } }]
       });
       const expectedResult = {
