@@ -23,13 +23,14 @@ function handleResult(text, code) {
 
 process.on('uncaughtException', (err) => {
   msg(err.message);
-  if (process.argv.includes('-v') || process.argv.includes('--verbose')) {
+  if (program.verbose) {
     msg(err.stack);
   }
   process.exit(1);
 });
 
 program.version(pkg.version);
+program.option('-v, --verbose', 'Be more verbose');
 
 program
   .command('diff [left] [right]')
@@ -40,7 +41,6 @@ program
   .option('-r, --rate [rateLimit]', 'Rate limit for concurrent requests')
   .option('-R, --header-right [headerRight]', 'Add a HTTP header to right side')
   .option('-t, --tag [tag]', 'Only include routes with this tag')
-  .option('-v, --verbose', 'Be more verbose')
   .action((left, right, options) => {
     options = options || {};
     options.args = minimist(process.argv);
