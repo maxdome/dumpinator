@@ -4,7 +4,14 @@ const inspect = require('inspect.js');
 const Config = require('../src/config');
 
 describe('Config', () => {
-  describe('parse()', () => {
+  describe('load()', () => {
+    it('fails if no config was found');
+    it('loads a custom config with -c');
+    it('loads a default dumpinator.conf.js');
+    it('loads a default dumpinator.json');
+  });
+
+  describe('parseJSON()', () => {
     let config;
     const globalHeaders = {
       'content-type': 'application/json',
@@ -19,78 +26,78 @@ describe('Config', () => {
     });
 
     it('fails if properties are invalid', () => {
-      const fn = () => config.parse({ foo: {} });
+      const fn = () => config.parseJSON({ foo: {} });
       inspect(fn).doesThrow('Config invalid: Key "foo" is not allowed!');
     });
 
     it('fails if defaults\'s properties are invalid', () => {
-      const fn = () => config.parse({ defaults: { foo: {} } });
+      const fn = () => config.parseJSON({ defaults: { foo: {} } });
       inspect(fn).doesThrow('Config invalid: Key "foo" in "defaults" is not allowed!');
     });
 
     it('fails if either side\'s properties are invalid', () => {
-      const fn = () => config.parse({ defaults: { left: { foo: 'bar' } } });
+      const fn = () => config.parseJSON({ defaults: { left: { foo: 'bar' } } });
       inspect(fn).doesThrow('Config invalid: Key "foo" in "left" is not allowed!');
     });
 
     it('fails if either side\'s method is invalid', () => {
-      const fn = () => config.parse({ defaults: { right: { method: 'BAR' } } });
+      const fn = () => config.parseJSON({ defaults: { right: { method: 'BAR' } } });
       inspect(fn).doesThrow('Config invalid: Method "BAR" in "right.method" is invalid!');
     });
 
     it('fails if either side\'s hostname is invalid', () => {
-      const fn = () => config.parse({ defaults: { right: { hostname: 'htp://foo.com' } } });
+      const fn = () => config.parseJSON({ defaults: { right: { hostname: 'htp://foo.com' } } });
       inspect(fn).doesThrow('Config invalid: Hostname "htp://foo.com" in "right.hostname" is invalid!');
     });
 
     it('fails if either side\'s header is invalid', () => {
-      const fn = () => config.parse({ defaults: { left: { header: 'foo' } } });
+      const fn = () => config.parseJSON({ defaults: { left: { header: 'foo' } } });
       inspect(fn).doesThrow('Config invalid: "left.header" is invalid!');
     });
 
     it('fails if either side\'s query is invalid', () => {
-      const fn = () => config.parse({ defaults: { left: { query: 'foo' } } });
+      const fn = () => config.parseJSON({ defaults: { left: { query: 'foo' } } });
       inspect(fn).doesThrow('Config invalid: "left.query" is invalid!');
     });
 
     it('fails if routes are invalid', () => {
-      const fn = () => config.parse({ routes: { foo: 'bar' } });
+      const fn = () => config.parseJSON({ routes: { foo: 'bar' } });
       inspect(fn).doesThrow('Config invalid: "routes" must be an array!');
     });
 
     it('fails if a route\'s properties are invalid', () => {
-      const fn = () => config.parse({ routes: [{ foo: 'bar' }] });
+      const fn = () => config.parseJSON({ routes: [{ foo: 'bar' }] });
       inspect(fn).doesThrow('Config invalid: Key "foo" in "routes[0]" is not allowed!');
       // inspect(fn).doesThrow('Config invalid: "routes" must be an array!');
     });
 
     it('fails if a route\'s url is invalid', () => {
-      const fn = () => config.parse({ routes: [{}] });
+      const fn = () => config.parseJSON({ routes: [{}] });
       inspect(fn).doesThrow('Config invalid: "routes[0]" must contain a "url" (string)!');
     });
 
     it('fails if a route\'s method is invalid', () => {
-      const fn = () => config.parse({ routes: [{ url: '/foo', method: 'FOO' }] });
+      const fn = () => config.parseJSON({ routes: [{ url: '/foo', method: 'FOO' }] });
       inspect(fn).doesThrow('Config invalid: Method "FOO" in "routes[0]" (/foo) is invalid!');
     });
 
     it('fails if a route\'s name is invalid', () => {
-      const fn = () => config.parse({ routes: [{ url: '/', name: [] }] });
+      const fn = () => config.parseJSON({ routes: [{ url: '/', name: [] }] });
       inspect(fn).doesThrow('Config invalid: Name in "routes[0]" (/) is invalid!');
     });
 
     it('fails if a route\'s tag is invalid', () => {
-      const fn = () => config.parse({ routes: [{ url: '/', tag: {} }] });
+      const fn = () => config.parseJSON({ routes: [{ url: '/', tag: {} }] });
       inspect(fn).doesThrow('Config invalid: Tag in "routes[0]" (/) is invalid!');
     });
 
     it('counts the routes correctly', () => {
-      const fn = () => config.parse({ routes: ['/1', '/2', '/3', {}] });
+      const fn = () => config.parseJSON({ routes: ['/1', '/2', '/3', {}] });
       inspect(fn).doesThrow('Config invalid: "routes[3]" must contain a "url" (string)!');
     });
 
     it('accepts routes as strings', () => {
-      config.parse({
+      config.parseJSON({
         routes: ['pages', 'assets', 'components']
       });
       const expectedResult = {
@@ -109,7 +116,7 @@ describe('Config', () => {
     });
 
     it('accepts routes as objects', () => {
-      config.parse({
+      config.parseJSON({
         routes: [{ url: 'pages' }, { url: 'assets' }, { url: 'components' }]
       });
       const expectedResult = {
@@ -128,7 +135,7 @@ describe('Config', () => {
     });
 
     it('merges global data into the routes', () => {
-      config.parse({
+      config.parseJSON({
         defaults: {
           left: { hostname: 'https://my.api.com/v1/', query: globalQueries, header: globalHeaders },
           right: { hostname: 'http://localhost/v1/', query: globalQueries, header: globalHeaders }
@@ -151,7 +158,7 @@ describe('Config', () => {
     });
 
     it('overrides global properties with local ones', () => {
-      config.parse({
+      config.parseJSON({
         defaults: {
           left: { method: 'POST', query: globalQueries }
         },
@@ -169,5 +176,12 @@ describe('Config', () => {
     });
 
     it('spreads routes with multiple methods, queries & headers'); // Feature idea: Using an array in the route's method, url or query duplicates the route for each value for convenience
+  });
+
+  describe('parseArguments()', () => {
+    it('fails if left & right are missing');
+    it('fails if header is invalid');
+    it('fails if rate is invalid');
+    it('fails if tag is invalid');
   });
 });
