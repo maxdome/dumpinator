@@ -34,7 +34,7 @@ program.option('-v, --verbose', 'Be more verbose');
 
 program
   .command('diff [left] [right]')
-  .description('Diff 2 URLs')
+  .description('Diff the given routes')
   .option('-c, --config [config]', 'Set a custom config')
   .option('-H, --header [header]', 'Add a HTTP header to both sides')
   .option('-L, --header-left [headerLeft]', 'Add a HTTP header to left side')
