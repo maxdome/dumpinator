@@ -50,14 +50,16 @@ program
       if (left) {
         return handleResult('No arguments allowed when using "-c"!', 1);
       }
+      config.parseOptions(options);
       config.load(options.config);
     } else if (!left) {
+      config.parseOptions(options);
       config.load();
     } else {
       config.parseArguments(left, right, options);
     }
 
-    handleResult(config.routes); // TODO Replace with dumpinator diff
+    handleResult(JSON.stringify(config, null, 2)); // TODO Replace with dumpinator diff
   });
 
 program.parse(process.argv);
