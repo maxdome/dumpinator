@@ -2,8 +2,10 @@
 
 const lodash = require('lodash');
 const crypto = require('crypto');
+const path = require('path');
 
 const validMethods = ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'];
+const defaultConfigs = ['./dumpinator.conf.js', './dumpinator.json'];
 
 function validateSide(name, data) {
   if (data) {
@@ -65,6 +67,20 @@ function validateRoute(data, i) {
   }
 }
 
+function validateHeaderOptions(args) {
+  if (lodash.has(args, 'H') || lodash.has(args, 'header')) {
+    throw new Error('[header] not implemented yet!');
+  }
+
+  if (lodash.has(args, 'L') || lodash.has(args, 'header-left')) {
+    throw new Error('[header-left] not implemented yet!');
+  }
+
+  if (lodash.has(args, 'R') || lodash.has(args, 'header-right')) {
+    throw new Error('[header-right] not implemented yet!');
+  }
+}
+
 function extendRoute(side, route) {
   const out = Object.assign({}, side, route);
   if (lodash.get(side, 'hostname')) {
@@ -84,10 +100,57 @@ class Config {
     this.routes = { left: [], right: [] };
   }
 
-  parse(input) {
+  load(file) {
+    // TODO: Rename file(name) related variables here
+    let filenames = [];
+    let conf;
+    let error;
+
+    if (file) {
+      filenames.push(file.substr(0, 1) === '/' ? file : path.join(process.cwd(), file));
+    } else {
+      filenames = defaultConfigs.map(defaultFile => path.join(process.cwd(), defaultFile));
+    }
+
+    filenames.some((configFile) => {
+      error = false;
+      try {
+        conf = require(configFile); // eslint-disable-line global-require,import/no-dynamic-require
+        return !!conf;
+      } catch (e) {
+        error = new Error(`Cannot find config "${configFile}"`);
+      }
+      return error;
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    this.parseJSON(conf);
+  }
+
+  parseJSON(input) {
+    const defaults = lodash.get(input, 'defaults');
     const routes = lodash.get(input, 'routes');
-    const left = lodash.get(input, 'left');
-    const right = lodash.get(input, 'right');
+    const left = lodash.get(defaults, 'left');
+    const right = lodash.get(defaults, 'right');
+
+    lodash.each(input, (val, key) => {
+      if (!lodash.includes(['defaults', 'routes'], key)) {
+        throw new Error(`Config invalid: Key "${key}" is not allowed!`);
+      }
+    });
+
+    if (defaults && !lodash.isObject(defaults)) {
+      throw new Error('Config invalid: "defaults" must be an object!');
+    }
+
+    lodash.each(defaults, (val, key) => {
+      if (!lodash.includes(['left', 'right', 'rateLimit'], key)) {
+        throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
+      }
+    });
 
     validateSide('left', left);
     validateSide('right', right);
@@ -109,8 +172,8 @@ class Config {
         route = { url: route };
       }
 
-      const leftRoute = extendRoute(input.left, lodash.clone(route));
-      const rightRoute = extendRoute(input.right, lodash.clone(route));
+      const leftRoute = extendRoute(left, lodash.clone(route));
+      const rightRoute = extendRoute(right, lodash.clone(route));
       const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
 
       leftRoute.id = routeHash;
@@ -119,6 +182,28 @@ class Config {
       this.routes.left.push(leftRoute);
       this.routes.right.push(rightRoute);
     });
+  }
+
+  parseArguments(left, right, options) {
+    if (!left) {
+      throw new Error('Arguments invalid: [left] missing!');
+    }
+    if (!right) {
+      throw new Error('Arguments invalid: [right] missing!');
+    }
+
+    validateHeaderOptions(options.args);
+
+    if (lodash.has(options.args, 'r') || lodash.has(options.args, 'rate')) {
+      throw new Error('[rate] not implemented yet!');
+    }
+
+    if (lodash.has(options.args, 't') || lodash.has(options.args, 'tag')) {
+      throw new Error('[tag] not implemented yet!');
+    }
+
+    this.routes.left.push(left);
+    this.routes.right.push(right);
   }
 }
 
