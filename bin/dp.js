@@ -34,7 +34,7 @@ program.option('-v, --verbose', 'Be more verbose');
 
 program
   .command('diff [left] [right]')
-  .description('Diff 2 URLs')
+  .description('Diff the given routes')
   .option('-c, --config [config]', 'Set a custom config')
   .option('-H, --header [header]', 'Add a HTTP header to both sides')
   .option('-L, --header-left [headerLeft]', 'Add a HTTP header to left side')
@@ -50,14 +50,16 @@ program
       if (left) {
         return handleResult('No arguments allowed when using "-c"!', 1);
       }
+      config.parseOptions(options);
       config.load(options.config);
     } else if (!left) {
+      config.parseOptions(options);
       config.load();
     } else {
       config.parseArguments(left, right, options);
     }
 
-    handleResult(config.routes); // TODO Replace with dumpinator diff
+    handleResult(JSON.stringify(config, null, 2)); // TODO Replace with dumpinator diff
   });
 
 program.parse(process.argv);
