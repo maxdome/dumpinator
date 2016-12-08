@@ -30,11 +30,11 @@ process.on('uncaughtException', (err) => {
 });
 
 program.version(pkg.version);
-program.option('-v, --verbose', 'Be more verbose');
+program.option('-v, --verbose', 'be more verbose');
 
 program
   .command('diff [left] [right]')
-  .description('Diff the given routes')
+  .description('Compare the given routes')
   .option('-c, --config [config]', 'Set a custom config')
   .option('-H, --header [header]', 'Add a HTTP header to both sides')
   .option('-L, --header-left [headerLeft]', 'Add a HTTP header to left side')
