@@ -12,7 +12,7 @@ describe('Diff', () => {
   });
 
   describe('compare()', () => {
-    it('checks whether two json object are equal or not (passes)', () => {
+    it('checks whether two json objects are equal or not (passes)', () => {
       const left = { name: 'Andi', coolness: '100%' };
       const right = { name: 'Andi', coolness: '100%' };
 
@@ -22,7 +22,7 @@ describe('Diff', () => {
       inspect(diffResult).isTrue();
     });
 
-    it('checks whether two json object are equal or not (failes)', () => {
+    it('checks whether two json objects are equal or not (fails)', () => {
       const left = { name: 'Andi', coolness: '100%' };
       const right = { name: 'Chrissn', coolness: '100%' };
 
@@ -42,7 +42,7 @@ describe('Diff', () => {
       inspect(diffResult).isTrue();
     });
 
-    it('checks whether two arrays are equal or not (failes)', () => {
+    it('checks whether two arrays are equal or not (fails)', () => {
       const left = ['Beer', 'Coffee'];
       const right = ['Beer', 'Tea'];
 
@@ -62,7 +62,7 @@ describe('Diff', () => {
       inspect(diffResult).isTrue();
     });
 
-    it('checks whether two strings are equal or not (failes)', () => {
+    it('checks whether two strings are equal or not (fails)', () => {
       const left = '{ name: \'Andi\', coolness: \'100%\' }';
       const right = '{ name: \'Chrissn\', coolness: \'100%\' }';
 
@@ -75,7 +75,7 @@ describe('Diff', () => {
 
 
   describe('diff()', () => {
-    it('diffs to json objects', () => {
+    it('diffs two json objects', () => {
       const left = { name: 'Andi', coolness: '100%' };
       const right = { name: 'Chrissn', coolness: '100%' };
 
