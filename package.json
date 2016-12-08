@@ -44,6 +44,8 @@
     "argv": "0.0.2",
     "co": "^4.6.0",
     "commander": "^2.9.0",
+    "diff": "^3.1.0",
+    "json.sortify": "^2.0.2",
     "lodash": "^4.17.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
