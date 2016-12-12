@@ -8,21 +8,12 @@ const Request = require('./request');
 const Stash = require('./stash');
 const Notify = require('./notify');
 
-
-const headers = {
-  accept: 'application/json'
-};
-
 class Dumpinator {
   static run(config) {
-
     const parallelRequests = 2;
     const jobs = [];
     const notify = new Notify();
     const routes = config.getRoutes();
-
-    console.log('Routes', routes);
-
 
     routes.forEach((test) => {
       notify.addTest(test);

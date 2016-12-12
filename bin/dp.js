@@ -5,6 +5,7 @@
 const program = require('commander');
 const pkg = require('../package.json');
 const minimist = require('minimist');
+const cowsay = require('cowsay');
 const Config = require('../src/config');
 
 const Dumpinator = require('../src/dumpinator');
@@ -63,8 +64,12 @@ program
 
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
-    notify.on('finish', () => {
-      handleResult('Dumpinator has done its job!');
+    notify.on('finish', (failures) => {
+      console.log(cowsay.think({ // eslint-disable-line
+        text: 'Fuck yeah, I\'m awesome!',
+        e: 'oO',
+        T: 'U'
+      }));
     });
   });
 

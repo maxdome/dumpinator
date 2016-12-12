@@ -1,6 +1,6 @@
 'use strict';
 
-const cf = require('colorfy')
+const cf = require('colorfy');
 
 class CLIReporter {
   constructor(notify) {
@@ -26,7 +26,7 @@ class CLIReporter {
         msg.red('❌');
       }
 
-      msg.dgrey('Route').grey(test.name || 'Nameless route :(').txt('-');
+      msg.dgrey('Route').grey(`${test.name}`).txt('-');
 
       if (test.state === 'passed') {
         msg.green('passed');
@@ -49,10 +49,8 @@ class CLIReporter {
     });
 
     notify.on('error', (err) => {
-      console.log('Something went wrong :( ', err);
+      cf().red('Something went wrong :(').nl().txt(err.stack || err.message).print();
     });
-
-    console.log('Start reporting:');
   }
 }
 
