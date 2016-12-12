@@ -4,6 +4,8 @@
   "data": [
     { "item": "one" },
     { "item": "two" },
+    { "item": "three" },
   ],
-  "num": 42
+  "num": 42,
+  "version": "2.0.0"
 }
