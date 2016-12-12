@@ -28,6 +28,8 @@ class Notify extends EventEmitter {
     this.session[test.id][test.order].state = status;
     this.emit('test.state', status);
 
+    if (state === 'downloaded')
+
     const allDone = ['left', 'right'].every(order => /passed|failed/.test(this.session[test.id][order].state));
     if (allDone) {
       const allPassed = ['left', 'right'].every(order => /passed/.test(this.session[test.id][order].state));

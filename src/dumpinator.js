@@ -23,7 +23,11 @@ class Dumpinator {
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
         yield stash.add(response);
-        notify.setState(test, 'passed');
+        notify.setState(test, 'downloaded');
+
+        if (notify.getState(test) === 'downloaded') {
+          notify.setState(test, 'passed');
+        }
       }));
     });
 
