@@ -64,7 +64,7 @@ program
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
     notify.on('finish', () => {
-      console.log('DONE!');
+      handleResult('Dumpinator has done its job!');
     });
   });
 
