@@ -9,7 +9,7 @@ class Diff {
       let diffResult;
 
       if (typeof left !== typeof right) {
-        throw new Error('Can not compare tow different source types!');
+        throw new Error('Cannot compare two different source types!');
       }
 
       if (typeof left === 'object') {
@@ -24,7 +24,7 @@ class Diff {
 
   compare(left, right) {
     if (typeof left !== typeof right) {
-      throw new Error('Can not compare tow different source types!');
+      throw new Error('Cannot compare two different source types!');
     }
 
     let leftStr = left;

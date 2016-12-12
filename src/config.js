@@ -67,17 +67,30 @@ function validateRoute(data, i) {
   }
 }
 
-function validateHeaderOptions(args) {
-  if (lodash.has(args, 'H') || lodash.has(args, 'header')) {
-    throw new Error('[header] not implemented yet!');
-  }
+function extendHeaders(self, type, header) {
+  if (header.length) {
+    let keyValue;
+    header.forEach((val) => {
+      val = val.toString();
+      keyValue = val.split(':');
 
-  if (lodash.has(args, 'L') || lodash.has(args, 'header-left')) {
-    throw new Error('[header-left] not implemented yet!');
-  }
+      if (keyValue.length < 2) {
+        throw new Error(`Arguments invalid: [${type}] (${val}) does not contain a ":"!`);
+      }
 
-  if (lodash.has(args, 'R') || lodash.has(args, 'header-right')) {
-    throw new Error('[header-right] not implemented yet!');
+      keyValue[0] = keyValue[0].trim();
+      keyValue[1] = keyValue[1].trim();
+
+      if (lodash.includes(['header', 'header-left'], type)) {
+        self.routes.left[0].header = self.routes.left[0].header || {};
+        self.routes.left[0].header[keyValue[0]] = keyValue[1];
+      }
+
+      if (lodash.includes(['header', 'header-right'], type)) {
+        self.routes.right[0].header = self.routes.right[0].header || {};
+        self.routes.right[0].header[keyValue[0]] = keyValue[1];
+      }
+    });
   }
 }
 
@@ -92,6 +105,19 @@ function extendRoute(side, route) {
   out.name = `${out.method} ${route.name || route.url}`;
   delete out.hostname;
   return out;
+}
+
+function parseRoute(type, url) {
+  const components = url.split(' ');
+  let method = 'GET';
+  if (components.length > 1) {
+    if (!lodash.includes(validMethods, components[0])) {
+      throw new Error(`Arguments invalid: Method "${components[0]}" in [${type}] is invalid!`);
+    }
+    method = components[0];
+    url = components[1];
+  }
+  return { method, url };
 }
 
 class Config {
@@ -137,7 +163,7 @@ class Config {
     const right = lodash.get(defaults, 'right');
 
     lodash.each(input, (val, key) => {
-      if (!lodash.includes(['defaults', 'routes'], key)) {
+      if (!lodash.includes(['options', 'defaults', 'routes'], key)) {
         throw new Error(`Config invalid: Key "${key}" is not allowed!`);
       }
     });
@@ -184,6 +210,43 @@ class Config {
     });
   }
 
+  parseOptions(options) {
+    options = options || {};
+    const rate = lodash.get(options.args, 'r') || lodash.get(options.args, 'rate');
+    const tag = lodash.get(options.args, 't') || lodash.get(options.args, 'tag');
+    const header = lodash.unionWith(
+      lodash.castArray(lodash.get(options.args, 'H', [])),
+      lodash.castArray(lodash.get(options.args, 'header', []))
+    );
+    const headerLeft = lodash.unionWith(
+      lodash.castArray(lodash.get(options.args, 'L', [])),
+      lodash.castArray(lodash.get(options.args, 'header-left', []))
+    );
+    const headerRight = lodash.unionWith(
+      lodash.castArray(lodash.get(options.args, 'R', [])),
+      lodash.castArray(lodash.get(options.args, 'header-right', []))
+    );
+
+    if (!lodash.isUndefined(rate) && (!lodash.isInteger(rate) || rate < 1)) {
+      throw new Error('Arguments invalid: [rate] must be an integer > 0!');
+    }
+
+    if (tag && !(lodash.isString(tag) || lodash.isNumber(tag))) {
+      throw new Error('Arguments invalid: [tag] must be a string or number!');
+    }
+
+    if (tag) {
+      this.options.tag = tag;
+    }
+    if (rate) {
+      this.options.rateLimit = rate;
+    }
+
+    extendHeaders(this, 'header', header);
+    extendHeaders(this, 'header-left', headerLeft);
+    extendHeaders(this, 'header-right', headerRight);
+  }
+
   parseArguments(left, right, options) {
     if (!left) {
       throw new Error('Arguments invalid: [left] missing!');
@@ -192,18 +255,10 @@ class Config {
       throw new Error('Arguments invalid: [right] missing!');
     }
 
-    validateHeaderOptions(options.args);
+    this.routes.left.push(parseRoute('left', left));
+    this.routes.right.push(parseRoute('right', right));
 
-    if (lodash.has(options.args, 'r') || lodash.has(options.args, 'rate')) {
-      throw new Error('[rate] not implemented yet!');
-    }
-
-    if (lodash.has(options.args, 't') || lodash.has(options.args, 'tag')) {
-      throw new Error('[tag] not implemented yet!');
-    }
-
-    this.routes.left.push(left);
-    this.routes.right.push(right);
+    this.parseOptions(options);
   }
 
   getRoutes() {

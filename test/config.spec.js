@@ -4,6 +4,19 @@ const inspect = require('inspect.js');
 const Config = require('../src/config');
 
 describe('Config', () => {
+  let config;
+  const globalHeaders = {
+    'content-type': 'application/json',
+    'accept-language': 'en-US'
+  };
+  const globalQueries = {
+    globalQuery: 123
+  };
+
+  beforeEach(() => {
+    config = new Config();
+  });
+
   describe('load()', () => {
     it('fails if no config was found');
     it('loads a custom config with -c');
@@ -12,19 +25,6 @@ describe('Config', () => {
   });
 
   describe('parseJSON()', () => {
-    let config;
-    const globalHeaders = {
-      'content-type': 'application/json',
-      'accept-language': 'en-US'
-    };
-    const globalQueries = {
-      globalQuery: 123
-    };
-
-    beforeEach(() => {
-      config = new Config();
-    });
-
     it('fails if properties are invalid', () => {
       const fn = () => config.parseJSON({ foo: {} });
       inspect(fn).doesThrow('Config invalid: Key "foo" is not allowed!');
@@ -179,10 +179,147 @@ describe('Config', () => {
   });
 
   describe('parseArguments()', () => {
-    it('fails if left & right are missing');
-    it('fails if header is invalid');
-    it('fails if rate is invalid');
-    it('fails if tag is invalid');
+    it('fails if right side is missing', () => {
+      const fn = () => config.parseArguments('http://a.b/left');
+      inspect(fn).doesThrow('Arguments invalid: [right] missing!');
+    });
+
+    it('fails if header is invalid', () => {
+      const fn = () => config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { header: 'foo' } });
+      inspect(fn).doesThrow('Arguments invalid: [header] (foo) does not contain a ":"!');
+    });
+    it('fails if rate is no integer', () => {
+      const fn = () => config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { rate: 'bar' } });
+      inspect(fn).doesThrow('Arguments invalid: [rate] must be an integer > 0!');
+    });
+    it('fails if rate is too small', () => {
+      const fn = () => config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { rate: 0 } });
+      inspect(fn).doesThrow('Arguments invalid: [rate] must be an integer > 0!');
+    });
+    it('fails if tag is invalid', () => {
+      const fn = () => config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { tag: {} } });
+      inspect(fn).doesThrow('Arguments invalid: [tag] must be a string or number!');
+    });
+    it('accepts valid "simple" routes', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left' }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right' }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right');
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts valid "extended" routes', () => {
+      const expectedResult = {
+        left: [
+          { method: 'POST', url: 'http://a.b/left' }
+        ],
+        right: [
+          { method: 'DELETE', url: 'http://a.b/right' }
+        ]
+      };
+      config.parseArguments('POST http://a.b/left', 'DELETE http://a.b/right');
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts a single header', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' } }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' } }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: 'foo:bar' } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts multiple headers', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' } }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' } }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: ['foo:bar', 'baz:bez'] } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts a single header-left', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' } }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right' }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { L: 'foo:bar' } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts multiple header-left', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' } }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right' }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { L: ['foo:bar', 'baz:bez'] } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts a single header-right', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left' }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' } }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: 'foo:bar' } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts multiple header-right', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left' }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' } }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: ['foo:bar', 'baz:bez'] } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts multiple types of headers', () => {
+      const expectedResult = {
+        left: [
+          { method: 'GET', url: 'http://a.b/left', header: { H: 'val1', header1: 'val2', header2: 'val3', L1: 'val4', L2: 'val5', left: 'val6' } }
+        ],
+        right: [
+          { method: 'GET', url: 'http://a.b/right', header: { H: 'val1', header1: 'val2', header2: 'val3', R1: 'val7', R2: 'val8', right: 'val9' } }
+        ]
+      };
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: 'H:val1', header: ['header1:val2', 'header2:val3'], L: ['L1:val4', 'L2:val5'], 'header-left': 'left:val6', R: ['R1:val7', 'R2:val8'], 'header-right': 'right:val9' } });
+      inspect(config.routes).isEql(expectedResult);
+    });
+    it('accepts a tag of type string', () => {
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { tag: 'foo' } });
+      inspect(config.options).isEql({ tag: 'foo' });
+    });
+    it('accepts a tag of type integer', () => {
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { tag: 123 } });
+      inspect(config.options).isEql({ tag: 123 });
+    });
+    it('accepts a valid rate', () => {
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { rate: 1 } });
+      inspect(config.options).isEql({ rateLimit: 1 });
+    });
   });
 
   describe('getRoutes()', () => {
