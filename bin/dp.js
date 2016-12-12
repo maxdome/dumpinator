@@ -6,6 +6,7 @@ const program = require('commander');
 const pkg = require('../package.json');
 const minimist = require('minimist');
 const Config = require('../src/config');
+const Dumpinator = require('../src/dumpinator');
 
 function msg() {
   console.log.apply(null, arguments); // eslint-disable-line no-console,prefer-rest-params
@@ -57,7 +58,8 @@ program
       config.parseArguments(left, right, options);
     }
 
-    handleResult(config.routes); // TODO Replace with dumpinator diff
+    const notify = Dumpinator.run(config.routes);
+    Dumpinator.report(notify);
   });
 
 program.parse(process.argv);

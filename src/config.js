@@ -205,6 +205,33 @@ class Config {
     this.routes.left.push(left);
     this.routes.right.push(right);
   }
+
+  getRoutes() {
+    const routes = [];
+
+    for (let i = 0; i < this.routes.left.length; i += 1) {
+      routes.push({
+        url: this.routes.left[i].url,
+        id: this.routes.left[i].id,
+        order: 'left'
+      }, {
+        url: this.routes.right[i].url,
+        id: this.routes.right[i].id,
+        order: 'right'
+      });
+    }
+
+    return routes;
+  }
+
+  addRoute(left, right) {
+    this.parseJSON({
+      routes: [{
+        left,
+        right
+      }]
+    });
+  }
 }
 
 module.exports = Config;

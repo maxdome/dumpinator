@@ -2,37 +2,43 @@
 
 'use strict';
 
-
 const path = require('path');
 const co = require('co');
 const Request = require('./request');
 const Stash = require('./stash');
+const Notify = require('./notify');
+
 
 const headers = {
   accept: 'application/json'
 };
 
 class Dumpinator {
-  static run() {
-    const tests = [
-      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-left' },
-      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-right' }
-    ];
+  static run(config) {
+    console.log(config);
 
     const parallelRequests = 2;
     const jobs = [];
+    const notify = new Notify();
+    const routes = config.getRoutes();
 
-    tests.forEach((test) => {
+    routes.forEach((test) => {
+      notify.addTest(test);
       jobs.push(co(function* task() {
         const request = new Request();
         const response = yield request.load(test);
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
         yield stash.add(response);
+        notify.testLoaded(test, 'success');
       }));
     });
 
-    return this.parallelize(jobs, parallelRequests);
+    this.parallelize(jobs, parallelRequests).then((res) => {
+      console.log('Collect requests done!');
+    });
+
+    return notify;
   }
 
   /**
@@ -67,6 +73,11 @@ class Dumpinator {
     }
 
     return Promise.all(slots).then(() => results);
+  }
+
+  static report(notify) {
+    const Reporter = require('./reporter/cli'); // eslint-disable-line
+    return new Reporter(notify);
   }
 }
 
