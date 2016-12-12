@@ -3,12 +3,37 @@
 const EventEmitter = require('events');
 
 class Notify extends EventEmitter {
-  addTest(test) {
-    this.emit('test.add', test);
+  constructor() {
+    super();
+
+    this.session = {};
   }
 
-  testLoaded(test, status) {
-    this.emit('test.status', status);
+  addTest(test) {
+    if (!this.session[test.id]) {
+      this.session[test.id] = {
+        state: 'pending',
+        name: test.name
+      };
+
+      this.emit('test.add', this.session[test.id]);
+    }
+
+    this.session[test.id][test.order] = {
+      state: 'pending'
+    };
+  }
+
+  setState(test, status) {
+    this.session[test.id][test.order].state = status;
+    this.emit('test.state', status);
+
+    const allDone = ['left', 'right'].every(order => /passed|failed/.test(this.session[test.id][order].state));
+    if (allDone) {
+      const allPassed = ['left', 'right'].every(order => /passed/.test(this.session[test.id][order].state));
+      this.session[test.id].state = allPassed ? 'passed' : 'failed';
+      this.emit('test.finish', this.session[test.id]);
+    }
   }
 }
 

@@ -3,18 +3,18 @@
 module.exports = {
   defaults: {
     left: {
-      hostname: 'http://a.b/'
+      hostname: 'https://github.com'
     },
     right: {
-      hostname: 'http://x.y/'
+      hostname: 'https://github.com'
     }
   },
   routes: [
     {
-      url: '/jsconfig1'
+      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
     },
     {
-      url: '/jsconfig2'
+      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
     }
   ]
 };

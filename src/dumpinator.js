@@ -15,12 +15,14 @@ const headers = {
 
 class Dumpinator {
   static run(config) {
-    console.log(config);
 
     const parallelRequests = 2;
     const jobs = [];
     const notify = new Notify();
     const routes = config.getRoutes();
+
+    console.log('Routes', routes);
+
 
     routes.forEach((test) => {
       notify.addTest(test);
@@ -30,12 +32,15 @@ class Dumpinator {
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
         yield stash.add(response);
-        notify.testLoaded(test, 'success');
+        notify.setState(test, 'passed');
       }));
     });
 
     this.parallelize(jobs, parallelRequests).then((res) => {
-      console.log('Collect requests done!');
+      notify.emit('finish');
+    }).catch((err) => {
+      notify.emit('error', err);
+      throw err;
     });
 
     return notify;

@@ -213,11 +213,13 @@ class Config {
       routes.push({
         url: this.routes.left[i].url,
         id: this.routes.left[i].id,
-        order: 'left'
+        order: 'left',
+        name: this.routes.left[i].name
       }, {
         url: this.routes.right[i].url,
         id: this.routes.right[i].id,
-        order: 'right'
+        order: 'right',
+        name: this.routes.right[i].name
       });
     }
 

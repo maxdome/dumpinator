@@ -58,8 +58,11 @@ program
       config.parseArguments(left, right, options);
     }
 
-    const notify = Dumpinator.run(config.routes);
+    const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
+    notify.on('finish', () => {
+      console.log('DONE!');
+    });
   });
 
 program.parse(process.argv);

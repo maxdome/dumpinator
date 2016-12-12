@@ -2,6 +2,7 @@
 
 const inspect = require('inspect.js');
 const sinon = require('sinon');
+const EventEmitter = require('events');
 
 inspect.useSinon(sinon);
 
@@ -53,13 +54,13 @@ describe('Dumpinator', () => {
 
       const parallelizeStub = sinon.spy(Dumpinator, 'parallelize');
 
-      const result = Dumpinator.run();
-      inspect(result).isPromise();
+      const result = Dumpinator.run(config);
+      inspect(result).isInstanceOf(EventEmitter);
 
-      return result.then((res) => {
+      // return result.then((res) => {
         inspect(parallelizeStub).wasCalledOnce();
-        inspect(res).isEql([]);
-      });
+        // inspect(res).isEql([]);
+      // });
     });
   });
 });
