@@ -337,34 +337,38 @@ describe('Config', () => {
     };
 
     it('Returns all routes', () => {
-      const config = new Config();
-      config.routes = routesConfig;
+      const testConfig = new Config();
+      testConfig.routes = routesConfig;
 
-      const allRoutes = config.getRoutes();
+      const allRoutes = testConfig.getRoutes();
       inspect(allRoutes).isArray().hasLength(6);
 
       inspect(allRoutes[0]).isEql({
         id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
         url: 'https://my.api.com/v1/pages',
-        order: 'left'
+        order: 'left',
+        name: 'GET pages'
       });
 
       inspect(allRoutes[1]).isEql({
         id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
         url: 'http://localhost/v1/pages',
-        order: 'right'
+        order: 'right',
+        name: 'GET pages'
       });
 
       inspect(allRoutes[4]).isEql({
         id: '894f1ac8202fa67e02135a415f391801',
         url: 'https://my.api.com/v1/components',
-        order: 'left'
+        order: 'left',
+        name: 'GET components'
       });
 
       inspect(allRoutes[5]).isEql({
         id: '894f1ac8202fa67e02135a415f391801',
         url: 'http://localhost/v1/components',
-        order: 'right'
+        order: 'right',
+        name: 'GET components'
       });
     });
   });

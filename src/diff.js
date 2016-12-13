@@ -31,8 +31,8 @@ class Diff {
     let rightStr = right;
 
     if (typeof left === 'object') {
-      leftStr = sortify(left.body);
-      rightStr = sortify(right.body);
+      leftStr = sortify(left);
+      rightStr = sortify(right);
     }
 
     return leftStr === rightStr;
