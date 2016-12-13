@@ -73,6 +73,27 @@ class Notify extends EventEmitter {
     this.session[test.id].state = 'failed';
     this.emit('test.finish', this.session[test.id]);
   }
+
+  finish(state) {
+    this.emit('finish', this.getSuitState());
+  }
+
+  error(err) {
+    this.emit('error', err);
+  }
+
+  getSuitState() {
+    /* eslint no-restricted-syntax: [0, 'ForInStatement'] */
+    for (const key in this.session) {
+      if (this.session.hasOwnProperty(key)) { // eslint-disable-line
+        if (this.session[key].state !== 'passed') {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 module.exports = Notify;

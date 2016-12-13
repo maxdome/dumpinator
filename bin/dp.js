@@ -24,11 +24,21 @@ function handleResult(text, code) {
   process.exit(code);
 }
 
+function generalErrorHandler(err) {
+  console.log(cowsay.think({ // eslint-disable-line
+    text: 'Shit, something went wrong!',
+    e: 'oO',
+    T: '',
+    f: 'head-in'
+  }));
+
+  console.log(''); // eslint-disable-line
+  console.log(program.verbose ? err.message : err.stack || err.message); // eslint-disable-line
+  console.log(''); // eslint-disable-line
+}
+
 process.on('uncaughtException', (err) => {
-  msg(err.message);
-  if (program.verbose) {
-    msg(err.stack);
-  }
+  generalErrorHandler(err);
   process.exit(1);
 });
 
@@ -64,25 +74,18 @@ program
 
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
-    notify.on('finish', (failures) => {
+    notify.on('finish', (allPassed) => {
       console.log(cowsay.think({ // eslint-disable-line
-        text: 'Fuck yeah, I\'m awesome!',
+        text: allPassed ? 'Fuck yeah, I\'m awesome!' : 'Dude, you did a fucking mistake!',
         e: 'oO',
         T: 'U'
       }));
+
+      console.log(''); // eslint-disable-line
     });
 
     notify.on('error', (err) => {
-      console.log(cowsay.think({ // eslint-disable-line
-        text: 'Shit, something went wrong!',
-        e: 'oO',
-        T: '',
-        f: 'head-in'
-      }));
-
-      console.log(''); // eslint-disable-line
-      console.log(err.stack || err.message); // eslint-disable-line
-      console.log(''); // eslint-disable-line
+      generalErrorHandler(err);
     });
   });
 

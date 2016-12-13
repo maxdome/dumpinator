@@ -50,9 +50,9 @@ class Dumpinator {
     });
 
     this.parallelize(jobs, parallelRequests).then((res) => {
-      notify.emit('finish');
+      notify.finish();
     }).catch((err) => {
-      notify.emit('error', err);
+      notify.error(err);
       throw err;
     });
 
