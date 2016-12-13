@@ -71,6 +71,19 @@ program
         T: 'U'
       }));
     });
+
+    notify.on('error', (err) => {
+      console.log(cowsay.think({ // eslint-disable-line
+        text: 'Shit, something went wrong!',
+        e: 'oO',
+        T: '',
+        f: 'head-in'
+      }));
+
+      console.log(''); // eslint-disable-line
+      console.log(err.stack || err.message); // eslint-disable-line
+      console.log(''); // eslint-disable-line
+    });
   });
 
 program.parse(process.argv);

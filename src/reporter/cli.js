@@ -56,14 +56,6 @@ class CLIReporter {
         .grey(['test failed', 'tests failed', this.counter.failed])
         .print(this.colorsEnabled);
     });
-
-    notify.on('error', (err) => {
-      cf()
-        .red('Something went wrong :(')
-        .nl()
-        .txt(err.stack || err.message)
-        .print();
-    });
   }
 }
 
