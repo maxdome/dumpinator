@@ -12,33 +12,8 @@ module.exports = {
   routes: [
     {
       url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v3/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
-    },
-    {
-      url: '/v1/test.json'
+    }, {
+      url: '/v2/test.json'
     }
   ]
 };
