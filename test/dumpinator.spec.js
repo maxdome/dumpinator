@@ -56,11 +56,7 @@ describe('Dumpinator', () => {
 
       const result = Dumpinator.run(config);
       inspect(result).isInstanceOf(EventEmitter);
-
-      // return result.then((res) => {
-        inspect(parallelizeStub).wasCalledOnce();
-        // inspect(res).isEql([]);
-      // });
+      inspect(parallelizeStub).wasCalledOnce();
     });
   });
 });
