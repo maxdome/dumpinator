@@ -8,7 +8,7 @@ inspect.useSinon(sinon);
 
 describe('Request', () => {
   describe('load()', () => {
-    it('returns a correct output', function () {
+    it.skip('returns a correct output', function () {
       this.timeout(5000);
       const req = new Request();
       const options = {
