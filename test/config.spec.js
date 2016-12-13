@@ -321,4 +321,55 @@ describe('Config', () => {
       inspect(config.options).isEql({ rateLimit: 1 });
     });
   });
+
+  describe('getRoutes()', () => {
+    const routesConfig = {
+      left: [
+        { id: 'd6d13704ca7ddfdb095505bc6e1cec6d', method: 'GET', url: 'https://my.api.com/v1/pages', name: 'GET pages' },
+        { id: 'bf86b8e4d608bf45f86eeeaf2e5be950', method: 'GET', url: 'https://my.api.com/v1/assets', name: 'GET assets' },
+        { id: '894f1ac8202fa67e02135a415f391801', method: 'GET', url: 'https://my.api.com/v1/components', name: 'GET components' }
+      ],
+      right: [
+        { id: 'd6d13704ca7ddfdb095505bc6e1cec6d', method: 'GET', url: 'http://localhost/v1/pages', name: 'GET pages' },
+        { id: 'bf86b8e4d608bf45f86eeeaf2e5be950', method: 'GET', url: 'http://localhost/v1/assets', name: 'GET assets' },
+        { id: '894f1ac8202fa67e02135a415f391801', method: 'GET', url: 'http://localhost/v1/components', name: 'GET components' }
+      ]
+    };
+
+    it('Returns all routes', () => {
+      const testConfig = new Config();
+      testConfig.routes = routesConfig;
+
+      const allRoutes = testConfig.getRoutes();
+      inspect(allRoutes).isArray().hasLength(6);
+
+      inspect(allRoutes[0]).hasProps({
+        id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
+        url: 'https://my.api.com/v1/pages',
+        side: 'left',
+        name: 'GET pages'
+      });
+
+      inspect(allRoutes[1]).hasProps({
+        id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
+        url: 'http://localhost/v1/pages',
+        side: 'right',
+        name: 'GET pages'
+      });
+
+      inspect(allRoutes[4]).hasProps({
+        id: '894f1ac8202fa67e02135a415f391801',
+        url: 'https://my.api.com/v1/components',
+        side: 'left',
+        name: 'GET components'
+      });
+
+      inspect(allRoutes[5]).hasProps({
+        id: '894f1ac8202fa67e02135a415f391801',
+        url: 'http://localhost/v1/components',
+        side: 'right',
+        name: 'GET components'
+      });
+    });
+  });
 });

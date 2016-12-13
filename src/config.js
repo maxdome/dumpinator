@@ -260,6 +260,39 @@ class Config {
 
     this.parseOptions(options);
   }
+
+  getRoutes() {
+    const routes = [];
+
+    for (let i = 0; i < this.routes.left.length; i += 1) {
+      routes.push({
+        url: this.routes.left[i].url,
+        id: this.routes.left[i].id,
+        side: 'left',
+        name: this.routes.left[i].name,
+        header: this.routes.left[i].header,
+        query: this.routes.left[i].query
+      }, {
+        url: this.routes.right[i].url,
+        id: this.routes.right[i].id,
+        side: 'right',
+        name: this.routes.right[i].name,
+        header: this.routes.right[i].header,
+        query: this.routes.right[i].query
+      });
+    }
+
+    return routes;
+  }
+
+  addRoute(left, right) {
+    this.parseJSON({
+      routes: [{
+        left,
+        right
+      }]
+    });
+  }
 }
 
 module.exports = Config;

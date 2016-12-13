@@ -4,7 +4,7 @@
   "data": [
     { "item": "one" },
     { "item": "two" },
-    { "item": "three" },
+    { "item": "three" }
   ],
   "num": 42,
   "version": "2.0.0"

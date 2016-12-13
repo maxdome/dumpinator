@@ -5,7 +5,10 @@
 const program = require('commander');
 const pkg = require('../package.json');
 const minimist = require('minimist');
+const cowsay = require('cowsay');
 const Config = require('../src/config');
+
+const Dumpinator = require('../src/dumpinator');
 
 function msg() {
   console.log.apply(null, arguments); // eslint-disable-line no-console,prefer-rest-params
@@ -21,11 +24,21 @@ function handleResult(text, code) {
   process.exit(code);
 }
 
+function generalErrorHandler(err) {
+  console.log(cowsay.think({ // eslint-disable-line
+    text: 'Shit, something went wrong!',
+    e: 'oO',
+    T: '',
+    f: 'head-in'
+  }));
+
+  console.log(''); // eslint-disable-line
+  console.log(program.verbose ? err.message : err.stack || err.message); // eslint-disable-line
+  console.log(''); // eslint-disable-line
+}
+
 process.on('uncaughtException', (err) => {
-  msg(err.message);
-  if (program.verbose) {
-    msg(err.stack);
-  }
+  generalErrorHandler(err);
   process.exit(1);
 });
 
@@ -59,7 +72,21 @@ program
       config.parseArguments(left, right, options);
     }
 
-    handleResult(JSON.stringify(config, null, 2)); // TODO Replace with dumpinator diff
+    const notify = Dumpinator.run(config);
+    Dumpinator.report(notify);
+    notify.on('finish', (allPassed) => {
+      console.log(cowsay.think({ // eslint-disable-line
+        text: allPassed ? 'Fuck yeah, I\'m awesome!' : 'Dude, you did a fucking mistake!',
+        e: 'oO',
+        T: 'U'
+      }));
+
+      console.log(''); // eslint-disable-line
+    });
+
+    notify.on('error', (err) => {
+      generalErrorHandler(err);
+    });
   });
 
 program.parse(process.argv);

@@ -3,18 +3,17 @@
 module.exports = {
   defaults: {
     left: {
-      hostname: 'http://a.b/'
+      hostname: 'http://localhost:3333'
     },
     right: {
-      hostname: 'http://x.y/'
+      hostname: 'http://localhost:3333'
     }
   },
   routes: [
     {
-      url: '/jsconfig1'
-    },
-    {
-      url: '/jsconfig2'
+      url: '/v1/test.json'
+    }, {
+      url: '/v2/test.json'
     }
   ]
 };

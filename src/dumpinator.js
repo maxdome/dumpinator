@@ -2,37 +2,61 @@
 
 'use strict';
 
-
 const path = require('path');
 const co = require('co');
 const Request = require('./request');
 const Stash = require('./stash');
-
-const headers = {
-  accept: 'application/json'
-};
+const Notify = require('./notify');
+const Diff = require('./diff');
 
 class Dumpinator {
-  static run() {
-    const tests = [
-      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-left' },
-      { url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', headers, id: 'assets-right' }
-    ];
-
+  static run(config) {
     const parallelRequests = 2;
     const jobs = [];
+    const notify = new Notify();
+    const routes = config.getRoutes();
 
-    tests.forEach((test) => {
+    routes.forEach((test) => {
+      notify.addTest(test);
       jobs.push(co(function* task() {
         const request = new Request();
-        const response = yield request.load(test);
+        let response;
+        try {
+          response = yield request.load(test);
+        } catch (err) {
+          if (err.status === 404) {
+            notify.setState(test, 'download-failed', 'Not found');
+            return;
+          }
 
-        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
+          throw err;
+        }
+
+        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
         yield stash.add(response);
+        notify.setState(test, 'downloaded');
+
+        if (notify.getState(test) === 'downloaded') {
+          const testResult = yield Dumpinator.compare(test);
+          if (testResult) {
+            notify.setTestPassed(test);
+          } else {
+            notify.setTestFailed(test);
+          }
+        } else if (notify.getState(test) === 'download-failed') {
+          notify.setTestFailed(test);
+        }
       }));
     });
 
-    return this.parallelize(jobs, parallelRequests);
+    this.parallelize(jobs, parallelRequests).then((res) => {
+      notify.finish();
+    }).catch((err) => {
+      notify.error(err);
+      throw err;
+    });
+
+    return notify;
   }
 
   /**
@@ -67,6 +91,21 @@ class Dumpinator {
     }
 
     return Promise.all(slots).then(() => results);
+  }
+
+  static report(notify) {
+    const Reporter = require('./reporter/cli'); // eslint-disable-line
+    return new Reporter(notify);
+  }
+
+  static compare(test) {
+    return Promise.all(['left', 'right'].map((side) => {
+      const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${side}.json`));
+      return stash.fetch();
+    })).then((res) => {
+      const diff = new Diff();
+      return diff.compare(res[0].body, res[1].body);
+    });
   }
 }
 
