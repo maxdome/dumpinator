@@ -75,14 +75,14 @@ class Notify extends EventEmitter {
   }
 
   finish(state) {
-    this.emit('finish', this.getSuitState());
+    this.emit('finish', this.getSuiteState());
   }
 
   error(err) {
     this.emit('error', err);
   }
 
-  getSuitState() {
+  getSuiteState() {
     /* eslint no-restricted-syntax: [0, 'ForInStatement'] */
     for (const key in this.session) {
       if (this.session.hasOwnProperty(key)) { // eslint-disable-line
