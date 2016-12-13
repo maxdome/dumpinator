@@ -37,7 +37,7 @@ class Request {
         }
         return resolve({
           headers: res.headers,
-          body: res.body
+          body: /^application.+json/.test(res.type) ? res.body : JSON.stringify(res.text)
         });
       });
     });

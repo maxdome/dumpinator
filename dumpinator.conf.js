@@ -3,42 +3,42 @@
 module.exports = {
   defaults: {
     left: {
-      hostname: 'https://github.com'
+      hostname: 'http://localhost:3333'
     },
     right: {
-      hostname: 'https://github.com'
+      hostname: 'http://localhost:3333'
     }
   },
   routes: [
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v3/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     },
     {
-      url: '/maxdome/dumpinator/blame/develop/test/fixtures/v1/test.json'
+      url: '/v1/test.json'
     }
   ]
 };

@@ -7,6 +7,7 @@ const co = require('co');
 const Request = require('./request');
 const Stash = require('./stash');
 const Notify = require('./notify');
+const Diff = require('./diff');
 
 class Dumpinator {
   static run(config) {
@@ -19,14 +20,31 @@ class Dumpinator {
       notify.addTest(test);
       jobs.push(co(function* task() {
         const request = new Request();
-        const response = yield request.load(test);
+        let response;
+        try {
+          response = yield request.load(test);
+        } catch (err) {
+          if (err.status === 404) {
+            notify.setState(test, 'download-failed');
+            return;
+          }
 
-        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}.json`));
+          throw err;
+        }
+
+        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.order}.json`));
         yield stash.add(response);
         notify.setState(test, 'downloaded');
 
         if (notify.getState(test) === 'downloaded') {
-          notify.setState(test, 'passed');
+          const testResult = yield Dumpinator.compare(test);
+          if (testResult) {
+            notify.setTestPassed(test);
+          } else {
+            notify.setTestFailed(test);
+          }
+        } else if (notify.getState(test) === 'download-failed') {
+          notify.setTestFailed(test);
         }
       }));
     });
@@ -78,6 +96,16 @@ class Dumpinator {
   static report(notify) {
     const Reporter = require('./reporter/cli'); // eslint-disable-line
     return new Reporter(notify);
+  }
+
+  static compare(test) {
+    return Promise.all(['left', 'right'].map((order) => {
+      const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${order}.json`));
+      return stash.fetch();
+    })).then((res) => {
+      const diff = new Diff();
+      return diff.compare(res[0], res[1]);
+    });
   }
 }
 
