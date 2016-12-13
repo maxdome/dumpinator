@@ -343,28 +343,28 @@ describe('Config', () => {
       const allRoutes = testConfig.getRoutes();
       inspect(allRoutes).isArray().hasLength(6);
 
-      inspect(allRoutes[0]).isEql({
+      inspect(allRoutes[0]).hasProps({
         id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
         url: 'https://my.api.com/v1/pages',
         order: 'left',
         name: 'GET pages'
       });
 
-      inspect(allRoutes[1]).isEql({
+      inspect(allRoutes[1]).hasProps({
         id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
         url: 'http://localhost/v1/pages',
         order: 'right',
         name: 'GET pages'
       });
 
-      inspect(allRoutes[4]).isEql({
+      inspect(allRoutes[4]).hasProps({
         id: '894f1ac8202fa67e02135a415f391801',
         url: 'https://my.api.com/v1/components',
         order: 'left',
         name: 'GET components'
       });
 
-      inspect(allRoutes[5]).isEql({
+      inspect(allRoutes[5]).hasProps({
         id: '894f1ac8202fa67e02135a415f391801',
         url: 'http://localhost/v1/components',
         order: 'right',

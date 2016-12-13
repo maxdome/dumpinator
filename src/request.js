@@ -27,7 +27,7 @@ class Request {
         this.req.send(options.body);
       }
 
-      lodash.each(options.headers, (val, key) => {
+      lodash.each(options.header, (val, key) => {
         this.req.set(key, val);
       });
 
@@ -36,7 +36,7 @@ class Request {
           return reject(err);
         }
         return resolve({
-          headers: res.headers,
+          headers: res.header,
           body: /^application.+json/.test(res.type) ? res.body : JSON.stringify(res.text)
         });
       });
