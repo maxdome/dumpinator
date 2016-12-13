@@ -32,7 +32,7 @@ class Dumpinator {
           throw err;
         }
 
-        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.order}.json`));
+        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
         yield stash.add(response);
         notify.setState(test, 'downloaded');
 
@@ -99,8 +99,8 @@ class Dumpinator {
   }
 
   static compare(test) {
-    return Promise.all(['left', 'right'].map((order) => {
-      const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${order}.json`));
+    return Promise.all(['left', 'right'].map((side) => {
+      const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${side}.json`));
       return stash.fetch();
     })).then((res) => {
       const diff = new Diff();

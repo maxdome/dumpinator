@@ -20,30 +20,30 @@ class Notify extends EventEmitter {
       this.emit('test.add', this.session[test.id]);
     }
 
-    this.session[test.id][test.order] = {
+    this.session[test.id][test.side] = {
       state: 'pending'
     };
   }
 
   setState(test, status, reason) {
-    this.session[test.id][test.order].state = status;
+    this.session[test.id][test.side].state = status;
     if (reason) {
-      this.session[test.id][test.order].reason = reason;
+      this.session[test.id][test.side].reason = reason;
     }
 
     this.emit('test.state', status);
 
     if (status === 'downloaded') {
-      const allDone = ['left', 'right'].every(order => /^downloaded$|^download-failed$/.test(this.session[test.id][order].state));
+      const allDone = ['left', 'right'].every(side => /^downloaded$|^download-failed$/.test(this.session[test.id][side].state));
       if (allDone) {
-        const allPassed = ['left', 'right'].every(order => /downloaded/.test(this.session[test.id][order].state));
+        const allPassed = ['left', 'right'].every(side => /downloaded/.test(this.session[test.id][side].state));
         this.session[test.id].state = allPassed ? 'downloaded' : 'download-failed';
         this.emit('test.downloaded', this.session[test.id]);
       }
     } else {
-      const allDone = ['left', 'right'].every(order => /^passed$|failed/.test(this.session[test.id][order].state));
+      const allDone = ['left', 'right'].every(side => /^passed$|failed/.test(this.session[test.id][side].state));
       if (allDone) {
-        const allPassed = ['left', 'right'].every(order => /passed/.test(this.session[test.id][order].state));
+        const allPassed = ['left', 'right'].every(side => /passed/.test(this.session[test.id][side].state));
         this.session[test.id].state = allPassed ? 'passed' : 'failed';
         this.emit('test.finish', this.session[test.id]);
       }
@@ -55,8 +55,8 @@ class Notify extends EventEmitter {
   }
 
   setTestPassed(test) {
-    ['left', 'right'].forEach((order) => {
-      this.session[test.id][order].state = 'passed';
+    ['left', 'right'].forEach((side) => {
+      this.session[test.id][side].state = 'passed';
     });
 
     this.session[test.id].state = 'passed';
@@ -64,9 +64,9 @@ class Notify extends EventEmitter {
   }
 
   setTestFailed(test) {
-    // ['left', 'right'].forEach((order) => {
-    //   if (this.session[test.id][order].state.indexOf('failed') === -1) {
-    //     this.session[test.id][order].state = 'failed';
+    // ['left', 'right'].forEach((side) => {
+    //   if (this.session[test.id][side].state.indexOf('failed') === -1) {
+    //     this.session[test.id][side].state = 'failed';
     //   }
     // });
 
