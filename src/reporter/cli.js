@@ -33,13 +33,14 @@ class CLIReporter {
       } else {
         msg.red('failed');
 
-        if (test.left.state.indexOf('failed') !== -1) {
-          msg.nl().txt('  ').grey('- left failed with: ').red(test.left.state);
-        }
-
-        if (test.right.state.indexOf('failed') !== -1) {
-          msg.nl().txt('  ').grey('- right failed with: ').red(test.right.state);
-        }
+        ['left', 'right'].forEach((order) => {
+          if (test[order].state.indexOf('failed') !== -1) {
+            msg.nl().txt('  ').grey(`- ${order} failed with:`).red(test[order].state);
+            if (test[order].reason) {
+              msg.txt(`(${test[order].reason})`);
+            }
+          }
+        });
       }
 
       msg.print(this.colorsEnabled);

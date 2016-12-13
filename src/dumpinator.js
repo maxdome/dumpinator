@@ -25,7 +25,7 @@ class Dumpinator {
           response = yield request.load(test);
         } catch (err) {
           if (err.status === 404) {
-            notify.setState(test, 'download-failed');
+            notify.setState(test, 'download-failed', 'Not found');
             return;
           }
 

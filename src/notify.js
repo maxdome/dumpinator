@@ -25,8 +25,12 @@ class Notify extends EventEmitter {
     };
   }
 
-  setState(test, status) {
+  setState(test, status, reason) {
     this.session[test.id][test.order].state = status;
+    if (reason) {
+      this.session[test.id][test.order].reason = reason;
+    }
+
     this.emit('test.state', status);
 
     if (status === 'downloaded') {
