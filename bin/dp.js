@@ -76,7 +76,7 @@ program
     Dumpinator.report(notify);
     notify.on('finish', (allPassed) => {
       console.log(cowsay.think({ // eslint-disable-line no-console
-        text: allPassed ? 'Fuck yeah, I\'m awesome!' : 'Dude, you did a fucking mistake!',
+        text: allPassed ? 'Hell yeah, I\'m awesome!' : 'Geez, I fucked it up!',
         e: 'oO',
         T: 'U'
       }));
