@@ -85,7 +85,7 @@ class Notify extends EventEmitter {
   getSuiteState() {
     /* eslint no-restricted-syntax: [0, 'ForInStatement'] */
     for (const key in this.session) {
-      if (this.session.hasOwnProperty(key)) { // eslint-disable-line
+      if (this.session.hasOwnProperty(key)) { // eslint-disable-line no-prototype-builtins
         if (this.session[key].state !== 'passed') {
           return false;
         }

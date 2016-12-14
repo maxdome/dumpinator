@@ -94,7 +94,7 @@ class Dumpinator {
   }
 
   static report(notify) {
-    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line
+    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
     return new Reporter(notify);
   }
 
