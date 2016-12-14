@@ -5,8 +5,8 @@
 const program = require('commander');
 const pkg = require('../package.json');
 const minimist = require('minimist');
-const cowsay = require('cowsay');
 const Config = require('../src/config');
+const CLIUtils = require('../src/utils/cli-utils');
 
 const Dumpinator = require('../src/dumpinator');
 
@@ -24,21 +24,9 @@ function handleResult(text, code) {
   process.exit(code);
 }
 
-function generalErrorHandler(err) {
-  console.log(cowsay.think({ // eslint-disable-line no-console
-    text: 'Shit, something went wrong!',
-    e: 'oO',
-    T: '',
-    f: 'head-in'
-  }));
-
-  console.log(''); // eslint-disable-line no-console
-  console.log(program.verbose ? err.message : err.stack || err.message); // eslint-disable-line no-console
-  console.log(''); // eslint-disable-line no-console
-}
 
 process.on('uncaughtException', (err) => {
-  generalErrorHandler(err);
+  CLIUtils.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
   process.exit(1);
 });
 
@@ -75,17 +63,11 @@ program
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
     notify.on('finish', (allPassed) => {
-      console.log(cowsay.think({ // eslint-disable-line no-console
-        text: allPassed ? 'Hell yeah, I\'m awesome!' : 'Geez, I fucked it up!',
-        e: 'oO',
-        T: 'U'
-      }));
-
-      console.log(''); // eslint-disable-line no-console
+      CLIUtils.generalSuccessHandler(allPassed ? 'Hell yeah, I\'m awesome!' : 'Geez, I fucked it up!');
     });
 
     notify.on('error', (err) => {
-      generalErrorHandler(err);
+      CLIUtils.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
     });
   });
 
