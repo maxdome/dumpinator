@@ -107,6 +107,19 @@ class Dumpinator {
       return diff.compare(res[0].body, res[1].body);
     });
   }
+
+  static diff(testId) {
+    return co(function* dumpinatorDiff() {
+      const leftStash = new Stash(path.join(__dirname, '../test/fixtures/v1/test.json'));
+      const left = yield leftStash.fetch();
+
+      const rightStash = new Stash(path.join(__dirname, '../test/fixtures/v2/test.json'));
+      const right = yield rightStash.fetch();
+
+      const diff = new Diff();
+      return yield diff.diff(left, right);
+    });
+  }
 }
 
 module.exports = Dumpinator;
