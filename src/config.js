@@ -268,14 +268,14 @@ class Config {
       routes.push({
         url: this.routes.left[i].url,
         id: this.routes.left[i].id,
-        order: 'left',
+        side: 'left',
         name: this.routes.left[i].name,
         header: this.routes.left[i].header,
         query: this.routes.left[i].query
       }, {
         url: this.routes.right[i].url,
         id: this.routes.right[i].id,
-        order: 'right',
+        side: 'right',
         name: this.routes.right[i].name,
         header: this.routes.right[i].header,
         query: this.routes.right[i].query

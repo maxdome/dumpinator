@@ -25,16 +25,16 @@ function handleResult(text, code) {
 }
 
 function generalErrorHandler(err) {
-  console.log(cowsay.think({ // eslint-disable-line
+  console.log(cowsay.think({ // eslint-disable-line no-console
     text: 'Shit, something went wrong!',
     e: 'oO',
     T: '',
     f: 'head-in'
   }));
 
-  console.log(''); // eslint-disable-line
-  console.log(program.verbose ? err.message : err.stack || err.message); // eslint-disable-line
-  console.log(''); // eslint-disable-line
+  console.log(''); // eslint-disable-line no-console
+  console.log(program.verbose ? err.message : err.stack || err.message); // eslint-disable-line no-console
+  console.log(''); // eslint-disable-line no-console
 }
 
 process.on('uncaughtException', (err) => {
@@ -75,13 +75,13 @@ program
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
     notify.on('finish', (allPassed) => {
-      console.log(cowsay.think({ // eslint-disable-line
-        text: allPassed ? 'Fuck yeah, I\'m awesome!' : 'Dude, you did a fucking mistake!',
+      console.log(cowsay.think({ // eslint-disable-line no-console
+        text: allPassed ? 'Hell yeah, I\'m awesome!' : 'Geez, I fucked it up!',
         e: 'oO',
         T: 'U'
       }));
 
-      console.log(''); // eslint-disable-line
+      console.log(''); // eslint-disable-line no-console
     });
 
     notify.on('error', (err) => {
