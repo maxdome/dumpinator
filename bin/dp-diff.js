@@ -24,26 +24,33 @@ function handleResult(text, code) {
 }
 
 function printDiff(diff) {
-  let num = 1;
+  let lineNumbersLeft = 1;
+  let lineNumbersRight = 1;
   const colored = cf();
 
   diff.forEach((line) => {
     if (line.removed) {
       line.value.replace(/^\n$/, '').split(/\n/g).forEach((l, index, array) => {
-        colored.txt(('  ' + num).substr(-2, 2), 'ltrim').txt('|');
+        colored.txt(('  ' + lineNumbersLeft).substr(-2, 2), 'ltrim').txt('|');
+        colored.txt('  ', 'ltrim').txt('|');
         colored.txt(l.replace(/\n$/, ''), 'bgred trim').nl();
       });
+      lineNumbersLeft += 1;
     } else if (line.added) {
       line.value.replace(/^\n$/, '').split(/\n/g).forEach((l, index, array) => {
-        colored.txt(('  ' + num).substr(-2, 2), 'ltrim').txt('|');
+        colored.txt('  ', 'ltrim').txt('|');
+        colored.txt(('  ' + lineNumbersRight).substr(-2, 2), 'ltrim').txt('|');
         colored.txt(l.replace(/\n$/, ''), 'bggreen trim').nl();
       });
+      lineNumbersRight += 1;
     } else {
       line.value.replace(/^\n$/, '').split(/\n/g).forEach((l, index, array) => {
-        colored.txt(('  ' + num).substr(-2, 2), 'ltrim').txt('|');
+        colored.txt(('  ' + lineNumbersLeft).substr(-2, 2), 'ltrim').txt('|');
+        colored.txt(('  ' + lineNumbersRight).substr(-2, 2), 'ltrim').txt('|');
         colored.txt(l.replace(/\n$/, ''), 'trim').nl();
 
-        num += 1;
+        lineNumbersLeft += 1;
+        lineNumbersRight += 1;
       });
     }
   });
