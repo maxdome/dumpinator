@@ -139,7 +139,7 @@ class Dumpinator {
       const diff = new Diff();
       return {
         type: 'diff',
-        diff: yield diff.diff(left, right)
+        diff: yield diff.diff(left.body, right.body)
       };
     });
   }
