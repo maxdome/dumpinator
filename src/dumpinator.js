@@ -4,6 +4,7 @@
 
 const path = require('path');
 const co = require('co');
+const glob = require('glob');
 const Request = require('./request');
 const Stash = require('./stash');
 const Notify = require('./notify');
@@ -95,7 +96,8 @@ class Dumpinator {
 
   static report(notify) {
     const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-    return new Reporter(notify);
+    const reporter = new Reporter();
+    return reporter.report(notify);
   }
 
   static compare(test) {
@@ -109,16 +111,43 @@ class Dumpinator {
   }
 
   static diff(testId) {
+    const stashDir = path.join(__dirname, '../tmp/');
     return co(function* dumpinatorDiff() {
-      const leftStash = new Stash(path.join(__dirname, '../test/fixtures/v1/test.json'));
+      const testFiles = glob.sync(`${testId}*-left.json`, { cwd: stashDir });
+
+      if (testFiles.length === 0) {
+        return {
+          type: 'error',
+          code: 1001,
+          msg: 'Not tests found'
+        };
+      } else if (testFiles.length > 1) {
+        return {
+          type: 'error',
+          code: 1002,
+          msg: 'Many tests found',
+          testFiles
+        };
+      }
+
+      const leftStash = new Stash(path.join(stashDir, testFiles[0]));
       const left = yield leftStash.fetch();
 
-      const rightStash = new Stash(path.join(__dirname, '../test/fixtures/v2/test.json'));
+      const rightStash = new Stash(path.join(stashDir, testFiles[0].replace('-left', '-right')));
       const right = yield rightStash.fetch();
 
       const diff = new Diff();
-      return yield diff.diff(left, right);
+      return {
+        type: 'diff',
+        diff: yield diff.diff(left, right)
+      };
     });
+  }
+
+  static reportDiff(diff) {
+    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
+    const reporter = new Reporter();
+    reporter.diff(diff);
   }
 }
 
