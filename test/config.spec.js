@@ -117,18 +117,18 @@ describe('Config', () => {
 
     it('accepts routes as objects', () => {
       config.parseJSON({
-        routes: [{ url: 'pages' }, { url: 'assets' }, { url: 'components' }]
+        routes: [{ url: 'pages', status: 204 }, { url: 'assets', status: 204 }, { url: 'components', status: 204 }]
       });
       const expectedResult = {
         left: [
-          { id: 'fbdbddef6cc3d049e64b1dd538a2a4dc', method: 'GET', url: 'pages', name: 'GET pages' },
-          { id: '45cb486c66193bc3520b234dcf3d105a', method: 'GET', url: 'assets', name: 'GET assets' },
-          { id: 'd74631ef5e46a1d2e10e4249bd6eb3bb', method: 'GET', url: 'components', name: 'GET components' }
+          { id: '4afc7e3ee61e5bbf37849d3696632068', method: 'GET', status: 204, url: 'pages', name: 'GET pages' },
+          { id: '52c37ae3a78f64868c83a71a5691d918', method: 'GET', status: 204, url: 'assets', name: 'GET assets' },
+          { id: '150ede31dd5ddcfc6e7c3d0080492d0b', method: 'GET', status: 204, url: 'components', name: 'GET components' }
         ],
         right: [
-          { id: 'fbdbddef6cc3d049e64b1dd538a2a4dc', method: 'GET', url: 'pages', name: 'GET pages' },
-          { id: '45cb486c66193bc3520b234dcf3d105a', method: 'GET', url: 'assets', name: 'GET assets' },
-          { id: 'd74631ef5e46a1d2e10e4249bd6eb3bb', method: 'GET', url: 'components', name: 'GET components' }
+          { id: '4afc7e3ee61e5bbf37849d3696632068', method: 'GET', status: 204, url: 'pages', name: 'GET pages' },
+          { id: '52c37ae3a78f64868c83a71a5691d918', method: 'GET', status: 204, url: 'assets', name: 'GET assets' },
+          { id: '150ede31dd5ddcfc6e7c3d0080492d0b', method: 'GET', status: 204, url: 'components', name: 'GET components' }
         ]
       };
       inspect(config.routes).isEql(expectedResult);
