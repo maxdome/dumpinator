@@ -24,17 +24,19 @@ class Dumpinator {
         try {
           response = yield request.load(test);
         } catch (err) {
-          if (err.status === 404) {
-            notify.setState(test, 'download-failed', 'Not found');
-            return;
-          }
-
-          throw err;
+          notify.setState(test, 'download-failed', err.message);
+          return;
         }
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
         yield stash.add(response);
         notify.setState(test, 'downloaded');
+
+        if (test.status && test.status !== response.meta.status) {
+          notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
+
+          return;
+        }
 
         if (notify.getState(test) === 'downloaded') {
           const testResult = yield Dumpinator.compare(test);

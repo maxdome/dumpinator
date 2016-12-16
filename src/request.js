@@ -31,16 +31,28 @@ class Request {
         this.req.set(key, val);
       });
 
+      const timer = Date.now();
       this.req.end((err, res) => {
-        if (err) {
+        const responseTime = Date.now() - timer;
+        if (err && !res) {
           return reject(err);
         }
+
         return resolve({
+          meta: this.getRequestMeta(res, responseTime),
           headers: res.header,
           body: /^application.+json/.test(res.type) ? res.body : JSON.stringify(res.text)
         });
       });
     });
+  }
+
+  getRequestMeta(res, responseTime) {
+    return {
+      status: res.status,
+      error: res.error,
+      responseTime
+    };
   }
 }
 

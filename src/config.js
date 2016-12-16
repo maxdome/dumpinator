@@ -43,7 +43,7 @@ function validateSide(name, data) {
 function validateRoute(data, i) {
   const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
   lodash.each(data, (val, key) => {
-    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query'], key)) {
+    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'status'], key)) {
       throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
     }
   });
@@ -94,7 +94,8 @@ function extendHeaders(self, type, header) {
   }
 }
 
-function extendRoute(side, route) {
+function extendRoute(side, route, defaults) {
+  defaults = defaults || {};
   const out = Object.assign({}, side, route);
   if (lodash.get(side, 'hostname')) {
     out.url = side.hostname + route.url;
@@ -102,6 +103,11 @@ function extendRoute(side, route) {
   if (!out.method) {
     out.method = 'GET';
   }
+
+  if (!out.status && defaults.status) {
+    out.status = defaults.status;
+  }
+
   out.name = `${out.method} ${route.name || route.url}`;
   delete out.hostname;
   return out;
@@ -173,7 +179,7 @@ class Config {
     }
 
     lodash.each(defaults, (val, key) => {
-      if (!lodash.includes(['left', 'right', 'rateLimit'], key)) {
+      if (!lodash.includes(['left', 'right', 'rateLimit', 'status'], key)) {
         throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
       }
     });
@@ -198,8 +204,8 @@ class Config {
         route = { url: route };
       }
 
-      const leftRoute = extendRoute(left, lodash.clone(route));
-      const rightRoute = extendRoute(right, lodash.clone(route));
+      const leftRoute = extendRoute(left, lodash.clone(route), defaults);
+      const rightRoute = extendRoute(right, lodash.clone(route), defaults);
       const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
 
       leftRoute.id = routeHash;
@@ -271,14 +277,16 @@ class Config {
         side: 'left',
         name: this.routes.left[i].name,
         header: this.routes.left[i].header,
-        query: this.routes.left[i].query
+        query: this.routes.left[i].query,
+        status: this.routes.left[i].status
       }, {
         url: this.routes.right[i].url,
         id: this.routes.right[i].id,
         side: 'right',
         name: this.routes.right[i].name,
         header: this.routes.right[i].header,
-        query: this.routes.right[i].query
+        query: this.routes.right[i].query,
+        status: this.routes.right[i].status
       });
     }
 
