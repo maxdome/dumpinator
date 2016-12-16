@@ -57,7 +57,7 @@ function validateRoute(data, i) {
       throw new Error(`Config invalid: Tag in "routes[${i}]"${url} is invalid!`);
     }
   }
-  if (!lodash.isString(data.url) && !lodash.isString(data.left.url) && !lodash.isString(data.right.url)) {
+  if (!lodash.isString(data.url) && !lodash.has(data, 'left.url') && !lodash.has(data, 'right.url')) {
     throw new Error(`Config invalid: "routes[${i}]" must contain a "url" (string)!`);
   }
   if (lodash.get(data, 'method')) {
