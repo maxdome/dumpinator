@@ -14,6 +14,13 @@ module.exports = {
       url: '/v1/test.json'
     }, {
       url: '/v2/test.json'
+    }, {
+      left: {
+        url: '/v1/banana.json'
+      },
+      right: {
+        url: '/v2/banana.json'
+      }
     }
   ]
 };

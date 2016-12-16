@@ -345,7 +345,7 @@ module.exports = {
 ```json
 {
   "defaults": {
-    "ignoreProperties": [
+    "ignoreBody": [
       "foo.bar",
       "customer.sessionId"
     ],

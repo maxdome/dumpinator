@@ -43,7 +43,7 @@ function validateSide(name, data) {
 function validateRoute(data, i) {
   const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
   lodash.each(data, (val, key) => {
-    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query'], key)) {
+    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'ignoreBody', 'ignoreHeader', 'left', 'right'], key)) {
       throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
     }
   });
@@ -57,7 +57,7 @@ function validateRoute(data, i) {
       throw new Error(`Config invalid: Tag in "routes[${i}]"${url} is invalid!`);
     }
   }
-  if (!lodash.isString(data.url)) {
+  if (!lodash.isString(data.url) && !lodash.isString(data.left.url) && !lodash.isString(data.right.url)) {
     throw new Error(`Config invalid: "routes[${i}]" must contain a "url" (string)!`);
   }
   if (lodash.get(data, 'method')) {
@@ -198,8 +198,20 @@ class Config {
         route = { url: route };
       }
 
-      const leftRoute = extendRoute(left, lodash.clone(route));
-      const rightRoute = extendRoute(right, lodash.clone(route));
+      let leftRoute;
+      let rightRoute;
+      if (lodash.has(route, 'left.url') && lodash.has(route, 'right.url')) {
+        leftRoute = extendRoute(left, {
+          url: lodash.get(route, 'left.url')
+        });
+        rightRoute = extendRoute(right, {
+          url: lodash.get(route, 'right.url')
+        });
+      } else {
+        leftRoute = extendRoute(left, lodash.clone(route));
+        rightRoute = extendRoute(right, lodash.clone(route));
+      }
+
       const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
 
       leftRoute.id = routeHash;
@@ -214,6 +226,7 @@ class Config {
     options = options || {};
     const rate = lodash.get(options.args, 'r') || lodash.get(options.args, 'rate');
     const tag = lodash.get(options.args, 't') || lodash.get(options.args, 'tag');
+    const debug = lodash.get(options.args, 'd') || lodash.get(options.args, 'debug');
     const header = lodash.unionWith(
       lodash.castArray(lodash.get(options.args, 'H', [])),
       lodash.castArray(lodash.get(options.args, 'header', []))
@@ -240,6 +253,9 @@ class Config {
     }
     if (rate) {
       this.options.rateLimit = rate;
+    }
+    if (debug) {
+      this.options.debug = true;
     }
 
     extendHeaders(this, 'header', header);

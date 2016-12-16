@@ -17,6 +17,10 @@ class Dumpinator {
     const routes = config.getRoutes();
 
     routes.forEach((test) => {
+      if (config.options.debug) {
+        console.log('[DEBUG] add route:', test); // eslint-disable-line no-console
+      }
+
       notify.addTest(test);
       jobs.push(co(function* task() {
         const request = new Request();

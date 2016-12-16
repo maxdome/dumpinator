@@ -1,0 +1,8 @@
+{
+  "kind": "fruit",
+  "color": "yellow",
+  "properties": {
+    "price": 1.3,
+    "age": "4 days"
+  }
+}
