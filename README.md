@@ -24,38 +24,38 @@ Install Dumpinator™ globally using
 # Using the CLI
 
     Synopsis: dp [options] [command]
-    
+
     Commands:
-    
+
       diff [options] [left] [right]  Compare the given routes
-    
+
     Options:
-    
+
       -h, --help     output usage information
       -V, --version  output the version number
       -v, --verbose  Be more verbose
 
 ## `diff` Command
 
-Can be used both with **config files** and **command line arguments**. Fetches the given routes and outputs a **diff report** by comparing each left & right side response. 
+Can be used both with **config files** and **command line arguments**. Fetches the given routes and outputs a **diff report** by comparing each left & right side response.
 
 ### Using the default config
 
 If no arguments are given, Dumpinator™ tries to find the default config in the current working directory. If `dumpinator.conf.js` is not found, it looks for `dumpinator.json` (CommonJS module) before giving up:
 
-    $ dp diff 
-    
+    $ dp diff
+
 ### Using a custom config
 
 A custom config can be provided via `-c` or `--config`:
 
     $ dp diff -c /path/to/my/config.json  # or config.js (CommonJS module)
 
-### Provding 2 routes directly (defaults to GET method) 
+### Provding 2 routes directly (defaults to GET method)
 
     $ dp diff http://localhost/v2/my-first-route http://myapi.com/v1/my-first-route
 
-### Provding 2 routes directly with custom methods 
+### Provding 2 routes directly with custom methods
 
     $ dp diff "POST http://localhost/v2/my-first-route" "POST http://myapi.com/v1/my-first-route"
 
@@ -86,7 +86,7 @@ Dumpinator™ accepts both **JSON** files and **CommonJS** modules which can be 
 
 ## Basic example
 
-The following config will fetch 2 routes `/my-first-route` and `/my-second-route` from both `http://localhost/v2/` and `http://myapi.com/v1/` and compare them. 
+The following config will fetch 2 routes `/my-first-route` and `/my-second-route` from both `http://localhost/v2/` and `http://myapi.com/v1/` and compare them.
 
 ### CommonJS
 
@@ -136,7 +136,7 @@ module.exports = {
 
 ## Adding default headers
 
-Additional headers can be added to the `defaults.left` and `defaults.right` sections where they get appended to each route: 
+Additional headers can be added to the `defaults.left` and `defaults.right` sections where they get appended to each route:
 
 ### CommonJS
 
@@ -194,7 +194,7 @@ module.exports = {
 
 ## Adding headers per route
 
-Headers can be added to each route individually, extending & overriding default headers: 
+Headers can be added to each route individually, extending & overriding default headers:
 
 ### CommonJS
 
@@ -239,7 +239,7 @@ module.exports = {
 
 ## Adding default query parameters
 
-Additional query parameters can be added to the `defaults.left` and `defaults.right` sections where they get appended to each route: 
+Additional query parameters can be added to the `defaults.left` and `defaults.right` sections where they get appended to each route:
 
 ### CommonJS
 
@@ -326,6 +326,33 @@ module.exports = {
 {
   "defaults": {
     ...
+  },
+  "routes": [
+    {
+      "url": "/my-first-route",
+      "query": {
+        "defaultQuery": "defaultValue",
+        ...
+      }
+    },
+    ...
+  ]
+}
+```
+
+### Ignore headers or body properties
+
+```json
+{
+  "defaults": {
+    "ignoreProperties": [
+      "foo.bar",
+      "customer.sessionId"
+    ],
+    "ignoreHeader": [
+      "sessionid",
+      "cookies"
+    ]
   },
   "routes": [
     {
