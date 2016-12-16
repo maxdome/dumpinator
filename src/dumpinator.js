@@ -82,7 +82,7 @@ class Dumpinator {
         while (beer !== 'empty') { // it never gets empty ;)
           const next = jobs.shift();
           if (!next) {
-            return; // we're finish now. Lets have a coffee :)
+            return; // we're done. Lets have a coffee :)
           }
 
           const res = yield next;
@@ -119,13 +119,13 @@ class Dumpinator {
         return {
           type: 'error',
           code: 1001,
-          msg: 'Not tests found'
+          msg: 'No tests found. Check the id.'
         };
       } else if (testFiles.length > 1) {
         return {
           type: 'error',
           code: 1002,
-          msg: 'Many tests found',
+          msg: 'Multiple tests found. Provide a unique id.',
           testFiles
         };
       }
