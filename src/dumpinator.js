@@ -108,7 +108,7 @@ class Dumpinator {
       return stash.fetch();
     })).then((res) => {
       const diff = new Diff();
-      return diff.compare(res[0].body, res[1].body);
+      return diff.compare(res[0].body, res[1].body, test.ignoreBody);
     });
   }
 }

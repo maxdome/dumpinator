@@ -7,7 +7,11 @@ module.exports = {
     },
     right: {
       hostname: 'http://localhost:3333'
-    }
+    },
+    ignoreBody: [
+      'properties.price',
+      'properties.age'
+    ]
   },
   routes: [
     {

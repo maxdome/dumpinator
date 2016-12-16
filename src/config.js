@@ -173,7 +173,7 @@ class Config {
     }
 
     lodash.each(defaults, (val, key) => {
-      if (!lodash.includes(['left', 'right', 'rateLimit'], key)) {
+      if (!lodash.includes(['left', 'right', 'rateLimit', 'ignoreBody', 'ignoreHeader'], key)) {
         throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
       }
     });
@@ -216,6 +216,19 @@ class Config {
 
       leftRoute.id = routeHash;
       rightRoute.id = routeHash;
+
+      ['ignoreBody', 'ignoreHeader'].forEach((prop) => {
+        if (lodash.has(defaults, prop)) {
+          if (!lodash.has(leftRoute, prop)) {
+            leftRoute[prop] = defaults[prop];
+          }
+
+          if (!lodash.has(rightRoute, prop)) {
+            rightRoute[prop] = defaults[prop];
+          }
+        }
+      });
+
 
       this.routes.left.push(leftRoute);
       this.routes.right.push(rightRoute);
@@ -287,14 +300,18 @@ class Config {
         side: 'left',
         name: this.routes.left[i].name,
         header: this.routes.left[i].header,
-        query: this.routes.left[i].query
+        query: this.routes.left[i].query,
+        ignoreBody: this.routes.left[i].ignoreBody,
+        ignoreHeader: this.routes.left[i].ignoreHeader
       }, {
         url: this.routes.right[i].url,
         id: this.routes.right[i].id,
         side: 'right',
         name: this.routes.right[i].name,
         header: this.routes.right[i].header,
-        query: this.routes.right[i].query
+        query: this.routes.right[i].query,
+        ignoreBody: this.routes.right[i].ignoreBody,
+        ignoreHeader: this.routes.right[i].ignoreHeader
       });
     }
 

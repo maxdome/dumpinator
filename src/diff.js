@@ -1,6 +1,7 @@
 'use strict';
 
 const jsdiff = require('diff');
+const lodash = require('lodash');
 const sortify = require('json.sortify');
 
 class Diff {
@@ -22,9 +23,14 @@ class Diff {
     });
   }
 
-  compare(left, right) {
+  compare(left, right, ignore) {
     if (typeof left !== typeof right) {
       throw new Error('Cannot compare two different source types!');
+    }
+
+    if (ignore) {
+      ignore.forEach(item => lodash.unset(left, item));
+      ignore.forEach(item => lodash.unset(right, item));
     }
 
     let leftStr = left;
