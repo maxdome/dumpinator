@@ -340,7 +340,28 @@ module.exports = {
 }
 ```
 
-### Ignore headers or body properties
+### Options
+
+#### Status
+
+The status can be set if a route test should fail when the status doesn't match.
+
+```json
+{
+  "defaults": {
+    ...
+  },
+  "routes": [
+    {
+      "url": "/my-first-route",
+      "status": 204
+    },
+    ...
+  ]
+}
+```
+
+#### Ignore headers or body properties
 
 ```json
 {

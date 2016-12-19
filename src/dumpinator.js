@@ -4,6 +4,7 @@
 
 const path = require('path');
 const co = require('co');
+const glob = require('glob');
 const Request = require('./request');
 const Stash = require('./stash');
 const Notify = require('./notify');
@@ -28,17 +29,19 @@ class Dumpinator {
         try {
           response = yield request.load(test);
         } catch (err) {
-          if (err.status === 404) {
-            notify.setState(test, 'download-failed', 'Not found');
-            return;
-          }
-
-          throw err;
+          notify.setState(test, 'download-failed', err.message);
+          return;
         }
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
         yield stash.add(response);
         notify.setState(test, 'downloaded');
+
+        if (test.status && test.status !== response.meta.status) {
+          notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
+
+          return;
+        }
 
         if (notify.getState(test) === 'downloaded') {
           const testResult = yield Dumpinator.compare(test);
@@ -85,7 +88,7 @@ class Dumpinator {
         while (beer !== 'empty') { // it never gets empty ;)
           const next = jobs.shift();
           if (!next) {
-            return; // we're finish now. Lets have a coffee :)
+            return; // we're done. Lets have a coffee :)
           }
 
           const res = yield next;
@@ -99,7 +102,8 @@ class Dumpinator {
 
   static report(notify) {
     const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-    return new Reporter(notify);
+    const reporter = new Reporter();
+    return reporter.report(notify);
   }
 
   static compare(test) {
@@ -120,6 +124,46 @@ class Dumpinator {
 
       return null;
     });
+  }
+
+  static diff(testId) {
+    const stashDir = path.join(__dirname, '../tmp/');
+    return co(function* dumpinatorDiff() {
+      const testFiles = glob.sync(`${testId}*-left.json`, { cwd: stashDir });
+
+      if (testFiles.length === 0) {
+        return {
+          type: 'error',
+          code: 1001,
+          msg: 'No tests found. Check the id.'
+        };
+      } else if (testFiles.length > 1) {
+        return {
+          type: 'error',
+          code: 1002,
+          msg: 'Multiple tests found. Provide a unique id.',
+          testFiles
+        };
+      }
+
+      const leftStash = new Stash(path.join(stashDir, testFiles[0]));
+      const left = yield leftStash.fetch();
+
+      const rightStash = new Stash(path.join(stashDir, testFiles[0].replace('-left', '-right')));
+      const right = yield rightStash.fetch();
+
+      const diff = new Diff();
+      return {
+        type: 'diff',
+        diff: yield diff.diff(left.body, right.body)
+      };
+    });
+  }
+
+  static reportDiff(diff) {
+    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
+    const reporter = new Reporter();
+    reporter.diff(diff);
   }
 }
 

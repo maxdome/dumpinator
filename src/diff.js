@@ -14,7 +14,8 @@ class Diff {
       }
 
       if (typeof left === 'object') {
-        diffResult = jsdiff.diffLines(sortify(left, null, '  '), sortify(right, null, '  '));
+        // diffResult = jsdiff.diffLines(sortify(left, null, '  '), sortify(right, null, '  '));
+        diffResult = jsdiff.diffJson(left, right);
       } else {
         diffResult = jsdiff.diffLines(left, right);
       }

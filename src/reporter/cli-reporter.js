@@ -1,10 +1,10 @@
 'use strict';
 
 const cf = require('colorfy');
+const jsdiff = require('diff');
 
 class CLIReporter {
-  constructor(notify) {
-    this.report(notify);
+  constructor() {
     this.colorsEnabled = process.env.isTTY;
     this.counter = {
       passed: 0,
@@ -56,6 +56,87 @@ class CLIReporter {
         .grey(['test failed', 'tests failed', this.counter.failed])
         .print(this.colorsEnabled);
     });
+  }
+
+  drawInlineDiff(colored, line, line2, light, dark) {
+    jsdiff.diffChars(line, line2).forEach((l) => {
+      if (l.added || l.removed) {
+        colored.txt(l.value, `${dark} trim`);
+      } else {
+        colored.txt(l.value, `${light} trim`);
+      }
+    });
+
+    // colored.nl();
+  }
+
+  diff(diff) {
+    if (diff.type === 'error') {
+      if (diff.testFiles) {
+        console.log(diff.testFiles.join('\n')); // eslint-disable-line no-console
+      }
+
+      return;
+    }
+
+    let lineNumbersLeft = 1;
+    let lineNumbersRight = 1;
+    const colored = cf();
+
+    const diffMap = diff.diff.map((line, index, arr) => {
+      line.prev = index ? arr[index - 1].line : [];
+      line.next = index < (arr.length - 1) ? arr[index + 1].value.replace(/\n$/, '').split(/\n/g) : [];
+      line.line = line.value.replace(/\n$/, '').split(/\n/g);
+
+      return line;
+    });
+
+    diffMap.forEach((line) => {
+      if (line.added) {
+        line.line.forEach((l, index, array) => {
+          colored.txt('  ', 'ltrim').txt('|');
+          colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
+          this.drawInlineDiff(colored, l, line.prev[index], 'bglime', 'bggreen');
+          colored.nl();
+        });
+        lineNumbersRight += 1;
+      } else if (line.removed) {
+        line.line.forEach((l, index, array) => {
+          colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
+          colored.txt('  ', 'ltrim').txt('|');
+          this.drawInlineDiff(colored, l, line.next[index], 'bgfire', 'bgred');
+          colored.nl();
+        });
+        lineNumbersLeft += 1;
+      } else {
+        line.line.forEach((l, index, array) => {
+          colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
+          colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
+          colored.txt(l, 'trim').nl();
+
+          lineNumbersLeft += 1;
+          lineNumbersRight += 1;
+        });
+      }
+    });
+
+    if (diffMap.length === 1 && !diffMap.added && !diffMap.removed) {
+      colored.nl().green(' ✔').grey('both responses are the same').nl();
+    } else {
+      let numDifferences = 0;
+      diffMap.forEach((line) => {
+        if (line.added) {
+          numDifferences += 1;
+        }
+      });
+      colored.nl().red(' ❌').grey([`There are ${numDifferences} difference in the response`, `There are ${numDifferences} differences in the response`, numDifferences]).nl();
+    }
+
+    colored.print();
+  }
+
+  log(msg) {
+    console.log(msg); // eslint-disable-line no-console
   }
 }
 

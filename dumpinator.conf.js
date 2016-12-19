@@ -8,6 +8,7 @@ module.exports = {
     right: {
       hostname: 'http://localhost:3333'
     },
+    status: 200,
     ignoreBody: [
       'properties.price',
       'properties.age'
@@ -23,7 +24,8 @@ module.exports = {
     {
       url: '/v1/test.json'
     }, {
-      url: '/v2/test.json'
+      url: '/v2/test.json',
+      status: 204
     }, {
       left: {
         url: '/v1/banana.json'
