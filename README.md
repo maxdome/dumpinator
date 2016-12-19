@@ -361,6 +361,34 @@ The status can be set if a route test should fail when the status doesn't match.
 }
 ```
 
+#### Ignore headers or body properties
+
+```json
+{
+  "defaults": {
+    "ignoreBody": [
+      "foo.bar",
+      "customer.sessionId"
+    ],
+    "ignoreHeader": [
+      "sessionid",
+      "cookies"
+    ]
+  },
+  "routes": [
+    {
+      "url": "/my-first-route",
+      "query": {
+        "defaultQuery": "defaultValue",
+        ...
+      }
+    },
+    ...
+  ]
+}
+```
+
+
 # Using the API
 
 The API can be used directly, too.

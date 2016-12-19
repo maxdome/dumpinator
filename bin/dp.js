@@ -42,6 +42,7 @@ program
   .option('-r, --rate [rateLimit]', 'Rate limit for concurrent requests')
   .option('-R, --header-right [headerRight]', 'Add a HTTP header to right side')
   .option('-t, --tag [tag]', 'Only include routes with this tag')
+  .option('-d, --debug', 'Enables debug mode')
   .action((left, right, options) => {
     options = options || {};
     options.args = minimist(process.argv);

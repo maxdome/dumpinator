@@ -43,7 +43,7 @@ function validateSide(name, data) {
 function validateRoute(data, i) {
   const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
   lodash.each(data, (val, key) => {
-    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'status'], key)) {
+    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'ignoreBody', 'ignoreHeader', 'status', 'left', 'right'], key)) {
       throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
     }
   });
@@ -57,7 +57,7 @@ function validateRoute(data, i) {
       throw new Error(`Config invalid: Tag in "routes[${i}]"${url} is invalid!`);
     }
   }
-  if (!lodash.isString(data.url)) {
+  if (!lodash.isString(data.url) && !lodash.has(data, 'left.url') && !lodash.has(data, 'right.url')) {
     throw new Error(`Config invalid: "routes[${i}]" must contain a "url" (string)!`);
   }
   if (lodash.get(data, 'method')) {
@@ -179,7 +179,7 @@ class Config {
     }
 
     lodash.each(defaults, (val, key) => {
-      if (!lodash.includes(['left', 'right', 'rateLimit', 'status'], key)) {
+      if (!lodash.includes(['left', 'right', 'rateLimit', 'status', 'ignoreBody', 'ignoreHeader'], key)) {
         throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
       }
     });
@@ -204,12 +204,37 @@ class Config {
         route = { url: route };
       }
 
-      const leftRoute = extendRoute(left, lodash.clone(route), defaults);
-      const rightRoute = extendRoute(right, lodash.clone(route), defaults);
+      let leftRoute;
+      let rightRoute;
+      if (lodash.has(route, 'left.url') && lodash.has(route, 'right.url')) {
+        leftRoute = extendRoute(left, {
+          url: lodash.get(route, 'left.url')
+        });
+        rightRoute = extendRoute(right, {
+          url: lodash.get(route, 'right.url')
+        });
+      } else {
+        leftRoute = extendRoute(left, lodash.clone(route));
+        rightRoute = extendRoute(right, lodash.clone(route));
+      }
+
       const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
 
       leftRoute.id = routeHash;
       rightRoute.id = routeHash;
+
+      ['ignoreBody', 'ignoreHeader'].forEach((prop) => {
+        if (lodash.has(defaults, prop)) {
+          if (!lodash.has(leftRoute, prop)) {
+            leftRoute[prop] = defaults[prop];
+          }
+
+          if (!lodash.has(rightRoute, prop)) {
+            rightRoute[prop] = defaults[prop];
+          }
+        }
+      });
+
 
       this.routes.left.push(leftRoute);
       this.routes.right.push(rightRoute);
@@ -220,6 +245,7 @@ class Config {
     options = options || {};
     const rate = lodash.get(options.args, 'r') || lodash.get(options.args, 'rate');
     const tag = lodash.get(options.args, 't') || lodash.get(options.args, 'tag');
+    const debug = lodash.get(options.args, 'd') || lodash.get(options.args, 'debug');
     const header = lodash.unionWith(
       lodash.castArray(lodash.get(options.args, 'H', [])),
       lodash.castArray(lodash.get(options.args, 'header', []))
@@ -246,6 +272,9 @@ class Config {
     }
     if (rate) {
       this.options.rateLimit = rate;
+    }
+    if (debug) {
+      this.options.debug = true;
     }
 
     extendHeaders(this, 'header', header);
@@ -278,6 +307,8 @@ class Config {
         name: this.routes.left[i].name,
         header: this.routes.left[i].header,
         query: this.routes.left[i].query,
+        ignoreBody: this.routes.left[i].ignoreBody,
+        ignoreHeader: this.routes.left[i].ignoreHeader,
         status: this.routes.left[i].status
       }, {
         url: this.routes.right[i].url,
@@ -286,6 +317,8 @@ class Config {
         name: this.routes.right[i].name,
         header: this.routes.right[i].header,
         query: this.routes.right[i].query,
+        ignoreBody: this.routes.right[i].ignoreBody,
+        ignoreHeader: this.routes.right[i].ignoreHeader,
         status: this.routes.right[i].status
       });
     }

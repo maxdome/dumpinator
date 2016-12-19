@@ -18,6 +18,10 @@ class Dumpinator {
     const routes = config.getRoutes();
 
     routes.forEach((test) => {
+      if (config.options.debug) {
+        console.log('[DEBUG] add route:', test); // eslint-disable-line no-console
+      }
+
       notify.addTest(test);
       jobs.push(co(function* task() {
         const request = new Request();
@@ -41,7 +45,7 @@ class Dumpinator {
 
         if (notify.getState(test) === 'downloaded') {
           const testResult = yield Dumpinator.compare(test);
-          if (testResult) {
+          if (testResult === null) {
             notify.setTestPassed(test);
           } else {
             notify.setTestFailed(test);
@@ -108,7 +112,17 @@ class Dumpinator {
       return stash.fetch();
     })).then((res) => {
       const diff = new Diff();
-      return diff.compare(res[0].body, res[1].body);
+      const headerDiff = diff.compare(res[0].headers, res[1].headers, test.ignoreHeader, true);
+      if (!headerDiff) {
+        return 'Headers don\'t match';
+      }
+
+      const bodyDiff = diff.compare(res[0].body, res[1].body, test.ignoreBody);
+      if (!bodyDiff) {
+        return 'Bodies don\'t match';
+      }
+
+      return null;
     });
   }
 
@@ -141,14 +155,15 @@ class Dumpinator {
       const diff = new Diff();
       return {
         type: 'diff',
-        diff: yield diff.diff(left.body, right.body)
+        bodyDiff: yield diff.diff(left.body, right.body),
+        headerDiff: yield diff.diff(left.headers, right.headers)
       };
     });
   }
 
-  static reportDiff(diff) {
+  static reportDiff(diff, options) {
     const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-    const reporter = new Reporter();
+    const reporter = new Reporter(options);
     reporter.diff(diff);
   }
 }
