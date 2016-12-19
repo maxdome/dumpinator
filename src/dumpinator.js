@@ -42,7 +42,7 @@ class Dumpinator {
 
         if (notify.getState(test) === 'downloaded') {
           const testResult = yield Dumpinator.compare(test);
-          if (testResult) {
+          if (testResult === null) {
             notify.setTestPassed(test);
           } else {
             notify.setTestFailed(test);
@@ -108,7 +108,17 @@ class Dumpinator {
       return stash.fetch();
     })).then((res) => {
       const diff = new Diff();
-      return diff.compare(res[0].body, res[1].body, test.ignoreBody);
+      const headerDiff = diff.compare(res[0].headers, res[1].headers, test.ignoreHeader, true);
+      if (!headerDiff) {
+        return 'Headers doesn\'t match';
+      }
+
+      const bodyDiff = diff.compare(res[0].body, res[1].body, test.ignoreBody);
+      if (!bodyDiff) {
+        return 'Bodies doesn\'t match';
+      }
+
+      return null;
     });
   }
 }

@@ -11,6 +11,12 @@ module.exports = {
     ignoreBody: [
       'properties.price',
       'properties.age'
+    ],
+    ignoreHeader: [
+      'x-api-version',
+      'x-date',
+      'etag',
+      'last-modified'
     ]
   },
   routes: [

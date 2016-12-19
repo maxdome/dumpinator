@@ -2,7 +2,8 @@
   "extends": "maxdome/node",
   "rules": {
     "strict": [2, "safe"],
-    "class-methods-use-this": 0
+    "class-methods-use-this": 0,
+    "no-restricted-syntax": [0, "ForOfStatement"]
   },
   "parserOptions": {
     "ecmaVersion": 6,

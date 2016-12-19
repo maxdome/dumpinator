@@ -88,4 +88,31 @@ describe('Diff', () => {
       });
     });
   });
+
+  describe('lowerCaseKeysRecursive()', () => {
+    it('lower case all object keys', () => {
+      const obj = {
+        Foo: 'bar',
+        'UPPER-CASED': {
+          Sub1: {
+            Sub2: 'OK'
+          }
+        },
+        lowercased: null,
+        NoBody: undefined
+      };
+
+      const diff = new Diff();
+      inspect(diff.lowerCaseKeysRecursive(obj)).isEql({
+        foo: 'bar',
+        'upper-cased': {
+          sub1: {
+            sub2: 'OK'
+          }
+        },
+        lowercased: null,
+        nobody: undefined
+      });
+    });
+  });
 });
