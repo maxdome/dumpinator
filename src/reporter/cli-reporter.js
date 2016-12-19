@@ -120,7 +120,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
           colored.txt('  ', 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred');
+          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgfire', 'bgred');
           colored.nl();
           lineNumbersLeft += 1;
         });
