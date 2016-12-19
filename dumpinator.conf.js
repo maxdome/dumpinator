@@ -14,10 +14,6 @@ module.exports = {
       'properties.age'
     ],
     ignoreHeader: [
-      'x-api-version',
-      'x-date',
-      'etag',
-      'last-modified'
     ]
   },
   routes: [

@@ -43,7 +43,7 @@ function validateSide(name, data) {
 function validateRoute(data, i) {
   const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
   lodash.each(data, (val, key) => {
-    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'ignoreBody', 'ignoreHeader', 'status'], key)) {
+    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'ignoreBody', 'ignoreHeader', 'status', 'left', 'right'], key)) {
       throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
     }
   });

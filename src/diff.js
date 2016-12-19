@@ -5,12 +5,22 @@ const lodash = require('lodash');
 const sortify = require('json.sortify');
 
 class Diff {
-  diff(left, right) {
+  diff(left, right, ignore, lowerCaseKeys) {
     return new Promise((resolve, reject) => {
       let diffResult;
 
       if (typeof left !== typeof right) {
         throw new Error('Cannot compare two different source types!');
+      }
+
+      if (ignore) {
+        ignore.forEach(item => lodash.unset(left, item));
+        ignore.forEach(item => lodash.unset(right, item));
+      }
+
+      if (lowerCaseKeys) {
+        left = this.lowerCaseKeysRecursive(left);
+        right = this.lowerCaseKeysRecursive(right);
       }
 
       if (typeof left === 'object') {

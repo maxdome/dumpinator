@@ -79,11 +79,23 @@ class CLIReporter {
       return;
     }
 
+    this.drawDiff('header', diff.headerDiff);
+    this.drawDiff('body', diff.bodyDiff);
+  }
+
+  log(msg) {
+    console.log(msg); // eslint-disable-line no-console
+  }
+
+  drawDiff(type, diff) {
     let lineNumbersLeft = 1;
     let lineNumbersRight = 1;
     const colored = cf();
+    const title = type === 'body' ? '[ BODY ]' : '[ HEAD ]';
 
-    const diffMap = diff.diff.map((line, index, arr) => {
+    colored.txt(`${title}`).nl();
+
+    const diffMap = diff.map((line, index, arr) => {
       line.prev = index ? arr[index - 1].line : [];
       line.next = index < (arr.length - 1) ? arr[index + 1].value.replace(/\n$/, '').split(/\n/g) : [];
       line.line = line.value.replace(/\n$/, '').split(/\n/g);
@@ -129,14 +141,10 @@ class CLIReporter {
           numDifferences += 1;
         }
       });
-      colored.nl().red(' ❌').grey([`There are ${numDifferences} difference in the response`, `There are ${numDifferences} differences in the response`, numDifferences]).nl();
+      colored.nl().red(' ❌').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
     }
 
     colored.print();
-  }
-
-  log(msg) {
-    console.log(msg); // eslint-disable-line no-console
   }
 }
 

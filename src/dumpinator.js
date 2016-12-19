@@ -155,7 +155,8 @@ class Dumpinator {
       const diff = new Diff();
       return {
         type: 'diff',
-        diff: yield diff.diff(left.body, right.body)
+        bodyDiff: yield diff.diff(left.body, right.body),
+        headerDiff: yield diff.diff(left.headers, right.headers)
       };
     });
   }
