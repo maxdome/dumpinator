@@ -114,12 +114,12 @@ class Dumpinator {
       const diff = new Diff();
       const headerDiff = diff.compare(res[0].headers, res[1].headers, test.ignoreHeader, true);
       if (!headerDiff) {
-        return 'Headers doesn\'t match';
+        return 'Headers don\'t match';
       }
 
       const bodyDiff = diff.compare(res[0].body, res[1].body, test.ignoreBody);
       if (!bodyDiff) {
-        return 'Bodies doesn\'t match';
+        return 'Bodies don\'t match';
       }
 
       return null;
