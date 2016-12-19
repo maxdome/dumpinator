@@ -64,7 +64,7 @@ class CLIReporter {
     // console.log('DIFF', line, line2)
     jsdiff.diffChars(line, line2).forEach((l) => {
       if (l.added || l.removed) {
-        colored.txt(l.value, `${dark} trim`);
+        colored.txt(l.value, `${dark || light} trim`);
       } else {
         colored.txt(l.value, `${light} trim`);
       }
@@ -112,7 +112,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt('  ', 'ltrim').txt('|');
           colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen', 'bggreen');
+          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen');
           colored.nl();
           lineNumbersRight += 1;
         });
@@ -120,7 +120,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
           colored.txt('  ', 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred', 'bgred');
+          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred');
           colored.nl();
           lineNumbersLeft += 1;
         });
