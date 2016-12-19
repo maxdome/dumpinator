@@ -142,7 +142,8 @@ class Dumpinator {
           type: 'error',
           code: 1002,
           msg: 'Multiple tests found. Provide a unique id.',
-          testFiles
+          testFiles,
+          query: testId
         };
       }
 

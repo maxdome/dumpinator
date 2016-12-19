@@ -27,7 +27,7 @@ program
     Dumpinator.diff(testId).then((diff) => {
       Dumpinator.reportDiff(diff, {
         showFullDiff: !!options.full,
-        noColor: !!options.noColor
+        noColor: !options.color
       });
     }).catch((err) => {
       CLIUtil.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
