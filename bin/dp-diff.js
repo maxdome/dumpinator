@@ -15,6 +15,8 @@ process.on('uncaughtException', (err) => {
 
 program.version(pkg.version);
 program.option('-v, --verbose', 'be more verbose');
+program.option('-F, --full', 'show the full diff');
+program.option('-C, --no-color', 'disable cli colors');
 
 program
   .usage('[test id]')
@@ -23,7 +25,10 @@ program
     options = options || {};
 
     Dumpinator.diff(testId).then((diff) => {
-      Dumpinator.reportDiff(diff);
+      Dumpinator.reportDiff(diff, {
+        showFullDiff: !!options.full,
+        noColor: !!options.noColor
+      });
     }).catch((err) => {
       CLIUtil.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
     });

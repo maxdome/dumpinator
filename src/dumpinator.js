@@ -161,9 +161,9 @@ class Dumpinator {
     });
   }
 
-  static reportDiff(diff) {
+  static reportDiff(diff, options) {
     const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-    const reporter = new Reporter();
+    const reporter = new Reporter(options);
     reporter.diff(diff);
   }
 }
