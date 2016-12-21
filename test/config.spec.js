@@ -227,10 +227,10 @@ describe('Config', () => {
     it('accepts a single header', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' } }
+          { id: '3cf4489ed60cf005557795effe296aee', method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' }, name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' } }
+          { id: '3cf4489ed60cf005557795effe296aee', method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' }, name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: 'foo:bar' } });
@@ -239,10 +239,10 @@ describe('Config', () => {
     it('accepts multiple headers', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' } }
+          { id: 'd8de1e85601e0f9967c5a1a118b40a78', method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' }, name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' } }
+          { id: 'd8de1e85601e0f9967c5a1a118b40a78', method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' }, name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: ['foo:bar', 'baz:bez'] } });
@@ -251,10 +251,10 @@ describe('Config', () => {
     it('accepts a single header-left', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' } }
+          { id: '3cf4489ed60cf005557795effe296aee', method: 'GET', url: 'http://a.b/left', header: { foo: 'bar' }, name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right' }
+          { id: '3cf4489ed60cf005557795effe296aee', method: 'GET', url: 'http://a.b/right', name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { L: 'foo:bar' } });
@@ -263,10 +263,10 @@ describe('Config', () => {
     it('accepts multiple header-left', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' } }
+          { id: 'd8de1e85601e0f9967c5a1a118b40a78', method: 'GET', url: 'http://a.b/left', header: { foo: 'bar', baz: 'bez' }, name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right' }
+          { id: 'd8de1e85601e0f9967c5a1a118b40a78', method: 'GET', url: 'http://a.b/right', name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { L: ['foo:bar', 'baz:bez'] } });
@@ -275,22 +275,22 @@ describe('Config', () => {
     it('accepts a single header-right', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left' }
+          { id: 'd845daa63d9c7ff67f5ec4dd29adca3b', method: 'GET', url: 'http://a.b/left', name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' } }
+          { id: 'd845daa63d9c7ff67f5ec4dd29adca3b', method: 'GET', url: 'http://a.b/right', header: { foo: 'bar' }, name: 'GET http://a.b/right' }
         ]
       };
-      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: 'foo:bar' } });
+      config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: 'foo:bar' }, name: 'GET http://a.b/right' });
       inspect(config.routes).isEql(expectedResult);
     });
     it('accepts multiple header-right', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left' }
+          { id: 'd845daa63d9c7ff67f5ec4dd29adca3b', method: 'GET', url: 'http://a.b/left', name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' } }
+          { id: 'd845daa63d9c7ff67f5ec4dd29adca3b', method: 'GET', url: 'http://a.b/right', header: { foo: 'bar', baz: 'bez' }, name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: ['foo:bar', 'baz:bez'] } });
@@ -299,10 +299,10 @@ describe('Config', () => {
     it('accepts multiple types of headers', () => {
       const expectedResult = {
         left: [
-          { method: 'GET', url: 'http://a.b/left', header: { H: 'val1', header1: 'val2', header2: 'val3', L1: 'val4', L2: 'val5', left: 'val6' } }
+          { id: '23b4d6c11ecaae3453e9ffeaaae37240', method: 'GET', url: 'http://a.b/left', header: { H: 'val1', header1: 'val2', header2: 'val3', L1: 'val4', L2: 'val5', left: 'val6' }, name: 'GET http://a.b/left' }
         ],
         right: [
-          { method: 'GET', url: 'http://a.b/right', header: { H: 'val1', header1: 'val2', header2: 'val3', R1: 'val7', R2: 'val8', right: 'val9' } }
+          { id: '23b4d6c11ecaae3453e9ffeaaae37240', method: 'GET', url: 'http://a.b/right', header: { H: 'val1', header1: 'val2', header2: 'val3', R1: 'val7', R2: 'val8', right: 'val9' }, name: 'GET http://a.b/right' }
         ]
       };
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: 'H:val1', header: ['header1:val2', 'header2:val3'], L: ['L1:val4', 'L2:val5'], 'header-left': 'left:val6', R: ['R1:val7', 'R2:val8'], 'header-right': 'right:val9' } });
