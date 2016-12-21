@@ -8,6 +8,8 @@ const pkg = require('../package.json');
 program
   .version(pkg.version)
 
+  .allowUnknownOption()
+
   .command('diff <left> <right>', 'compare the given routes')
   .command('show <id>', 'show a diff of the given id')
   .command('run', 'run the diff suite', { isDefault: true })
