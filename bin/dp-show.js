@@ -24,7 +24,7 @@ program
         noColor: !!options.noColor
       });
     }).catch((err) => {
-      CLIUtils.generalErrorHandler(err);
+      CLIUtils.generalExceptionHandler(err);
     });
   });
 

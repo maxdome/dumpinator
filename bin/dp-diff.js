@@ -29,12 +29,9 @@ program
 
     const notify = Dumpinator.run(config);
     Dumpinator.report(notify);
-    notify.on('finish', (allPassed) => {
-      CLIUtils.generalSuccessHandler(allPassed ? 'Hell yeah, I\'m awesome!' : 'Geez, I fucked it up!');
-    });
 
     notify.on('error', (err) => {
-      CLIUtils.generalErrorHandler(err);
+      CLIUtils.generalExceptionHandler(err);
     });
   });
 
