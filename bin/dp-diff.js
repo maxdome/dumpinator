@@ -33,10 +33,25 @@ if (options.args.length === 2) {
   config.parseArguments(left, right, minimistArgs);
 
   const notify = Dumpinator.run(config);
-  Dumpinator.report(notify);
 
   notify.on('error', (err) => {
     CLIUtils.generalExceptionHandler(err);
+  });
+
+  notify.on('finish', (result) => {
+    if (result) {
+      CLIUtils.generalSuccessHandler();
+      return;
+    }
+
+    Dumpinator.diff('xxxxxxxx').then((diff) => {
+      Dumpinator.reportDiff(diff, {
+        showFullDiff: !!options.full,
+        noColor: !options.color
+      });
+    }).catch((err) => {
+      CLIUtils.generalExceptionHandler(err);
+    });
   });
 } else if (options.args.length === 1) {
   const resultId = options.args[0];
