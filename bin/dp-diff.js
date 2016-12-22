@@ -3,34 +3,35 @@
 'use strict';
 
 const program = require('commander');
-const pkg = require('../package.json');
+const minimist = require('minimist');
 
 const Dumpinator = require('../src/dumpinator');
-const CLIUtil = require('../src/utils/cli-utils');
-
-process.on('uncaughtException', (err) => {
-  CLIUtil.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
-  process.exit(1);
-});
-
-program.version(pkg.version);
-program.option('-v, --verbose', 'be more verbose');
-program.option('-F, --full', 'show the full diff');
-program.option('-C, --no-color', 'disable cli colors');
+const Config = require('../src/config');
+const CLIUtils = require('../src/utils/cli-utils');
 
 program
-  .usage('[test id]')
-  .description('Shows a diff of the given test')
-  .action((testId, options) => {
-    options = options || {};
+  .option('-C, --no-color', 'disable cli colors')
+  .option('-d, --debug', 'enable debug mode')
+  .option('-F, --full', 'show the full diff')
+  .option('-H, --header [header]', 'add a HTTP header to both sides')
+  .option('-L, --header-left [headerLeft]', 'add a HTTP header to left side')
+  .option('-R, --header-right [headerRight]', 'add a HTTP header to right side')
+  .option('-v, --verbose', 'be more verbose');
 
-    Dumpinator.diff(testId).then((diff) => {
-      Dumpinator.reportDiff(diff, {
-        showFullDiff: !!options.full,
-        noColor: !options.color
-      });
-    }).catch((err) => {
-      CLIUtil.generalErrorHandler(program.verbose ? err.message : err.stack || err.message);
+program
+  .command('diff <left> <right>', 'compare the given routes')
+  .action((left, right, options) => {
+    options = options || {};
+    options.args = minimist(process.argv);
+    const config = new Config();
+
+    config.parseArguments(left, right, options);
+
+    const notify = Dumpinator.run(config);
+    Dumpinator.report(notify);
+
+    notify.on('error', (err) => {
+      CLIUtils.generalExceptionHandler(err);
     });
   });
 

@@ -69,6 +69,9 @@ function validateRoute(data, i) {
 
 function extendHeaders(self, type, header) {
   if (header.length) {
+    const leftRoute = self.routes.left[0];
+    const rightRoute = self.routes.right[0];
+
     let keyValue;
     header.forEach((val) => {
       val = val.toString();
@@ -82,15 +85,22 @@ function extendHeaders(self, type, header) {
       keyValue[1] = keyValue[1].trim();
 
       if (lodash.includes(['header', 'header-left'], type)) {
-        self.routes.left[0].header = self.routes.left[0].header || {};
-        self.routes.left[0].header[keyValue[0]] = keyValue[1];
+        leftRoute.header = leftRoute.header || {};
+        leftRoute.header[keyValue[0]] = keyValue[1];
       }
 
       if (lodash.includes(['header', 'header-right'], type)) {
-        self.routes.right[0].header = self.routes.right[0].header || {};
-        self.routes.right[0].header[keyValue[0]] = keyValue[1];
+        rightRoute.header = rightRoute.header || {};
+        rightRoute.header[keyValue[0]] = keyValue[1];
       }
     });
+
+    const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
+
+    leftRoute.id = routeHash;
+    leftRoute.name = leftRoute.name || `${leftRoute.method} ${leftRoute.url}`;
+    rightRoute.id = routeHash;
+    rightRoute.name = rightRoute.name || `${rightRoute.method} ${rightRoute.url}`;
   }
 }
 
@@ -108,7 +118,7 @@ function extendRoute(side, route, defaults) {
     out.status = defaults.status;
   }
 
-  out.name = `${out.method} ${route.name || route.url}`;
+  out.name = route.name || `${out.method} ${route.url}`;
   delete out.hostname;
   return out;
 }
