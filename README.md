@@ -46,7 +46,7 @@ The `run` task is the default task an will be used if no task was added to the c
 
     $ dp [options]
 
-is the same like
+is the same as
 
     $ dp run [options]
 

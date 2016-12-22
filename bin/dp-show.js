@@ -18,5 +18,5 @@ program
 
 // const options = program.parse(process.argv);
 
-console.log('No sorry, I can\'t show your the result. Nobody has implemented it yet.'); // eslint-disable-line no-console
+console.log('No sorry, I can\'t show you the result. Nobody has implemented it yet.'); // eslint-disable-line no-console
 console.log('Will you implement it? Would be nice :D'); // eslint-disable-line no-console
