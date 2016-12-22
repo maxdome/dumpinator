@@ -14,7 +14,7 @@ class Notify extends EventEmitter {
       this.session[test.id] = {
         state: 'pending',
         name: test.name,
-        id: test.id.substr(0, 8)
+        id: test.id ? test.id.substr(0, 8) : 'xxxxxxxx'
       };
 
       this.emit('test.add', this.session[test.id]);

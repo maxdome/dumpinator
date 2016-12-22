@@ -14,18 +14,15 @@ program
   .option('-v, --verbose', 'be more verbose');
 
 program
-  .command('<id>', 'show a diff of the given id')
-  .action((id, options) => {
-    options = options || {};
+  .command('<id>', 'show a result of the given id');
 
-    Dumpinator.diff(id).then((diff) => {
-      Dumpinator.reportDiff(diff, {
-        showFullDiff: !!options.full,
-        noColor: !!options.noColor
-      });
-    }).catch((err) => {
-      CLIUtils.generalExceptionHandler(err);
-    });
+const options = program.parse(process.argv);
+
+Dumpinator.diff(program.args[0]).then((diff) => {
+  Dumpinator.reportDiff(diff, {
+    showFullDiff: !!options.full,
+    noColor: !!options.noColor
   });
-
-program.parse(process.argv);
+}).catch((err) => {
+  CLIUtils.generalExceptionHandler(err);
+});
