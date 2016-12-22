@@ -4,8 +4,8 @@
 
 const program = require('commander');
 
-const Dumpinator = require('../src/dumpinator');
-const CLIUtils = require('../src/utils/cli-utils');
+// const Dumpinator = require('../src/dumpinator');
+// const CLIUtils = require('../src/utils/cli-utils');
 
 program
   .option('-C, --no-color', 'disable cli colors')
@@ -14,18 +14,9 @@ program
   .option('-v, --verbose', 'be more verbose');
 
 program
-  .command('<id>', 'show a diff of the given id')
-  .action((id, options) => {
-    options = options || {};
+  .command('<id>', 'show a result of the given id');
 
-    Dumpinator.diff(id).then((diff) => {
-      Dumpinator.reportDiff(diff, {
-        showFullDiff: !!options.full,
-        noColor: !!options.noColor
-      });
-    }).catch((err) => {
-      CLIUtils.generalExceptionHandler(err);
-    });
-  });
+// const options = program.parse(process.argv);
 
-program.parse(process.argv);
+console.log('No sorry, I can\'t show you the result. Nobody has implemented it yet.'); // eslint-disable-line no-console
+console.log('Will you implement it? Would be nice :D'); // eslint-disable-line no-console

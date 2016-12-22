@@ -15,6 +15,7 @@ class CLIUtils {
     console.log(''); // eslint-disable-line no-console
     console.log(program.verbose ? err.stack : err.message || err.message); // eslint-disable-line no-console
     console.log(''); // eslint-disable-line no-console
+    process.exit(1);
   }
 
   static generalErrorHandler() {
@@ -25,6 +26,7 @@ class CLIUtils {
       T: 'U'
     }));
     console.log(''); // eslint-disable-line no-console
+    process.exit(1);
   }
 
   static generalSuccessHandler() {
