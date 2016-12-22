@@ -18,11 +18,5 @@ program
 
 const options = program.parse(process.argv);
 
-Dumpinator.diff(program.args[0]).then((diff) => {
-  Dumpinator.reportDiff(diff, {
-    showFullDiff: !!options.full,
-    noColor: !!options.noColor
-  });
-}).catch((err) => {
-  CLIUtils.generalExceptionHandler(err);
-});
+console.log('No sorry, I can\'t show your the result. Nobody has implemented it yet.');
+console.log('Will you implement it? Would be nice :D');
