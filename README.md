@@ -27,7 +27,11 @@ Install Dumpinator™ globally using
 
     Commands:
 
-      diff [options] [left] [right]  Compare the given routes
+      diff <left> <right>  compare the given routes
+      diff <id>            compare the given routes by a result id
+      show <id>            show a result of the given id
+      run                  run the diff suite (default task)
+      help [cmd]           display help for [cmd]
 
     Options:
 
@@ -35,49 +39,63 @@ Install Dumpinator™ globally using
       -V, --version  output the version number
       -v, --verbose  Be more verbose
 
-## `diff` Command
+## `run` Command
 
-Can be used both with **config files** and **command line arguments**. Fetches the given routes and outputs a **diff report** by comparing each left & right side response.
+Can be used both with **config files** and **command line arguments**. Fetches the given routes and outputs a **run report** by comparing each left & right side response.
+The `run` task is the default task an will be used if no task was added to the command.
+
+    $ dp [options]
+
+is the same as
+
+    $ dp run [options]
 
 ### Using the default config
 
 If no arguments are given, Dumpinator™ tries to find the default config in the current working directory. If `dumpinator.conf.js` is not found, it looks for `dumpinator.json` (CommonJS module) before giving up:
 
-    $ dp diff
+    $ dp run
 
 ### Using a custom config
 
 A custom config can be provided via `-c` or `--config`:
 
-    $ dp diff -c /path/to/my/config.json  # or config.js (CommonJS module)
+    $ dp run -c /path/to/my/config.json  # or config.js (CommonJS module)
 
 ### Provding 2 routes directly (defaults to GET method)
 
-    $ dp diff http://localhost/v2/my-first-route http://myapi.com/v1/my-first-route
+    $ dp run http://localhost/v2/my-first-route http://myapi.com/v1/my-first-route
 
 ### Provding 2 routes directly with custom methods
 
-    $ dp diff "POST http://localhost/v2/my-first-route" "POST http://myapi.com/v1/my-first-route"
+    $ dp run "POST http://localhost/v2/my-first-route" "POST http://myapi.com/v1/my-first-route"
 
 ### Adding custom headers to both sides
 
-    $ dp diff <left> <right> -H "content-type:application/json" -H "language:en_US"  # or --header "..."
+    $ dp run <left> <right> -H "content-type:application/json" -H "language:en_US"  # or --header "..."
 
 ### Adding custom headers to left side only
 
-    $ dp diff <left> <right> -L "content-type:application/json" -L "language:en_US"  # or --header-left "..."
+    $ dp run <left> <right> -L "content-type:application/json" -L "language:en_US"  # or --header-left "..."
 
 ### Adding custom headers to both sides
 
-    $ dp diff <left> <right> -R "content-type:application/json" -R "language:en_US"  # or --header-right "..."
+    $ dp run <left> <right> -R "content-type:application/json" -R "language:en_US"  # or --header-right "..."
 
 ### Overriding the concurrency rate limit
 
-    $ dp diff -r 10  # or --rate ...
+    $ dp run -r 10  # or --rate ...
 
 ### Only include routes with a tag
 
-    $ dp diff -t "some-route-type"  # or --tag "..."
+    $ dp run -t "some-route-type"  # or --tag "..."
+
+
+## `diff` Command
+
+This command shows a diff of two given routes or a result id. The entered id must be a unique request id, its enough to add the first few chars.
+
+    $ dp diff fe345dc
 
 
 # Config Files

@@ -20,19 +20,48 @@ program
 
 program
   .command('diff <left> <right>', 'compare the given routes')
-  .action((left, right, options) => {
-    options = options || {};
-    options.args = minimist(process.argv);
-    const config = new Config();
+  .command('diff <id>', 'compare the given routes by a result id');
 
-    config.parseArguments(left, right, options);
+const options = program.parse(process.argv);
 
-    const notify = Dumpinator.run(config);
-    Dumpinator.report(notify);
+if (options.args.length === 2) {
+  const config = new Config();
+  const left = options.args[0];
+  const right = options.args[1];
+  const minimistArgs = minimist(process.argv);
 
-    notify.on('error', (err) => {
+  config.parseArguments(left, right, minimistArgs);
+
+  const notify = Dumpinator.run(config);
+
+  notify.on('error', (err) => {
+    CLIUtils.generalExceptionHandler(err);
+  });
+
+  notify.on('finish', (result) => {
+    if (result) {
+      CLIUtils.generalSuccessHandler();
+      return;
+    }
+
+    Dumpinator.diff('xxxxxxxx').then((diff) => {
+      Dumpinator.reportDiff(diff, {
+        showFullDiff: !!options.full,
+        noColor: !options.color
+      });
+    }).catch((err) => {
       CLIUtils.generalExceptionHandler(err);
     });
   });
+} else if (options.args.length === 1) {
+  const resultId = options.args[0];
 
-program.parse(process.argv);
+  Dumpinator.diff(resultId).then((diff) => {
+    Dumpinator.reportDiff(diff, {
+      showFullDiff: !!options.full,
+      noColor: !options.color
+    });
+  }).catch((err) => {
+    CLIUtils.generalExceptionHandler(err);
+  });
+}

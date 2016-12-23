@@ -10,6 +10,7 @@ class Notify extends EventEmitter {
   }
 
   addTest(test) {
+    test.id = test.id || 'xxxxxxxx';
     if (!this.session[test.id]) {
       this.session[test.id] = {
         state: 'pending',
