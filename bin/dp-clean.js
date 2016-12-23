@@ -6,7 +6,6 @@ const path = require('path');
 const program = require('commander');
 const promptly = require('promptly');
 
-// const Dumpinator = require('../src/dumpinator');
 const FileUtils = require('../src/utils/file-utils');
 const CLIUtils = require('../src/utils/cli-utils');
 

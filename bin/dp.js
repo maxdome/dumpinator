@@ -14,6 +14,6 @@ program
   .command('diff <id>', 'compare the given routes by a result id')
   .command('show <id>', 'show a result of the given id')
   .command('run', 'run the diff suite', { isDefault: true })
-  .command('clean', 'removes all tmp files')
+  .command('clean [dir]', 'remove all tmp files')
 
   .parse(process.argv);
