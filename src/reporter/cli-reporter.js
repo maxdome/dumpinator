@@ -45,6 +45,15 @@ class CLIReporter {
         });
       }
 
+      const extended = true;
+      if (extended) {
+        msg.nl().txt(' ');
+        ['left', 'right'].forEach((side) => {
+          const time = test.responseTime;
+          msg.grey(`${side}:`).llgrey('⌛').grey(`${time}ms`);
+        });
+      }
+
       msg.print(this.colorsEnabled);
     });
 

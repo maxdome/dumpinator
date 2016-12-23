@@ -55,6 +55,14 @@ class Notify extends EventEmitter {
     return this.session[test.id].state;
   }
 
+  setData(test, key, value) {
+    this.session[test.id][key] = value;
+  }
+
+  getData(test, key) {
+    return this.session[test.id][key];
+  }
+
   setTestPassed(test) {
     ['left', 'right'].forEach((side) => {
       this.session[test.id][side].state = 'passed';

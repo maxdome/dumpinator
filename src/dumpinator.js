@@ -36,6 +36,7 @@ class Dumpinator {
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
         yield stash.add(response);
         notify.setState(test, 'downloaded');
+        notify.setData(test, 'responseTime', response.meta.responseTime);
 
         if (test.status && test.status !== response.meta.status) {
           notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
