@@ -92,6 +92,7 @@ class CLIReporter {
 
     this.drawDiff('header', diff.headerDiff);
     this.drawDiff('body', diff.bodyDiff);
+    this.drawStatusDiff(diff.meta);
   }
 
   log(msg) {
@@ -164,6 +165,25 @@ class CLIReporter {
     }
 
     colored.print(this.colorsEnabled);
+  }
+
+  drawStatusDiff(meta) {
+    const coloredStatus = cf();
+    const coloredResponse = cf();
+    ['left', 'right'].forEach((order) => {
+      const expected = meta[order].expectedStatus;
+      const status = meta[order].status;
+      const time = meta[order].responseTime;
+
+      if (status !== expected) {
+        coloredStatus.red('❌').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
+      }
+
+      coloredResponse.txt('⌛').grey(`Response time of the ${order} route: ${time} ms`).nl();
+    });
+
+    coloredStatus.print();
+    coloredResponse.print();
   }
 }
 
