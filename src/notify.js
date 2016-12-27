@@ -7,6 +7,7 @@ class Notify extends EventEmitter {
     super();
 
     this.session = {};
+    this.num = 0;
   }
 
   addTest(test) {
