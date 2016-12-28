@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dumpinator report</title>
+    <style type="text/css">
+      body {
+        font-size: 14px;
+        font-family: sans-serif;
+      }
+
+      .result-listing {
+        padding: 0;
+      }
+
+      .test-result {
+        list-style: none;
+        margin: 0;
+      }
+
+      .test-result.state-passed .state {
+        color: #040;
+        font-weight: bold;
+      }
+
+      .test-result.state-failed .state {
+        color: #800;
+        font-weight: bold;
+      }
+
+      .test-result .id {
+        color: #018;
+        font-style: italic;;
+      }
+
+      .test-result.state-passed::before {
+        content: '✔';
+        color: #040;
+        display: inline-block;
+        width: 16px;
+      }
+
+      .test-result.state-failed::before {
+        content: '✘';
+        color: #800;
+        display: inline-block;
+        width: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dumpinator report</h1>
+    <ul class="result-listing">
+        <li class="test-result state-passed">
+          <span class="name">GET /v1/test.json</span>
+          <span class="id">91779cce</span>
+          <span class="state">passed</span>
+          <ul>
+          </ul>
+        </li>
+        <li class="test-result state-failed">
+          <span class="name">GET /v2/test.json</span>
+          <span class="id">d51a9f33</span>
+          <span class="state">failed</span>
+          <ul>
+              <li>failed - HTTP status code 204 expected, but got 200</li>
+              <li>failed - HTTP status code 204 expected, but got 200</li>
+          </ul>
+        </li>
+        <li class="test-result state-failed">
+          <span class="name">GET /v1/banana.json</span>
+          <span class="id">2ffe7e42</span>
+          <span class="state">failed</span>
+          <ul>
+          </ul>
+        </li>
+    </ul>
+  </body>
+</html>

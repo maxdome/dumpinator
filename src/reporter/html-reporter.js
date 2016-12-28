@@ -1,13 +1,15 @@
 'use strict';
 
-const cf = require('colorfy');
-const jsdiff = require('diff');
+const path = require('path');
+const fs = require('fs');
+const handlebars = require('handlebars');
 
 class HTMLReporter {
   constructor(options) {
-    // options = options || {};
-    // this.colorsEnabled = options.noColors === undefined ? process.env.isTTY : !options.noColors;
-    // this.showFullDiff = options.showFullDiff;
+    options = options || {};
+
+    this.output = options.output || path.join(process.cwd(), 'dumpinator-report.html');
+
     this.counter = {
       passed: 0,
       failed: 0,
@@ -38,7 +40,11 @@ class HTMLReporter {
   }
 
   createReport(data) {
-    console.log(this.tests);
+    console.log('Write report', this.tests);
+    const html = handlebars.compile(fs.readFileSync(path.join(__dirname, '../../templates/html-report.hbs'), { encoding: 'utf8' }));
+    fs.writeFileSync(this.output, html({
+      tests: this.tests
+    }));
   }
 
   diff(diff) {

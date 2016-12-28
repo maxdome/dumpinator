@@ -115,14 +115,14 @@ class Dumpinator {
     if (config.cli) {
       console.log('Load cli reporter');
       const CLIReporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-      const cliReporter = new CLIReporter();
+      const cliReporter = new CLIReporter(config.cli);
       cliReporter.report(notify);
     }
 
     if (config.html) {
       console.log('Load html reporter');
       const HTMLReporter = require('./reporter/html-reporter'); // eslint-disable-line global-require
-      const htmlReporter = new HTMLReporter();
+      const htmlReporter = new HTMLReporter(config.html);
       htmlReporter.report(notify);
     }
   }
