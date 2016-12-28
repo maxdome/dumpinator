@@ -40,10 +40,10 @@ class HTMLReporter {
   }
 
   createReport(data) {
-    console.log('Write report', this.tests);
     const html = handlebars.compile(fs.readFileSync(path.join(__dirname, '../../templates/html-report.hbs'), { encoding: 'utf8' }));
     fs.writeFileSync(this.output, html({
-      tests: this.tests
+      tests: this.tests,
+      counter: this.counter
     }));
   }
 

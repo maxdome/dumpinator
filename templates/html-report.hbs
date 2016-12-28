@@ -29,7 +29,7 @@
       }
 
       .test-result .id {
-        color: #018;
+        color: #003e90;
         font-style: italic;;
       }
 
@@ -45,6 +45,36 @@
         color: #800;
         display: inline-block;
         width: 16px;
+      }
+
+      .test-summary {
+        position: fixed;
+        right: 10px;
+        top: 10px;
+        padding: 0;
+        background-color: #eee;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .test-summary .done {
+        color: #003e90;
+        font-weight: bold;
+      }
+
+      .test-summary .passed {
+        color: #040;
+        font-weight: bold;
+      }
+
+      .test-summary .failed {
+        color: #800;
+        font-weight: bold;
+      }
+
+      .test-summary .item {
+        list-style: none;
+        margin: 0;
       }
     </style>
   </head>
@@ -67,5 +97,18 @@
         </li>
       {{/each}}
     </ul>
+    <ul class="test-summary">
+      <li class="item"><span class="done">{{counter.total}}</span> done</li>
+      <li class="item"><span class="passed">{{counter.passed}}</span> passed</li>
+      <li class="item"><span class="failed">{{counter.failed}}</span> failed</li>
+    </ul>
+
+    {{#unless counter.failed}}
+      <div style="position: relative; margin-top: 20px">
+        <div style="position: absolute; left: 15px; top: 23px">Hell, yeah</div>
+        <img src="https://openclipart.org/download/81109/speech-bubble.svg" width="100"><br>
+        <img style="margin-left: 90px" src="https://openclipart.org/download/194695/happy-cow.svg" width="100">
+      </div>
+    {{/unless}}
   </body>
 </html>
