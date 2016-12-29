@@ -17,6 +17,7 @@ class Dumpinator {
     const notify = new Notify();
     const routes = config.getRoutes();
 
+    this.loadReporter(config.reporter, notify);
     routes.forEach((test) => {
       if (config.options.debug) {
         console.log('[DEBUG] add route:', test); // eslint-disable-line no-console
@@ -101,10 +102,18 @@ class Dumpinator {
     return Promise.all(slots).then(() => results);
   }
 
-  static report(notify) {
-    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-    const reporter = new Reporter();
-    return reporter.report(notify);
+  static loadReporter(config, notify) {
+    if (config.cli) {
+      const CLIReporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
+      const cliReporter = new CLIReporter(config.cli);
+      cliReporter.report(notify);
+    }
+
+    if (config.html) {
+      const HTMLReporter = require('./reporter/html-reporter'); // eslint-disable-line global-require
+      const htmlReporter = new HTMLReporter(config.html);
+      htmlReporter.report(notify);
+    }
   }
 
   static compare(test) {

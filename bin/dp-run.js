@@ -26,7 +26,6 @@ if (program.config) {
 }
 
 const notify = Dumpinator.run(config);
-Dumpinator.report(notify);
 notify.on('finish', (allPassed) => {
   CLIUtils[allPassed ? 'generalSuccessHandler' : 'generalErrorHandler']();
 });

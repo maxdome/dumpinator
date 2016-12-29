@@ -140,6 +140,10 @@ class Config {
   constructor(options) {
     this.options = options || {};
     this.routes = { left: [], right: [] };
+    this.reporter = this.options.reporter || {
+      cli: { colors: true },
+      html: { output: path.join(process.cwd(), 'dumpinator-report.html') }
+    };
   }
 
   load(file) {
