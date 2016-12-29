@@ -34,7 +34,7 @@ class Dumpinator {
         }
 
         const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
-        yield stash.add(response);
+        yield stash.add(Dumpinator.extendResponse(response, test));
         notify.setState(test, 'downloaded');
 
         if (test.status && test.status !== response.meta.status) {
@@ -141,8 +141,9 @@ class Dumpinator {
         return {
           type: 'error',
           code: 1002,
-          msg: 'Multiple tests found. Provide a unique id.',
-          testFiles
+          msg: 'Multiple tests found. Provide an unique id.',
+          testFiles,
+          query: testId
         };
       }
 
@@ -156,7 +157,11 @@ class Dumpinator {
       return {
         type: 'diff',
         bodyDiff: yield diff.diff(left.body, right.body),
-        headerDiff: yield diff.diff(left.headers, right.headers)
+        headerDiff: yield diff.diff(left.headers, right.headers),
+        meta: {
+          left: left.meta,
+          right: right.meta
+        }
       };
     });
   }
@@ -165,6 +170,11 @@ class Dumpinator {
     const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
     const reporter = new Reporter(options);
     reporter.diff(diff);
+  }
+
+  static extendResponse(response, test) {
+    response.meta.expectedStatus = test.status;
+    return response;
   }
 }
 

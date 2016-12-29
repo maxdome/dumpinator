@@ -43,7 +43,7 @@
   "dependencies": {
     "argv": "0.0.2",
     "co": "^4.6.0",
-    "colorfy": "^0.4.0",
+    "colorfy": "^0.5.0",
     "commander": "^2.9.0",
     "cowsay": "^1.1.9",
     "diff": "^3.1.0",

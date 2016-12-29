@@ -6,7 +6,7 @@ const jsdiff = require('diff');
 class CLIReporter {
   constructor(options) {
     options = options || {};
-    this.colorsEnabled = options.noColors === undefined ? process.env.isTTY : !options.noColors;
+    this.colorsEnabled = options.noColor === undefined ? process.env.isTTY : !options.noColor;
     this.showFullDiff = options.showFullDiff;
     this.counter = {
       passed: 0,
@@ -61,7 +61,6 @@ class CLIReporter {
   }
 
   drawInlineDiff(colored, line, line2, light, dark) {
-    // console.log('DIFF', line, line2)
     jsdiff.diffChars(line, line2).forEach((l) => {
       if (l.added || l.removed) {
         colored.txt(l.value, `${dark} trim`);
@@ -69,21 +68,31 @@ class CLIReporter {
         colored.txt(l.value, `${light} trim`);
       }
     });
-
-    // colored.nl();
   }
 
   diff(diff) {
     if (diff.type === 'error') {
-      if (diff.testFiles) {
-        console.log(diff.testFiles.join('\n')); // eslint-disable-line no-console
+      const colorized = cf();
+      if (diff.msg) {
+        colorized.txt(diff.msg, 'trim').nl();
       }
+
+
+      if (diff.testFiles) {
+        const highlightStr = diff.query.length;
+        diff.testFiles.forEach((filename) => {
+          colorized.yellow(filename.substr(0, highlightStr), 'bold').txt(filename.substr(highlightStr), 'trim').nl(); // eslint-disable-line no-console
+        });
+      }
+
+      colorized.print(this.colorsEnabled);
 
       return;
     }
 
     this.drawDiff('header', diff.headerDiff);
     this.drawDiff('body', diff.bodyDiff);
+    this.drawStatusDiff(diff.meta);
   }
 
   log(msg) {
@@ -107,12 +116,11 @@ class CLIReporter {
     });
 
     diffMap.forEach((line) => {
-      // console.log('LINE', line)
       if (line.added) {
         line.line.forEach((l, index, array) => {
           colored.txt('  ', 'ltrim').txt('|');
           colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bglime', 'bggreen');
+          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
           colored.nl();
           lineNumbersRight += 1;
         });
@@ -120,7 +128,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
           colored.txt('  ', 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgfire', 'bgred');
+          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred', 'bgdred');
           colored.nl();
           lineNumbersLeft += 1;
         });
@@ -156,7 +164,26 @@ class CLIReporter {
       colored.nl().red(' ❌').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
     }
 
-    colored.print();
+    colored.print(this.colorsEnabled);
+  }
+
+  drawStatusDiff(meta) {
+    const coloredStatus = cf();
+    const coloredResponse = cf();
+    ['left', 'right'].forEach((order) => {
+      const expected = meta[order].expectedStatus;
+      const status = meta[order].status;
+      const time = meta[order].responseTime;
+
+      if (status !== expected) {
+        coloredStatus.red('❌').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
+      }
+
+      coloredResponse.txt('⌛').grey(`Response time of the ${order} route: ${time} ms`).nl();
+    });
+
+    coloredStatus.print();
+    coloredResponse.print();
   }
 }
 
