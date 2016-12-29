@@ -29,12 +29,41 @@ class CLIUtils {
     process.exit(1);
   }
 
-  static generalSuccessHandler() {
+  static generalSuccessHandler(msg) {
     console.log(''); // eslint-disable-line no-console
-    console.log(cowsay.think({ // eslint-disable-line no-console
-      text: 'Hell yeah, I\'m awesome!',
-      e: '-O'
-    }));
+
+    if (msg) {
+      console.log(cowsay.say({ // eslint-disable-line no-console
+        text: msg,
+        e: 'oO'
+      }));
+    } else {
+      console.log(cowsay.think({ // eslint-disable-line no-console
+        text: 'Hell yeah, I\'m awesome!',
+        e: '-O'
+      }));
+    }
+
+    console.log(''); // eslint-disable-line no-console
+  }
+
+  static generalWarningHandler(msg) {
+    console.log(''); // eslint-disable-line no-console
+
+    if (msg) {
+      console.log(cowsay.say({ // eslint-disable-line no-console
+        text: msg,
+        e: 'o-',
+        T: 'U'
+      }));
+    } else {
+      console.log(cowsay.think({ // eslint-disable-line no-console
+        text: 'Am I crazy???',
+        e: 'o-',
+        T: 'U'
+      }));
+    }
+
     console.log(''); // eslint-disable-line no-console
   }
 }
