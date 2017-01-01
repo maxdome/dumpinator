@@ -7,6 +7,13 @@ const path = require('path');
 const validMethods = ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'];
 const defaultConfigs = ['./dumpinator.conf.js', './dumpinator.json'];
 
+const ALLOWED_ROUTE_KEYS = [
+  'name', 'tag', 'method',
+  'hostname', 'url', 'header',
+  'query', 'ignoreBody',
+  'ignoreHeader', 'status',
+  'left', 'right', 'before', 'after'];
+
 function validateSide(name, data) {
   if (data) {
     if (!lodash.isObject(data)) {
@@ -43,7 +50,7 @@ function validateSide(name, data) {
 function validateRoute(data, i) {
   const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
   lodash.each(data, (val, key) => {
-    if (!lodash.includes(['name', 'tag', 'method', 'hostname', 'url', 'header', 'query', 'ignoreBody', 'ignoreHeader', 'status', 'left', 'right'], key)) {
+    if (!lodash.includes(ALLOWED_ROUTE_KEYS, key)) {
       throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
     }
   });
@@ -340,13 +347,36 @@ class Config {
     return routes;
   }
 
-  addRoute(left, right) {
-    this.parseJSON({
-      routes: [{
-        left,
-        right
-      }]
-    });
+  toJSON() {
+    const routes = [];
+
+    for (let i = 0; i < this.routes.left.length; i += 1) {
+      routes.push({
+        url: this.routes.left[i].url,
+        id: this.routes.left[i].id,
+        side: 'left',
+        name: this.routes.left[i].name,
+        header: this.routes.left[i].header,
+        query: this.routes.left[i].query,
+        ignoreBody: this.routes.left[i].ignoreBody,
+        ignoreHeader: this.routes.left[i].ignoreHeader,
+        status: this.routes.left[i].status
+      }, {
+        url: this.routes.right[i].url,
+        id: this.routes.right[i].id,
+        side: 'right',
+        name: this.routes.right[i].name,
+        header: this.routes.right[i].header,
+        query: this.routes.right[i].query,
+        ignoreBody: this.routes.right[i].ignoreBody,
+        ignoreHeader: this.routes.right[i].ignoreHeader,
+        status: this.routes.right[i].status
+      });
+    }
+  }
+
+  addRoute(route) {
+    this.routes.push(new Route(route));
   }
 }
 

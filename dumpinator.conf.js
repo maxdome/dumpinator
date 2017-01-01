@@ -18,7 +18,13 @@ module.exports = {
   },
   routes: [
     {
-      url: '/v1/test.json'
+      url: '/v1/test.json',
+      before() {
+        console.log('Before first route');
+      },
+      after() {
+        console.log('After first route');
+      }
     }, {
       url: '/v2/test.json',
       status: 204
@@ -30,5 +36,11 @@ module.exports = {
         url: '/v2/banana.json'
       }
     }
-  ]
+  ],
+  before() {
+    console.log('Before all');
+  },
+  after() {
+    console.log('After all');
+  }
 };

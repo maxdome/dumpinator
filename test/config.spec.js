@@ -175,7 +175,23 @@ describe('Config', () => {
       inspect(config.routes).isEql(expectedResult);
     });
 
-    it('spreads routes with multiple methods, queries & headers'); // Feature idea: Using an array in the route's method, url or query duplicates the route for each value for convenience
+    it.only('accepts a before method', () => {
+      const fn = () => {};
+
+      config.parseJSON({
+        defaults: {
+          left: { method: 'GET', hostname: 'http://dumpi.rocks' },
+          right: { method: 'GET', hostname: 'http://dumpi.sucks' }
+        },
+        routes: [{ url: 'ping', before: fn }]
+      });
+
+      inspect(config.routes).isEql({
+        left: { url: '' },
+        right: { url: '' },
+        before: fn
+      });
+    });
   });
 
   describe('parseArguments()', () => {
@@ -296,6 +312,7 @@ describe('Config', () => {
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { R: ['foo:bar', 'baz:bez'] } });
       inspect(config.routes).isEql(expectedResult);
     });
+
     it('accepts multiple types of headers', () => {
       const expectedResult = {
         left: [
@@ -308,14 +325,17 @@ describe('Config', () => {
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { H: 'H:val1', header: ['header1:val2', 'header2:val3'], L: ['L1:val4', 'L2:val5'], 'header-left': 'left:val6', R: ['R1:val7', 'R2:val8'], 'header-right': 'right:val9' } });
       inspect(config.routes).isEql(expectedResult);
     });
+
     it('accepts a tag of type string', () => {
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { tag: 'foo' } });
       inspect(config.options).isEql({ tag: 'foo' });
     });
+
     it('accepts a tag of type integer', () => {
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { tag: 123 } });
       inspect(config.options).isEql({ tag: 123 });
     });
+
     it('accepts a valid rate', () => {
       config.parseArguments('http://a.b/left', 'http://a.b/right', { args: { rate: 1 } });
       inspect(config.options).isEql({ rateLimit: 1 });
