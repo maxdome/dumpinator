@@ -50,7 +50,7 @@ describe('Route', () => {
 
     it('validate input parameters, should fail', () => {
       inspect(() => {
-        const route = new Route({
+        const route = new Route({ // eslint-disable-line no-unused-vars
           hustnam: 'http://dumpi.rocks',
           left: { url: 'foo' },
           right: { url: 'bar' }
@@ -60,7 +60,7 @@ describe('Route', () => {
 
     it('validate input parameters in left site, should fail', () => {
       inspect(() => {
-        const route = new Route({
+        const route = new Route({ // eslint-disable-line no-unused-vars
           hostname: 'http://dumpi.rocks',
           left: { url: 'foo', hustnam: 'http://nonsens.io' },
           right: { url: 'bar' }
@@ -70,7 +70,7 @@ describe('Route', () => {
 
     it('validate input parameters in right site, should fail', () => {
       inspect(() => {
-        const route = new Route({
+        const route = new Route({ // eslint-disable-line no-unused-vars
           hostname: 'http://dumpi.rocks',
           left: { url: 'foo' },
           right: { url: 'bar', hustnam: 'http://nonsens.io' }
@@ -183,7 +183,7 @@ describe('Route', () => {
           url: 'http://stage.dumpi.rocks/bar',
           method: 'GET',
           ignoreBody: ['foo']
-        },
+        }
       });
     });
 
@@ -211,7 +211,7 @@ describe('Route', () => {
           url: 'http://stage.dumpi.rocks/bar',
           method: 'GET',
           ignoreHeader: ['etag', 'x-dumpinator']
-        },
+        }
       });
     });
   });
