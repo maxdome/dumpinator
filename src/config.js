@@ -1,156 +1,35 @@
 'use strict';
 
 const lodash = require('lodash');
-const crypto = require('crypto');
 const path = require('path');
+
+const Route = require('./route');
 
 const validMethods = ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'];
 const defaultConfigs = ['./dumpinator.conf.js', './dumpinator.json'];
 
-const ALLOWED_ROUTE_KEYS = [
-  'name', 'tag', 'method',
-  'hostname', 'url', 'header',
-  'query', 'ignoreBody',
-  'ignoreHeader', 'status',
-  'left', 'right', 'before', 'after'];
-
-function validateSide(name, data) {
-  if (data) {
-    if (!lodash.isObject(data)) {
-      throw new Error(`Config invalid: "${name}" must be an object!`);
-    }
-    lodash.each(data, (val, key) => {
-      if (!lodash.includes(['method', 'hostname', 'header', 'query'], key)) {
-        throw new Error(`Config invalid: Key "${key}" in "${name}" is not allowed!`);
-      }
-    });
-    if (lodash.get(data, 'method')) {
-      if (!lodash.includes(validMethods, data.method)) {
-        throw new Error(`Config invalid: Method "${data.method}" in "${name}.method" is invalid!`);
-      }
-    }
-    if (lodash.get(data, 'hostname')) {
-      if (!data.hostname.match(/^https?:\/\//)) {
-        throw new Error(`Config invalid: Hostname "${data.hostname}" in "${name}.hostname" is invalid!`);
-      }
-    }
-    if (lodash.get(data, 'header')) {
-      if (!lodash.isObject(data.header)) {
-        throw new Error(`Config invalid: "${name}.header" is invalid!`);
-      }
-    }
-    if (lodash.get(data, 'query')) {
-      if (!lodash.isObject(data.query)) {
-        throw new Error(`Config invalid: "${name}.query" is invalid!`);
-      }
-    }
-  }
-}
-
-function validateRoute(data, i) {
-  const url = lodash.has(data, 'url') ? ` (${data.url})` : '';
-  lodash.each(data, (val, key) => {
-    if (!lodash.includes(ALLOWED_ROUTE_KEYS, key)) {
-      throw new Error(`Config invalid: Key "${key}" in "routes[${i}]" is not allowed!`);
-    }
-  });
-  if (lodash.get(data, 'name')) {
-    if (!lodash.isString(data.name) && !lodash.isNumber(data.name)) {
-      throw new Error(`Config invalid: Name in "routes[${i}]"${url} is invalid!`);
-    }
-  }
-  if (lodash.get(data, 'tag')) {
-    if (!lodash.isString(data.tag) && !lodash.isNumber(data.tag)) {
-      throw new Error(`Config invalid: Tag in "routes[${i}]"${url} is invalid!`);
-    }
-  }
-  if (!lodash.isString(data.url) && !lodash.has(data, 'left.url') && !lodash.has(data, 'right.url')) {
-    throw new Error(`Config invalid: "routes[${i}]" must contain a "url" (string)!`);
-  }
-  if (lodash.get(data, 'method')) {
-    if (!lodash.includes(validMethods, data.method)) {
-      throw new Error(`Config invalid: Method "${data.method}" in "routes[${i}]"${url} is invalid!`);
-    }
-  }
-}
-
-function extendHeaders(self, type, header) {
-  if (header.length) {
-    const leftRoute = self.routes.left[0];
-    const rightRoute = self.routes.right[0];
-
-    let keyValue;
-    header.forEach((val) => {
-      val = val.toString();
-      keyValue = val.split(':');
-
-      if (keyValue.length < 2) {
-        throw new Error(`Arguments invalid: [${type}] (${val}) does not contain a ":"!`);
-      }
-
-      keyValue[0] = keyValue[0].trim();
-      keyValue[1] = keyValue[1].trim();
-
-      if (lodash.includes(['header', 'header-left'], type)) {
-        leftRoute.header = leftRoute.header || {};
-        leftRoute.header[keyValue[0]] = keyValue[1];
-      }
-
-      if (lodash.includes(['header', 'header-right'], type)) {
-        rightRoute.header = rightRoute.header || {};
-        rightRoute.header[keyValue[0]] = keyValue[1];
-      }
-    });
-
-    const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
-
-    leftRoute.id = routeHash;
-    leftRoute.name = leftRoute.name || `${leftRoute.method} ${leftRoute.url}`;
-    rightRoute.id = routeHash;
-    rightRoute.name = rightRoute.name || `${rightRoute.method} ${rightRoute.url}`;
-  }
-}
-
-function extendRoute(side, route, defaults) {
-  defaults = defaults || {};
-  const out = Object.assign({}, side, route);
-  if (lodash.get(side, 'hostname')) {
-    out.url = side.hostname + route.url;
-  }
-  if (!out.method) {
-    out.method = 'GET';
-  }
-
-  if (!out.status && defaults.status) {
-    out.status = defaults.status;
-  }
-
-  out.name = route.name || `${out.method} ${route.url}`;
-  delete out.hostname;
-  return out;
-}
-
-function parseRoute(type, url) {
-  const components = url.split(' ');
-  let method = 'GET';
-  if (components.length > 1) {
-    if (!lodash.includes(validMethods, components[0])) {
-      throw new Error(`Arguments invalid: Method "${components[0]}" in [${type}] is invalid!`);
-    }
-    method = components[0];
-    url = components[1];
-  }
-  return { method, url };
-}
-
 class Config {
   constructor(options) {
     this.options = options || {};
-    this.routes = { left: [], right: [] };
-    this.reporter = this.options.reporter || {
+    this.routes = [];
+    this.reporter = options.reporter || {
       cli: { colors: true },
       html: { output: path.join(process.cwd(), 'dumpinator-report.html') }
     };
+
+    if (!lodash.isUndefined(options.rateLimit) && (!lodash.isInteger(options.rateLimit) || options.rateLimit < 1)) {
+      throw new Error('Arguments invalid: [rateLimit] must be an integer > 0!');
+    }
+
+    if (options.tag && !(lodash.isString(options.tag) || lodash.isNumber(options.tag))) {
+      throw new Error('Arguments invalid: [tag] must be a string or number!');
+    }
+
+    this.rateLimit = options.rateLimit || 1;
+    this.tag = options.tag || null;
+    this.verbose = options.verbose || false;
+    this.debug = options.debug || false;
+    this.noColor = options.noColor || process.env.isTTY;
   }
 
   load(file) {
@@ -184,29 +63,14 @@ class Config {
   }
 
   parseJSON(input) {
-    const defaults = lodash.get(input, 'defaults');
-    const routes = lodash.get(input, 'routes');
-    const left = lodash.get(defaults, 'left');
-    const right = lodash.get(defaults, 'right');
+    this.setDefaults(lodash.get(input, 'defaults'), {});
+    const routes = lodash.get(input, 'routes', []);
 
     lodash.each(input, (val, key) => {
-      if (!lodash.includes(['options', 'defaults', 'routes'], key)) {
+      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after'], key)) {
         throw new Error(`Config invalid: Key "${key}" is not allowed!`);
       }
     });
-
-    if (defaults && !lodash.isObject(defaults)) {
-      throw new Error('Config invalid: "defaults" must be an object!');
-    }
-
-    lodash.each(defaults, (val, key) => {
-      if (!lodash.includes(['left', 'right', 'rateLimit', 'status', 'ignoreBody', 'ignoreHeader'], key)) {
-        throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
-      }
-    });
-
-    validateSide('left', left);
-    validateSide('right', right);
 
     if (!Array.isArray(routes)) {
       throw new Error('Config invalid: "routes" must be an array!');
@@ -217,130 +81,52 @@ class Config {
         throw new Error(`Config invalid: "routes[${i}]" (${route.url || route}) must must be a string or an object!`);
       }
 
-      if (lodash.isObject(route)) {
-        validateRoute(route, i);
-      }
-
       if (lodash.isString(route)) {
-        route = { url: route };
+        route = { left: { url: route }, right: { url: route } };
       }
 
-      let leftRoute;
-      let rightRoute;
-      if (lodash.has(route, 'left.url') && lodash.has(route, 'right.url')) {
-        leftRoute = extendRoute(left, {
-          url: lodash.get(route, 'left.url')
-        });
-        rightRoute = extendRoute(right, {
-          url: lodash.get(route, 'right.url')
-        });
-      } else {
-        leftRoute = extendRoute(left, lodash.clone(route));
-        rightRoute = extendRoute(right, lodash.clone(route));
-      }
-
-      const routeHash = crypto.createHash('md5').update(JSON.stringify(leftRoute)).digest('hex');
-
-      leftRoute.id = routeHash;
-      rightRoute.id = routeHash;
-
-      ['ignoreBody', 'ignoreHeader'].forEach((prop) => {
-        if (lodash.has(defaults, prop)) {
-          if (!lodash.has(leftRoute, prop)) {
-            leftRoute[prop] = defaults[prop];
-          }
-
-          if (!lodash.has(rightRoute, prop)) {
-            rightRoute[prop] = defaults[prop];
-          }
-        }
-      });
-
-
-      this.routes.left.push(leftRoute);
-      this.routes.right.push(rightRoute);
+      this.addRoute(route);
     });
   }
 
-  parseOptions(options) {
-    options = options || {};
-    const rate = lodash.get(options.args, 'r') || lodash.get(options.args, 'rate');
-    const tag = lodash.get(options.args, 't') || lodash.get(options.args, 'tag');
-    const debug = lodash.get(options.args, 'd') || lodash.get(options.args, 'debug');
-    const header = lodash.unionWith(
-      lodash.castArray(lodash.get(options.args, 'H', [])),
-      lodash.castArray(lodash.get(options.args, 'header', []))
-    );
-    const headerLeft = lodash.unionWith(
-      lodash.castArray(lodash.get(options.args, 'L', [])),
-      lodash.castArray(lodash.get(options.args, 'header-left', []))
-    );
-    const headerRight = lodash.unionWith(
-      lodash.castArray(lodash.get(options.args, 'R', [])),
-      lodash.castArray(lodash.get(options.args, 'header-right', []))
-    );
-
-    if (!lodash.isUndefined(rate) && (!lodash.isInteger(rate) || rate < 1)) {
-      throw new Error('Arguments invalid: [rate] must be an integer > 0!');
+  setDefaults(defaults) {
+    if (defaults && !lodash.isObject(defaults)) {
+      throw new Error('Config invalid: "defaults" must be an object!');
     }
 
-    if (tag && !(lodash.isString(tag) || lodash.isNumber(tag))) {
-      throw new Error('Arguments invalid: [tag] must be a string or number!');
-    }
+    lodash.each(defaults, (val, key) => {
+      if (!lodash.includes(['left', 'right', 'rateLimit', 'status', 'ignoreBody', 'ignoreHeader'], key)) {
+        throw new Error(`Config invalid: Key "${key}" in "defaults" is not allowed!`);
+      }
+    });
 
-    if (tag) {
-      this.options.tag = tag;
-    }
-    if (rate) {
-      this.options.rateLimit = rate;
-    }
-    if (debug) {
-      this.options.debug = true;
-    }
-
-    extendHeaders(this, 'header', header);
-    extendHeaders(this, 'header-left', headerLeft);
-    extendHeaders(this, 'header-right', headerRight);
-  }
-
-  parseArguments(left, right, options) {
-    if (!left) {
-      throw new Error('Arguments invalid: [left] missing!');
-    }
-    if (!right) {
-      throw new Error('Arguments invalid: [right] missing!');
-    }
-
-    this.routes.left.push(parseRoute('left', left));
-    this.routes.right.push(parseRoute('right', right));
-
-    this.parseOptions(options);
+    this.defaults = defaults;
   }
 
   getRoutes() {
     const routes = [];
 
-    for (let i = 0; i < this.routes.left.length; i += 1) {
+    for (let i = 0; i < this.routes.length; i += 1) {
       routes.push({
-        url: this.routes.left[i].url,
-        id: this.routes.left[i].id,
+        url: this.routes[i].left.url,
+        id: this.routes[i].id,
         side: 'left',
-        name: this.routes.left[i].name,
-        header: this.routes.left[i].header,
-        query: this.routes.left[i].query,
-        ignoreBody: this.routes.left[i].ignoreBody,
-        ignoreHeader: this.routes.left[i].ignoreHeader,
-        status: this.routes.left[i].status
+        name: this.routes[i].name,
+        header: this.routes[i].left.header,
+        query: this.routes[i].left.query,
+        ignoreBody: this.routes[i].left.ignoreBody,
+        ignoreHeader: this.routes[i].left.ignoreHeader,
+        status: this.routes[i].left.status
       }, {
-        url: this.routes.right[i].url,
-        id: this.routes.right[i].id,
+        url: this.routes[i].right.url,
+        id: this.routes[i].id,
         side: 'right',
-        name: this.routes.right[i].name,
-        header: this.routes.right[i].header,
-        query: this.routes.right[i].query,
-        ignoreBody: this.routes.right[i].ignoreBody,
-        ignoreHeader: this.routes.right[i].ignoreHeader,
-        status: this.routes.right[i].status
+        name: this.routes[i].name,
+        header: this.routes[i].right.header,
+        query: this.routes[i].right.query,
+        ignoreBody: this.routes[i].right.ignoreBody,
+        ignoreHeader: this.routes[i].right.ignoreHeader,
+        status: this.routes[i].right.status
       });
     }
 
@@ -348,34 +134,21 @@ class Config {
   }
 
   toJSON() {
-    const routes = [];
-
-    for (let i = 0; i < this.routes.left.length; i += 1) {
-      routes.push({
-        url: this.routes.left[i].url,
-        id: this.routes.left[i].id,
-        side: 'left',
-        name: this.routes.left[i].name,
-        header: this.routes.left[i].header,
-        query: this.routes.left[i].query,
-        ignoreBody: this.routes.left[i].ignoreBody,
-        ignoreHeader: this.routes.left[i].ignoreHeader,
-        status: this.routes.left[i].status
-      }, {
-        url: this.routes.right[i].url,
-        id: this.routes.right[i].id,
-        side: 'right',
-        name: this.routes.right[i].name,
-        header: this.routes.right[i].header,
-        query: this.routes.right[i].query,
-        ignoreBody: this.routes.right[i].ignoreBody,
-        ignoreHeader: this.routes.right[i].ignoreHeader,
-        status: this.routes.right[i].status
-      });
-    }
+    return this.routes;
   }
 
   addRoute(route) {
+    lodash.each(this.defaults, (value, key) => {
+      if (key === 'left' || key === 'right') {
+        route[key] = Object.assign({}, route[key], value);
+        return;
+      }
+
+      if (!(key in route)) {
+        route[key] = this.defaults[key];
+      }
+    });
+
     this.routes.push(new Route(route));
   }
 }

@@ -3,7 +3,6 @@
 'use strict';
 
 const program = require('commander');
-const minimist = require('minimist');
 
 const Dumpinator = require('../src/dumpinator');
 const Config = require('../src/config');
@@ -25,12 +24,14 @@ program
 const options = program.parse(process.argv);
 
 if (options.args.length === 2) {
-  const config = new Config();
-  const left = options.args[0];
-  const right = options.args[1];
-  const minimistArgs = minimist(process.argv);
+  const config = new Config({
+    debug: options.debug,
+    noColor: ('color' in options) ? !options.color : undefined,
+    full: options.full
+  });
 
-  config.parseArguments(left, right, minimistArgs);
+  const routeConf = CLIUtils.parseRouteArguments(process.argv);
+  config.addRoute(routeConf);
 
   const notify = Dumpinator.run(config);
 
