@@ -379,6 +379,67 @@ The status can be set if a route test should fail when the status doesn't match.
 }
 ```
 
+#### Method
+
+The `method` options sets the HTTP send method which can be set in either level. Uses `GET` as default.  
+
+Dumpinator supports these methods:  
+
+`CHECKOUT` `COPY` `DELETE` `GET` `HEAD` `LOCK` `MERGE` `MKACTIVITY` `MKCOL` `MOVE` `M-SEARCH` `NOTIFY` `OPTIONS` `PATCH` `POST` `PURGE` `PUT` `REPORT` `SEARCH` `SUBSCRIBE` `TRACE` `UNLOCK` `UNSUBSCRIBE`
+
+```json
+{
+  "defaults": {
+    "method": "GET",
+    ...
+  },
+  "routes": [
+    {
+      "url": "/my-first-route",
+      "status": 204,
+      "right": {
+        "method": "POST"
+      }
+    },
+    ...
+  ]
+}
+```
+
+#### Before and after hooks
+
+The `before` and `after` options are accepting a callback function. A before function on the main level will be called before any test has been done and after, after all tests have been done. A `before` and `after` callback on a route level will be called before or after a route has been tested. This feature works in `commonjs-mode` only!
+
+```javascript
+module.exports = {
+  defaults: {
+    // ...
+  },
+  before: () => {
+    console.log('Start test runner');
+    return Promise.resolve();
+  },
+  after: () => {
+    console.log('Stop test runner');
+    return Promise.resolve();
+  }
+  routes: [
+    {
+      url: '/my-first-route',
+      before: () => {
+        console.log('Start route test');
+        return Promise.resolve();
+      },
+      after: () => {
+        console.log('Start route test');
+        return Promise.resolve();
+      }
+    },
+    // ...
+  ]
+};
+```
+
 #### Ignore headers or body properties
 
 ```json

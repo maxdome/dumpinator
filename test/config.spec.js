@@ -225,6 +225,36 @@ describe('Config', () => {
           left: { method: 'GET', hostname: 'http://dumpi.rocks/' },
           right: { method: 'GET', hostname: 'http://dumpi.sucks/' }
         },
+        routes: [{ url: 'ping' }],
+        before: fn
+      });
+
+      inspect(config.before).isEql(fn);
+    });
+
+    it('accepts a after method', () => {
+      const fn = () => {};
+
+      config.parseJSON({
+        defaults: {
+          left: { method: 'GET', hostname: 'http://dumpi.rocks/' },
+          right: { method: 'GET', hostname: 'http://dumpi.sucks/' }
+        },
+        routes: [{ url: 'ping' }],
+        after: fn
+      });
+
+      inspect(config.after).isEql(fn);
+    });
+
+    it('accepts a before method on route level', () => {
+      const fn = () => {};
+
+      config.parseJSON({
+        defaults: {
+          left: { method: 'GET', hostname: 'http://dumpi.rocks/' },
+          right: { method: 'GET', hostname: 'http://dumpi.sucks/' }
+        },
         routes: [{ url: 'ping', before: fn }]
       });
 
@@ -237,7 +267,7 @@ describe('Config', () => {
       }]);
     });
 
-    it('accepts a after method', () => {
+    it('accepts a after method on route level', () => {
       const fn = () => {};
 
       config.parseJSON({
@@ -252,50 +282,6 @@ describe('Config', () => {
         id: '2e2b8e3461e5aed3f0c28071828a17e9',
         left: { url: 'http://dumpi.rocks/ping', method: 'GET' },
         right: { url: 'http://dumpi.sucks/ping', method: 'GET' },
-        name: 'GET /ping',
-        after: fn
-      }]);
-    });
-
-    it('accepts a before method on route level', () => {
-      const fn = () => {};
-      const fn2 = () => {};
-      const fn3 = () => {};
-
-      config.parseJSON({
-        defaults: {
-          left: { method: 'GET', hostname: 'http://dumpi.rocks/', before: fn2 },
-          right: { method: 'GET', hostname: 'http://dumpi.sucks/', before: fn3 }
-        },
-        routes: [{ url: 'ping', before: fn }]
-      });
-
-      inspect(config.routes).isEql([{
-        id: '2e2b8e3461e5aed3f0c28071828a17e9',
-        left: { url: 'http://dumpi.rocks/ping', method: 'GET', before: fn2 },
-        right: { url: 'http://dumpi.sucks/ping', method: 'GET', before: fn3 },
-        name: 'GET /ping',
-        before: fn
-      }]);
-    });
-
-    it('accepts a after method on route level', () => {
-      const fn = () => {};
-      const fn2 = () => {};
-      const fn3 = () => {};
-
-      config.parseJSON({
-        defaults: {
-          left: { method: 'GET', hostname: 'http://dumpi.rocks/', after: fn2 },
-          right: { method: 'GET', hostname: 'http://dumpi.sucks/', after: fn3 }
-        },
-        routes: [{ url: 'ping', after: fn }]
-      });
-
-      inspect(config.routes).isEql([{
-        id: '2e2b8e3461e5aed3f0c28071828a17e9',
-        left: { url: 'http://dumpi.rocks/ping', method: 'GET', after: fn2 },
-        right: { url: 'http://dumpi.sucks/ping', method: 'GET', after: fn3 },
         name: 'GET /ping',
         after: fn
       }]);

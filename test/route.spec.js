@@ -78,6 +78,26 @@ describe('Route', () => {
       }).doesThrow(/Invalid configuration/);
     });
 
+    it('throws an error if method is not allowed', () => {
+      inspect(() => {
+        const route = new Route({ // eslint-disable-line no-unused-vars
+          method: 'GOT',
+          left: { url: 'foo' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('throws an error if before is used in a side level', () => {
+      inspect(() => {
+        const route = new Route({ // eslint-disable-line no-unused-vars
+          method: 'GOT',
+          left: { url: 'foo', before: 'foo' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
     it('overwrites hostname', () => {
       const route = new Route({
         hostname: 'http://dumpi.rocks',

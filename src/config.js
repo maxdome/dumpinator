@@ -5,7 +5,6 @@ const path = require('path');
 
 const Route = require('./route');
 
-const validMethods = ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'];
 const defaultConfigs = ['./dumpinator.conf.js', './dumpinator.json'];
 
 class Config {
@@ -87,6 +86,14 @@ class Config {
 
       this.addRoute(route);
     });
+
+    if (input.before) {
+      this.before = input.before;
+    }
+
+    if (input.after) {
+      this.after = input.after;
+    }
   }
 
   setDefaults(defaults) {

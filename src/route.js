@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const lodash = require('lodash');
 
 class Route {
   constructor(route) {
@@ -62,14 +63,31 @@ class Route {
   }
 
   validate(validateionData) {
-    const ALLOWED_ROUTE_KEYS = [
-      'name', 'tag', 'method',
+    const ALLOWED_SITE_KEYS = [
+      'method',
       'hostname', 'url', 'header',
       'query', 'ignoreBody',
-      'ignoreHeader', 'status',
-      'before', 'after'];
+      'ignoreHeader', 'status'
+    ];
 
-    const reg = new RegExp(`^${ALLOWED_ROUTE_KEYS.join('|')}$`);
+    const ALLOWED_ROUTE_KEYS = [
+      'name', 'tag', 'before', 'after'
+    ];
+
+    const ALLOWED_METHODS = [
+      'GET', 'POST', 'PUT', 'DELETE',
+      'HEAD', 'CHECKOUT', 'COPY',
+      'LOCK', 'MERGE', 'MKACTIVITY',
+      'MKCOL', 'MOVE', 'M-SEARCH',
+      'NOTIFY', 'OPTIONS', 'PATCH',
+      'PURGE', 'REPORT', 'SEARCH',
+      'SUBSCRIBE', 'TRACE',
+      'UNLOCK', 'UNSUBSCRIBE'
+    ];
+
+    const regAllowedSiteKeys = new RegExp(`^${ALLOWED_SITE_KEYS.join('|')}$`);
+    const regAllowedRouteKeys = new RegExp(`^${ALLOWED_ROUTE_KEYS.concat(ALLOWED_SITE_KEYS).join('|')}$`);
+    const regAllowedMethods = new RegExp(`^${ALLOWED_METHODS.join('|')}$`);
 
     const validate = (obj, level) => {
       Object.keys(obj).forEach((key) => {
@@ -78,11 +96,19 @@ class Route {
           return;
         }
 
+        const reg = level ? regAllowedSiteKeys : regAllowedRouteKeys;
         if (!reg.test(key)) {
           throw new Error(`Invalid configuration! ${key} not allowed in ${level || 'base'} route`);
         }
       });
     };
+
+    ['method', 'left.method', 'right.method'].forEach((key) => {
+      const value = lodash.get(validateionData, key);
+      if (value && !regAllowedMethods.test(value)) {
+        throw new Error(`Invalid configuration! ${value} is not a valid method in ${key}`);
+      }
+    });
 
     validate(validateionData);
   }
