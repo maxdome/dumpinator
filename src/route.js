@@ -40,6 +40,23 @@ class Route {
       }
     });
 
+    // set optional route only properties
+    ['before', 'after'].forEach((prop) => {
+      if (!this.left[prop]) {
+        const param = this.getSiteParam(route, 'left', prop);
+        if (param) {
+          this.left[prop] = param;
+        }
+      }
+
+      if (!this.right[prop]) {
+        const param = this.getSiteParam(route, 'right', prop);
+        if (param) {
+          this.right[prop] = param;
+        }
+      }
+    });
+
     this.createId();
     this.createName();
   }
@@ -76,6 +93,14 @@ class Route {
     }
 
     return route[param] || defaultValue;
+  }
+
+  getSiteParam(route, site, param, defaultValue) {
+    if (route[site] && route[site][param]) {
+      return route[site][param];
+    }
+
+    return defaultValue;
   }
 
   getUrl(route, site) {

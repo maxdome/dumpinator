@@ -10,7 +10,7 @@ const defaultConfigs = ['./dumpinator.conf.js', './dumpinator.json'];
 
 class Config {
   constructor(options) {
-    this.options = options || {};
+    options = options || {};
     this.routes = [];
     this.reporter = options.reporter || {
       cli: { colors: true },
