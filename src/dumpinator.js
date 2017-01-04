@@ -15,50 +15,129 @@ class Dumpinator {
     const parallelRequests = 2;
     const jobs = [];
     const notify = new Notify();
-    const routes = config.getRoutes();
+    const routes = config.routes;
 
     this.loadReporter(config.reporter, notify);
-    routes.forEach((test) => {
-      if (config.options.debug) {
-        console.log('[DEBUG] add route:', test); // eslint-disable-line no-console
+
+    co(function* runner() {
+      if (config.before) {
+        if (config.debug) {
+          console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
+        }
+
+        const p = config.before(notify);
+        if (p) {
+          yield p;
+        }
       }
 
-      notify.addTest(test);
-      jobs.push(co(function* task() {
-        const request = new Request();
-        let response;
-        try {
-          response = yield request.load(test);
-        } catch (err) {
-          notify.setState(test, 'download-failed', err.message);
-          return;
+      for (const route of routes) {
+        if (config.debug) {
+          console.log('[DEBUG] add route:', route); // eslint-disable-line no-console
         }
 
-        const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
-        yield stash.add(Dumpinator.extendResponse(response, test));
-        notify.setState(test, 'downloaded');
-        notify.setData(test, 'responseTime', response.meta.responseTime);
+        notify.addTest(route);
 
-        if (test.status && test.status !== response.meta.status) {
-          notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
+        jobs.push(co(function* task() {
+          for (const side of ['left', 'right']) {
+            const test = Dumpinator.createTest(route, side);
 
-          return;
-        }
+            if (config.beforeEach) {
+              if (config.debug) {
+                console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
+              }
 
-        if (notify.getState(test) === 'downloaded') {
-          const testResult = yield Dumpinator.compare(test);
-          if (testResult === null) {
-            notify.setTestPassed(test);
-          } else {
-            notify.setTestFailed(test);
+              const p = config.beforeEach(notify);
+              if (p) {
+                yield p;
+              }
+            }
+
+            if (route.before) {
+              if (config.debug) {
+                console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
+              }
+
+              const p = route.before(notify);
+              if (p) {
+                yield p;
+              }
+            }
+
+            const request = new Request();
+            let response;
+            let finish = false;
+            try {
+              response = yield request.load(test);
+            } catch (err) {
+              notify.setState(test, 'download-failed', err.message);
+              finish = true;
+            }
+
+            if (!finish) {
+              const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
+              yield stash.add(Dumpinator.extendResponse(response, test));
+              notify.setState(test, 'downloaded');
+              notify.setData(test, 'responseTime', response.meta.responseTime);
+
+              if (test.status && test.status !== response.meta.status) {
+                notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
+
+                finish = true;
+              }
+            }
+
+            if (!finish) {
+              if (notify.getState(test) === 'downloaded') {
+                const testResult = yield Dumpinator.compare(test);
+                if (testResult === null) {
+                  notify.setTestPassed(test);
+                } else {
+                  notify.setTestFailed(test);
+                }
+              } else if (notify.getState(test) === 'download-failed') {
+                notify.setTestFailed(test);
+              }
+            }
+
+            if (route.after) {
+              if (config.debug) {
+                console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
+              }
+
+              const p = route.after(notify);
+              if (p) {
+                yield p;
+              }
+            }
+
+            if (config.afterEach) {
+              if (config.debug) {
+                console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
+              }
+
+              const p = config.afterEach(notify);
+              if (p) {
+                yield p;
+              }
+            }
           }
-        } else if (notify.getState(test) === 'download-failed') {
-          notify.setTestFailed(test);
-        }
-      }));
-    });
+        }));
+      }
 
-    this.parallelize(jobs, parallelRequests).then((res) => {
+      yield this.parallelize(jobs, parallelRequests);
+
+      if (config.after) {
+        if (config.debug) {
+          console.log('[DEBUG] call after all method'); // eslint-disable-line no-console
+        }
+
+        const p = config.after(notify);
+        if (p) {
+          yield p;
+        }
+      }
+    }.bind(this)).then((res) => {
       notify.finish();
     }).catch((err) => {
       notify.error(err);
@@ -185,6 +264,14 @@ class Dumpinator {
   static extendResponse(response, test) {
     response.meta.expectedStatus = test.status;
     return response;
+  }
+
+  static createTest(route, side) {
+    return Object.assign({
+      side,
+      id: route.id,
+      name: route.name
+    }, route[side]);
   }
 }
 

@@ -11,20 +11,21 @@ class Notify extends EventEmitter {
   }
 
   addTest(test) {
-    test.id = test.id || 'xxxxxxxx';
     if (!this.session[test.id]) {
       this.session[test.id] = {
         state: 'pending',
         name: test.name,
-        id: test.id.substr(0, 8)
+        id: test.id.substr(0, 8),
+        left: {
+          state: 'pending'
+        },
+        right: {
+          state: 'pending'
+        }
       };
 
       this.emit('test.add', this.session[test.id]);
     }
-
-    this.session[test.id][test.side] = {
-      state: 'pending'
-    };
   }
 
   setState(test, status, reason) {

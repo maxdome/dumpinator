@@ -217,7 +217,7 @@ describe('Config', () => {
       inspect(config.routes).isEql(expectedResult);
     });
 
-    it('accepts a before method', () => {
+    it('accepts a before callback', () => {
       const fn = () => {};
 
       config.parseJSON({
@@ -232,7 +232,7 @@ describe('Config', () => {
       inspect(config.before).isEql(fn);
     });
 
-    it('accepts a after method', () => {
+    it('accepts a after callback', () => {
       const fn = () => {};
 
       config.parseJSON({
@@ -247,7 +247,37 @@ describe('Config', () => {
       inspect(config.after).isEql(fn);
     });
 
-    it('accepts a before method on route level', () => {
+    it('accepts a beforeEach callback', () => {
+      const fn = () => {};
+
+      config.parseJSON({
+        defaults: {
+          left: { method: 'GET', hostname: 'http://dumpi.rocks/' },
+          right: { method: 'GET', hostname: 'http://dumpi.sucks/' }
+        },
+        routes: [{ url: 'ping' }],
+        beforeEach: fn
+      });
+
+      inspect(config.beforeEach).isEql(fn);
+    });
+
+    it('accepts a afterEach callback', () => {
+      const fn = () => {};
+
+      config.parseJSON({
+        defaults: {
+          left: { method: 'GET', hostname: 'http://dumpi.rocks/' },
+          right: { method: 'GET', hostname: 'http://dumpi.sucks/' }
+        },
+        routes: [{ url: 'ping' }],
+        afterEach: fn
+      });
+
+      inspect(config.afterEach).isEql(fn);
+    });
+
+    it('accepts a before callback on route level', () => {
       const fn = () => {};
 
       config.parseJSON({
@@ -267,7 +297,7 @@ describe('Config', () => {
       }]);
     });
 
-    it('accepts a after method on route level', () => {
+    it('accepts a after callback on route level', () => {
       const fn = () => {};
 
       config.parseJSON({

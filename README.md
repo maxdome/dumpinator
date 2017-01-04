@@ -406,9 +406,19 @@ Dumpinator supports these methods:
 }
 ```
 
-#### Before and after hooks
+#### Callbacks
 
-The `before` and `after` options are accepting a callback function. A before function on the main level will be called before any test has been done and after, after all tests have been done. A `before` and `after` callback on a route level will be called before or after a route has been tested. This feature works in `commonjs-mode` only!
+Dumpinator supports callbacks which allows to do some actions during a test run.  
+
+`before` on the base level: Getting called before any tests have been started
+`beforeEach on the base level`: Getting called before each route gets called
+`before on the test level`: Getting called before left and right routes getting called
+`after` on the test level: Getting called after left and right routes getting called
+`afterEach` on the base level: Getting called after each route gets called
+`after` on the base level: Getting called after all tests have been done
+
+Callbacks are simple functions. Callback are both, syncron and asyncron. If you return a promise, a callback gets handeled as an asyncron callback, otherwise return nothing.
+
 
 ```javascript
 module.exports = {
@@ -419,9 +429,11 @@ module.exports = {
     console.log('Start test runner');
     return Promise.resolve();
   },
+  beforeEach: () => {
+    console.log('Before each test');
+  },
   after: () => {
     console.log('Stop test runner');
-    return Promise.resolve();
   }
   routes: [
     {

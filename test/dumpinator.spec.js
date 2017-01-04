@@ -43,10 +43,20 @@ describe('Dumpinator', () => {
 
     before(() => {
       config = new Config();
-      config.routes = {
-        left: [{ id: 'd6d13704ca7ddfdb095505bc6e1cec6d', method: 'GET', url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', name: 'GET test' }],
-        right: [{ id: 'd6d13704ca7ddfdb095505bc6e1cec6d', method: 'GET', url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json', name: 'GET test' }]
-      };
+      config.routes = [
+        {
+          id: 'd6d13704ca7ddfdb095505bc6e1cec6d',
+          left: {
+            method: 'GET',
+            url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json'
+          },
+          right: {
+            method: 'GET',
+            url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/test.json'
+          },
+          name: 'GET test'
+        }
+      ];
     });
 
     it('crawls n pages in parallel', () => {

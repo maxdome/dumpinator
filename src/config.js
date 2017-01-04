@@ -66,7 +66,7 @@ class Config {
     const routes = lodash.get(input, 'routes', []);
 
     lodash.each(input, (val, key) => {
-      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after'], key)) {
+      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after', 'beforeEach', 'afterEach'], key)) {
         throw new Error(`Config invalid: Key "${key}" is not allowed!`);
       }
     });
@@ -91,8 +91,16 @@ class Config {
       this.before = input.before;
     }
 
+    if (input.beforeEach) {
+      this.beforeEach = input.beforeEach;
+    }
+
     if (input.after) {
       this.after = input.after;
+    }
+
+    if (input.afterEach) {
+      this.afterEach = input.afterEach;
     }
   }
 
