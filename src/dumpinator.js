@@ -25,7 +25,7 @@ class Dumpinator {
           console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
         }
 
-        const p = config.before(notify);
+        const p = config.before(routes, notify);
         if (p) {
           yield p;
         }
@@ -44,7 +44,7 @@ class Dumpinator {
               console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
             }
 
-            const p = config.beforeEach(notify);
+            const p = config.beforeEach(route, notify);
             if (p) {
               yield p;
             }
@@ -55,7 +55,7 @@ class Dumpinator {
               console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
             }
 
-            const p = route.before(notify);
+            const p = route.before(route, notify);
             if (p) {
               yield p;
             }
@@ -108,7 +108,7 @@ class Dumpinator {
             console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
           }
 
-          const p = route.after(notify);
+          const p = route.after(route, notify);
           if (p) {
             yield p;
           }
@@ -119,7 +119,7 @@ class Dumpinator {
             console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
           }
 
-          const p = config.afterEach(notify);
+          const p = config.afterEach(route, notify);
           if (p) {
             yield p;
           }
@@ -133,7 +133,7 @@ class Dumpinator {
           console.log('[DEBUG] call after all method'); // eslint-disable-line no-console
         }
 
-        const p = config.after(notify);
+        const p = config.after(routes, notify);
         if (p) {
           yield p;
         }
