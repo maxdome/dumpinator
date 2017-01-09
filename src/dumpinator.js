@@ -39,30 +39,31 @@ class Dumpinator {
         notify.addTest(route);
 
         jobs.push(co(function* task() {
+          if (config.beforeEach) {
+            if (config.debug) {
+              console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
+            }
+
+            const p = config.beforeEach(notify);
+            if (p) {
+              yield p;
+            }
+          }
+
+          if (route.before) {
+            if (config.debug) {
+              console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
+            }
+
+            const p = route.before(notify);
+            if (p) {
+              yield p;
+            }
+          }
+
           for (const side of ['left', 'right']) {
             const test = Dumpinator.createTest(route, side);
 
-            if (config.beforeEach) {
-              if (config.debug) {
-                console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
-              }
-
-              const p = config.beforeEach(notify);
-              if (p) {
-                yield p;
-              }
-            }
-
-            if (route.before) {
-              if (config.debug) {
-                console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
-              }
-
-              const p = route.before(notify);
-              if (p) {
-                yield p;
-              }
-            }
 
             const request = new Request();
             let response;
@@ -99,30 +100,30 @@ class Dumpinator {
                 notify.setTestFailed(test);
               }
             }
-
-            if (route.after) {
-              if (config.debug) {
-                console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
-              }
-
-              const p = route.after(notify);
-              if (p) {
-                yield p;
-              }
-            }
-
-            if (config.afterEach) {
-              if (config.debug) {
-                console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
-              }
-
-              const p = config.afterEach(notify);
-              if (p) {
-                yield p;
-              }
-            }
           }
         }));
+
+        if (route.after) {
+          if (config.debug) {
+            console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
+          }
+
+          const p = route.after(notify);
+          if (p) {
+            yield p;
+          }
+        }
+
+        if (config.afterEach) {
+          if (config.debug) {
+            console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
+          }
+
+          const p = config.afterEach(notify);
+          if (p) {
+            yield p;
+          }
+        }
       }
 
       yield this.parallelize(jobs, parallelRequests);

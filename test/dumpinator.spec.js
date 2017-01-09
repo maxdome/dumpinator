@@ -38,10 +38,10 @@ describe('Dumpinator', () => {
     });
   });
 
-  describe('run()', () => {
+  describe.only('run()', () => {
     let config;
 
-    before(() => {
+    beforeEach(() => {
       config = new Config();
       config.routes = [
         {
@@ -66,7 +66,38 @@ describe('Dumpinator', () => {
 
       const result = Dumpinator.run(config);
       inspect(result).isInstanceOf(EventEmitter);
+      inspect(result).hasMethod('then');
       inspect(parallelizeStub).wasCalledOnce();
+    });
+
+    it('calls before all and after all callbacks', () => {
+      config.before = sinon.stub();
+      config.after = sinon.stub();
+      const result = Dumpinator.run(config);
+      return result.then(() => {
+        inspect(config.before).wasCalledOnce();
+        inspect(config.after).wasCalledOnce();
+      });
+    });
+
+    it('calls beforeEach and afterEach callbacks', () => {
+      config.beforeEach = sinon.stub();
+      config.afterEach = sinon.stub();
+      const result = Dumpinator.run(config);
+      return result.then(() => {
+        inspect(config.beforeEach).wasCalledOnce();
+        inspect(config.afterEach).wasCalledOnce();
+      });
+    });
+
+    it('calls before route and after route callbacks', () => {
+      config.routes[0].before = sinon.stub();
+      config.routes[0].after = sinon.stub();
+      const result = Dumpinator.run(config);
+      return result.then(() => {
+        inspect(config.routes[0].before).wasCalledOnce();
+        inspect(config.routes[0].after).wasCalledOnce();
+      });
     });
   });
 });

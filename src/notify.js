@@ -87,10 +87,16 @@ class Notify extends EventEmitter {
 
   finish(state) {
     this.emit('finish', this.getSuiteState());
+    if (this.callbackPromise) {
+      this.callResolve(state);
+    }
   }
 
   error(err) {
     this.emit('error', err);
+    if (this.callbackPromise) {
+      this.callReject(err);
+    }
   }
 
   getSuiteState() {
@@ -104,6 +110,15 @@ class Notify extends EventEmitter {
     }
 
     return true;
+  }
+
+  then(fn) {
+    this.callbackPromise = new Promise((resolve, reject) => {
+      this.callResolve = resolve;
+      this.callReject = reject;
+    });
+
+    return this.callbackPromise.then(fn);
   }
 }
 
