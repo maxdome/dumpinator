@@ -38,7 +38,7 @@ describe('Dumpinator', () => {
     });
   });
 
-  describe.only('run()', () => {
+  describe('run()', () => {
     let config;
 
     beforeEach(() => {
