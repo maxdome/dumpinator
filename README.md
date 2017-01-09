@@ -411,9 +411,9 @@ Dumpinator supports these methods:
 Dumpinator supports callbacks which allows to do some actions during a test run.  
 
 `before` on the base level: Getting called before any tests have been started
-`beforeEach on the base level`: Getting called before each route gets called
-`before on the test level`: Getting called before left and right routes getting called
-`after` on the test level: Getting called after left and right routes getting called
+`beforeEach` on the base level: Getting called before each route gets called
+`before` on the route level: Getting called before left and right routes getting called
+`after` on the route level: Getting called after left and right routes getting called
 `afterEach` on the base level: Getting called after each route gets called
 `after` on the base level: Getting called after all tests have been done
 
