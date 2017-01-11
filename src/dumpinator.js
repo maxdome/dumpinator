@@ -16,6 +16,7 @@ class Dumpinator {
     const jobs = [];
     const notify = new Notify();
     const routes = config.routes;
+    const requestTimeout = config.timeout;
 
     this.loadReporter(config.reporter, notify);
 
@@ -63,9 +64,10 @@ class Dumpinator {
 
           for (const side of ['left', 'right']) {
             const test = Dumpinator.createTest(route, side);
-
-
-            const request = new Request();
+            const request = new Request({
+              debug: config.debug,
+              timeout: requestTimeout
+            });
             let response;
             let finish = false;
             try {

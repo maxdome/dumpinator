@@ -26,6 +26,8 @@ const config = new Config({
   noColor: ('color' in options) ? !options.color : undefined
 });
 
+config.timeout = 30000;
+
 if (program.config) {
   config.load(program.config);
 } else {

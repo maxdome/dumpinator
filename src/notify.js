@@ -58,7 +58,7 @@ class Notify extends EventEmitter {
   }
 
   setData(test, key, value) {
-    this.session[test.id][key] = value;
+    this.session[test.id][test.side][key] = value;
   }
 
   getData(test, key) {
