@@ -69,11 +69,11 @@ class CLIReporter {
     });
   }
 
-  drawInlineDiff(colored, line, line2, light, dark) {
+  drawInlineDiff(mode, colored, line, line2, light, dark) {
     jsdiff.diffChars(line, line2).forEach((l) => {
-      if (l.added || l.removed) {
+      if ((l.removed && mode === 'added') || (l.removed && mode === 'removed')) {
         colored.txt(l.value, `${dark} trim`);
-      } else {
+      } else if (!l.added && !l.removed) {
         colored.txt(l.value, `${light} trim`);
       }
     });
@@ -129,7 +129,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt('   ', 'ltrim').txt('|');
           colored.txt((`   ${lineNumbersRight}`).substr(-3, 3), 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
+          this.drawInlineDiff('added', colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
           colored.nl();
           lineNumbersRight += 1;
         });
@@ -137,7 +137,7 @@ class CLIReporter {
         line.line.forEach((l, index, array) => {
           colored.txt((`   ${lineNumbersLeft}`).substr(-3, 3), 'ltrim').txt('|');
           colored.txt('   ', 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred', 'bgdred');
+          this.drawInlineDiff('removed', colored, l, line.next[index] || '', 'bgred', 'bgdred');
           colored.nl();
           lineNumbersLeft += 1;
         });

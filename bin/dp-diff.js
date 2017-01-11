@@ -45,7 +45,8 @@ if (options.args.length === 2) {
       return;
     }
 
-    Dumpinator.diff('xxxxxxxx').then((diff) => {
+
+    Dumpinator.diff(Object.keys(notify.session)[0]).then((diff) => {
       Dumpinator.reportDiff(diff, {
         showFullDiff: !!options.full,
         noColor: !options.color
