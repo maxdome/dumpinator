@@ -127,16 +127,16 @@ class CLIReporter {
     diffMap.forEach((line) => {
       if (line.added) {
         line.line.forEach((l, index, array) => {
-          colored.txt('  ', 'ltrim').txt('|');
-          colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
+          colored.txt('   ', 'ltrim').txt('|');
+          colored.txt((`   ${lineNumbersRight}`).substr(-3, 3), 'ltrim').txt('|');
           this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
           colored.nl();
           lineNumbersRight += 1;
         });
       } else if (line.removed) {
         line.line.forEach((l, index, array) => {
-          colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
-          colored.txt('  ', 'ltrim').txt('|');
+          colored.txt((`   ${lineNumbersLeft}`).substr(-3, 3), 'ltrim').txt('|');
+          colored.txt('   ', 'ltrim').txt('|');
           this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred', 'bgdred');
           colored.nl();
           lineNumbersLeft += 1;
@@ -144,14 +144,14 @@ class CLIReporter {
       } else {
         line.line.forEach((l, index, array) => {
           if (!this.showFullDiff && index > 3 && index === array.length - 3) {
-            colored.txt(('··'), 'ltrim').txt('|');
-            colored.txt(('··'), 'ltrim').txt('|');
+            colored.txt(('···'), 'ltrim').txt('|');
+            colored.txt(('···'), 'ltrim').txt('|');
             colored.nl();
           }
 
           if (this.showFullDiff || (index < 3 || index > array.length - 4)) {
-            colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
-            colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
+            colored.txt((`   ${lineNumbersLeft}`).substr(-3, 3), 'ltrim').txt('|');
+            colored.txt((`   ${lineNumbersRight}`).substr(-3, 3), 'ltrim').txt('|');
             colored.txt(l, 'trim').nl();
           }
 
