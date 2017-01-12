@@ -27,7 +27,6 @@ class Config {
     this.rateLimit = options.rateLimit || 1;
     this.tag = options.tag || null;
     this.verbose = options.verbose || false;
-    this.debug = options.debug || false;
     this.noColor = options.noColor || process.env.isTTY;
   }
 

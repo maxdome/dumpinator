@@ -9,7 +9,6 @@ const program = require('commander');
 
 program
   .option('-C, --no-color', 'disable cli colors')
-  .option('-d, --debug', 'enable debug mode')
   .option('-F, --full', 'show the full diff')
   .option('-v, --verbose', 'be more verbose');
 

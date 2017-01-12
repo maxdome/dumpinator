@@ -10,7 +10,6 @@ const CLIUtils = require('../src/utils/cli-utils');
 
 program
   .option('-C, --no-color', 'disable cli colors')
-  .option('-d, --debug', 'enable debug mode')
   .option('-F, --full', 'show the full diff')
   .option('-H, --header [header]', 'add a HTTP header to both sides')
   .option('-L, --header-left [headerLeft]', 'add a HTTP header to left side')
@@ -25,7 +24,6 @@ const options = program.parse(process.argv);
 
 if (options.args.length === 2) {
   const config = new Config({
-    debug: options.debug,
     noColor: ('color' in options) ? !options.color : undefined,
     full: options.full
   });

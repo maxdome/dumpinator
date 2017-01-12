@@ -22,7 +22,7 @@ class Dumpinator {
 
     co(function* runner() {
       if (config.before) {
-        if (config.debug) {
+        if (config.verbose) {
           console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
         }
 
@@ -33,7 +33,7 @@ class Dumpinator {
       }
 
       for (const route of routes) {
-        if (config.debug) {
+        if (config.verbose) {
           console.log('[DEBUG] add route:', route); // eslint-disable-line no-console
         }
 
@@ -41,7 +41,7 @@ class Dumpinator {
 
         jobs.push(co(function* task() {
           if (config.beforeEach) {
-            if (config.debug) {
+            if (config.verbose) {
               console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
             }
 
@@ -52,7 +52,7 @@ class Dumpinator {
           }
 
           if (route.before) {
-            if (config.debug) {
+            if (config.verbose) {
               console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
             }
 
@@ -65,7 +65,7 @@ class Dumpinator {
           for (const side of ['left', 'right']) {
             const test = Dumpinator.createTest(route, side);
             const request = new Request({
-              debug: config.debug,
+              verbose: config.verbose,
               timeout: requestTimeout
             });
             let response;
@@ -106,7 +106,7 @@ class Dumpinator {
         }));
 
         if (route.after) {
-          if (config.debug) {
+          if (config.verbose) {
             console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
           }
 
@@ -117,7 +117,7 @@ class Dumpinator {
         }
 
         if (config.afterEach) {
-          if (config.debug) {
+          if (config.verbose) {
             console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
           }
 
@@ -131,7 +131,7 @@ class Dumpinator {
       yield this.parallelize(jobs, parallelRequests);
 
       if (config.after) {
-        if (config.debug) {
+        if (config.verbose) {
           console.log('[DEBUG] call after all method'); // eslint-disable-line no-console
         }
 
