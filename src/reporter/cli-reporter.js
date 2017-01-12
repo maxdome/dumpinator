@@ -25,7 +25,7 @@ class CLIReporter {
         msg.green('✔');
       } else {
         this.counter.failed += 1;
-        msg.red('❌');
+        msg.red('✗');
       }
 
       msg.dgrey('Route').grey(`${test.name}`).grey(`(${test.id})`).txt('-');
@@ -170,7 +170,7 @@ class CLIReporter {
           numDifferences += 1;
         }
       });
-      colored.nl().red(' ❌').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
+      colored.nl().red(' ✗').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
     }
 
     colored.print(this.colorsEnabled);
@@ -185,14 +185,14 @@ class CLIReporter {
       const time = meta[order].responseTime;
 
       if (status !== expected) {
-        coloredStatus.red('❌').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
+        coloredStatus.red('✗').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
       }
 
       coloredResponse.txt('⌛').grey(`Response time of the ${order} route: ${time} ms`).nl();
     });
 
-    coloredStatus.print();
-    coloredResponse.print();
+    coloredStatus.print(this.colorsEnabled);
+    coloredResponse.print(this.colorsEnabled);
   }
 }
 

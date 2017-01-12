@@ -12,12 +12,15 @@ class Config {
     options = options || {};
     this.routes = [];
     this.reporter = options.reporter || {
-      cli: { colors: true },
+      cli: { noColor: options.noColor },
       html: { output: path.join(process.cwd(), 'dumpinator-report.html') }
     };
 
-    if (!lodash.isUndefined(options.rateLimit) && (!lodash.isInteger(options.rateLimit) || options.rateLimit < 1)) {
-      throw new Error('Arguments invalid: [rateLimit] must be an integer > 0!');
+    if (!lodash.isUndefined(options.rateLimit)) {
+      options.rateLimit = parseInt(options.rateLimit, 10);
+      if (!lodash.isInteger(options.rateLimit) || options.rateLimit < 1) {
+        throw new Error('Arguments invalid: [rateLimit] must be an integer > 0!');
+      }
     }
 
     if (options.tag && !(lodash.isString(options.tag) || lodash.isNumber(options.tag))) {
