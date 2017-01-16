@@ -149,8 +149,8 @@ class Route {
 
   createName() {
     if (!this.name) {
-      const leftName = this.left.url.replace(/^https?:\/\/.+?\//, '');
-      const rightName = this.right.url.replace(/^https?:\/\/.+?\//, '');
+      const leftName = this.left.url.replace(/^https?:\/\/.+?(\/)+/, '/');
+      const rightName = this.right.url.replace(/^https?:\/\/.+?(\/)+/, '/');
       const name = leftName === rightName ? leftName : `${leftName} ↔ ${rightName}`;
       this.name = `${this.left.method} ${name}`;
     }
