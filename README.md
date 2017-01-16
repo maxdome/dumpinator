@@ -93,9 +93,13 @@ A custom config can be provided via `-c` or `--config`:
 
 ## `diff` Command
 
-This command shows a diff of two given routes or a result id. The entered id must be a unique request id, its enough to add the first few chars.
+This command shows a diff of two given routes or a result id. It's ok to use only the first characters as long as a unique match is found.
 
-    $ dp diff fe345dc
+    $ dp diff http://foo.com/my.json http://bar.com/my.json
+
+or
+
+    $ dp diff fe345dc  # or dp diff fe
 
 
 # Config Files
@@ -362,7 +366,7 @@ module.exports = {
 
 #### Status
 
-The status can be set if a route test should fail when the status doesn't match.
+Setting the `status` option makes a route test fail if the status code doesn't match.
 
 ```json
 {
@@ -381,7 +385,7 @@ The status can be set if a route test should fail when the status doesn't match.
 
 #### Method
 
-The `method` options sets the HTTP send method which can be set in either level. Uses `GET` as default.  
+The `method` option sets the HTTP send method which can be set in either level. `GET` is the default.  
 
 Dumpinator supports these methods:  
 
@@ -408,17 +412,16 @@ Dumpinator supports these methods:
 
 #### Callbacks
 
-Dumpinator supports callbacks which allows to do some actions during a test run.  
+Callbacks can be used as hooks on any level to add some before/after logic.
 
-`before` on the base level: Getting called before any tests have been started
-`beforeEach` on the base level: Getting called before each route gets called
-`before` on the route level: Getting called before left and right routes getting called
-`after` on the route level: Getting called after left and right routes getting called
-`afterEach` on the base level: Getting called after each route gets called
-`after` on the base level: Getting called after all tests have been done
+`before` on base level: Called before starting all tests
+`beforeEach` on base level: Called before each route
+`before` on route level: Called before a single route
+`after` on route level: Called after a single route
+`afterEach` on base level: Called after each route
+`after` on base level: Called after completing all tests
 
-Callbacks are simple functions. Callback are both, syncron and asyncron. If you return a promise, a callback gets handeled as an asyncron callback, otherwise return nothing.
-
+Callbacks are simple functions and either sync or async. If you return a promise, the callback will be handled async, otherwise sync.
 
 ```javascript
 module.exports = {
@@ -426,24 +429,24 @@ module.exports = {
     // ...
   },
   before: () => {
-    console.log('Start test runner');
+    console.log('All tests started');
     return Promise.resolve();
   },
   beforeEach: () => {
-    console.log('Before each test');
+    console.log('Route started');
   },
   after: () => {
-    console.log('Stop test runner');
+    console.log('All tests completed');
   }
   routes: [
     {
       url: '/my-first-route',
       before: () => {
-        console.log('Start route test');
+        console.log('Individual route started');
         return Promise.resolve();
       },
       after: () => {
-        console.log('Start route test');
+        console.log('Individual route completed');
         return Promise.resolve();
       }
     },
@@ -452,7 +455,9 @@ module.exports = {
 };
 ```
 
-#### Ignore headers or body properties
+#### Ignoring properties
+
+Sometimes, you don't care about certain header or body properties and want to ignore them. Use `ignoreHeader` and `ignoreBody` for that. 
 
 ```json
 {
