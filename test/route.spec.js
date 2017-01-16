@@ -22,7 +22,7 @@ describe('Route', () => {
           url: 'http://dumpi.rocks/bar',
           method: 'GET'
         },
-        name: 'GET /foo <> /bar',
+        name: 'GET /foo ↔ /bar',
         id: 'd12681f36b140d6c1ba74c4813f4b6d7'
       });
     });
@@ -43,7 +43,7 @@ describe('Route', () => {
           url: 'http://dumpi.rocks/bar',
           method: 'GET'
         },
-        name: 'GET /foo <> /bar',
+        name: 'GET /foo ↔ /bar',
         id: 'd12681f36b140d6c1ba74c4813f4b6d7'
       });
     });
