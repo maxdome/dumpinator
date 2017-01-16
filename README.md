@@ -93,9 +93,13 @@ A custom config can be provided via `-c` or `--config`:
 
 ## `diff` Command
 
-This command shows a diff of two given routes or a result id. The entered id must be a unique request id, its enough to add the first few chars.
+This command shows a diff of two given routes or a result id. It's ok to use only the first characters as long as a unique match is found.
 
-    $ dp diff fe345dc
+    $ dp diff http://foo.com/my.json http://bar.com/my.json
+
+or
+
+    $ dp diff fe345dc  # or dp diff fe
 
 
 # Config Files
@@ -362,7 +366,7 @@ module.exports = {
 
 #### Status
 
-The status can be set if a route test should fail when the status doesn't match.
+Setting the `status` option makes a route test fail if the status code doesn't match.
 
 ```json
 {
@@ -379,7 +383,81 @@ The status can be set if a route test should fail when the status doesn't match.
 }
 ```
 
-#### Ignore headers or body properties
+#### Method
+
+The `method` option sets the HTTP send method which can be set in either level. `GET` is the default.  
+
+Dumpinator supports these methods:  
+
+`CHECKOUT` `COPY` `DELETE` `GET` `HEAD` `LOCK` `MERGE` `MKACTIVITY` `MKCOL` `MOVE` `M-SEARCH` `NOTIFY` `OPTIONS` `PATCH` `POST` `PURGE` `PUT` `REPORT` `SEARCH` `SUBSCRIBE` `TRACE` `UNLOCK` `UNSUBSCRIBE`
+
+```json
+{
+  "defaults": {
+    "method": "GET",
+    ...
+  },
+  "routes": [
+    {
+      "url": "/my-first-route",
+      "status": 204,
+      "right": {
+        "method": "POST"
+      }
+    },
+    ...
+  ]
+}
+```
+
+#### Callbacks
+
+Callbacks can be used as hooks on any level to add some before/after logic.
+
+`before` on base level: Called before starting all tests
+`beforeEach` on base level: Called before each route
+`before` on route level: Called before a single route
+`after` on route level: Called after a single route
+`afterEach` on base level: Called after each route
+`after` on base level: Called after completing all tests
+
+Callbacks are simple functions and either sync or async. If you return a promise, the callback will be handled async, otherwise sync.
+
+```javascript
+module.exports = {
+  defaults: {
+    // ...
+  },
+  before: () => {
+    console.log('All tests started');
+    return Promise.resolve();
+  },
+  beforeEach: () => {
+    console.log('Route started');
+  },
+  after: () => {
+    console.log('All tests completed');
+  }
+  routes: [
+    {
+      url: '/my-first-route',
+      before: () => {
+        console.log('Individual route started');
+        return Promise.resolve();
+      },
+      after: () => {
+        console.log('Individual route completed');
+        return Promise.resolve();
+      }
+    },
+    // ...
+  ]
+};
+```
+
+#### Ignoring properties
+
+Sometimes, you don't care about certain header or body properties and want to ignore them. Use `ignoreHeader` and `ignoreBody` for that. 
 
 ```json
 {

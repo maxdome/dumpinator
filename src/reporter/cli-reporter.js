@@ -25,7 +25,7 @@ class CLIReporter {
         msg.green('✔');
       } else {
         this.counter.failed += 1;
-        msg.red('❌');
+        msg.red('✗');
       }
 
       msg.dgrey('Route').grey(`${test.name}`).grey(`(${test.id})`).txt('-');
@@ -49,7 +49,7 @@ class CLIReporter {
       if (extended) {
         msg.nl().txt(' ');
         ['left', 'right'].forEach((side) => {
-          const time = test.responseTime;
+          const time = test[side].responseTime;
           msg.grey(`${side}:`).llgrey('⌛').grey(`${time || 0}ms`);
         });
       }
@@ -69,11 +69,11 @@ class CLIReporter {
     });
   }
 
-  drawInlineDiff(colored, line, line2, light, dark) {
+  drawInlineDiff(mode, colored, line, line2, light, dark) {
     jsdiff.diffChars(line, line2).forEach((l) => {
-      if (l.added || l.removed) {
+      if ((l.removed && mode === 'added') || (l.removed && mode === 'removed')) {
         colored.txt(l.value, `${dark} trim`);
-      } else {
+      } else if (!l.added && !l.removed) {
         colored.txt(l.value, `${light} trim`);
       }
     });
@@ -127,31 +127,31 @@ class CLIReporter {
     diffMap.forEach((line) => {
       if (line.added) {
         line.line.forEach((l, index, array) => {
-          colored.txt('  ', 'ltrim').txt('|');
-          colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
+          colored.txt('   ', 'ltrim').txt('|');
+          colored.txt((`   ${lineNumbersRight}`).substr(-3, 3), 'ltrim').txt('|');
+          this.drawInlineDiff('added', colored, l, line.prev[index] || '', 'bggreen', 'bgdgreen');
           colored.nl();
           lineNumbersRight += 1;
         });
       } else if (line.removed) {
         line.line.forEach((l, index, array) => {
-          colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
-          colored.txt('  ', 'ltrim').txt('|');
-          this.drawInlineDiff(colored, l, line.next[index] || '', 'bgred', 'bgdred');
+          colored.txt((`   ${lineNumbersLeft}`).substr(-3, 3), 'ltrim').txt('|');
+          colored.txt('   ', 'ltrim').txt('|');
+          this.drawInlineDiff('removed', colored, l, line.next[index] || '', 'bgred', 'bgdred');
           colored.nl();
           lineNumbersLeft += 1;
         });
       } else {
         line.line.forEach((l, index, array) => {
           if (!this.showFullDiff && index > 3 && index === array.length - 3) {
-            colored.txt(('··'), 'ltrim').txt('|');
-            colored.txt(('··'), 'ltrim').txt('|');
+            colored.txt(('···'), 'ltrim').txt('|');
+            colored.txt(('···'), 'ltrim').txt('|');
             colored.nl();
           }
 
           if (this.showFullDiff || (index < 3 || index > array.length - 4)) {
-            colored.txt((`  ${lineNumbersLeft}`).substr(-2, 2), 'ltrim').txt('|');
-            colored.txt((`  ${lineNumbersRight}`).substr(-2, 2), 'ltrim').txt('|');
+            colored.txt((`   ${lineNumbersLeft}`).substr(-3, 3), 'ltrim').txt('|');
+            colored.txt((`   ${lineNumbersRight}`).substr(-3, 3), 'ltrim').txt('|');
             colored.txt(l, 'trim').nl();
           }
 
@@ -170,7 +170,7 @@ class CLIReporter {
           numDifferences += 1;
         }
       });
-      colored.nl().red(' ❌').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
+      colored.nl().red(' ✗').grey([`${numDifferences} difference in the ${type} found`, `${numDifferences} differences in the ${type} found`, numDifferences]).nl();
     }
 
     colored.print(this.colorsEnabled);
@@ -185,14 +185,14 @@ class CLIReporter {
       const time = meta[order].responseTime;
 
       if (status !== expected) {
-        coloredStatus.red('❌').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
+        coloredStatus.red('✗').grey(`Status code check failed: ${order} expected ${expected} but got ${status}`).nl();
       }
 
       coloredResponse.txt('⌛').grey(`Response time of the ${order} route: ${time} ms`).nl();
     });
 
-    coloredStatus.print();
-    coloredResponse.print();
+    coloredStatus.print(this.colorsEnabled);
+    coloredResponse.print(this.colorsEnabled);
   }
 }
 

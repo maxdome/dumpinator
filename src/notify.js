@@ -11,20 +11,21 @@ class Notify extends EventEmitter {
   }
 
   addTest(test) {
-    test.id = test.id || 'xxxxxxxx';
     if (!this.session[test.id]) {
       this.session[test.id] = {
         state: 'pending',
         name: test.name,
-        id: test.id.substr(0, 8)
+        id: test.id.substr(0, 8),
+        left: {
+          state: 'pending'
+        },
+        right: {
+          state: 'pending'
+        }
       };
 
       this.emit('test.add', this.session[test.id]);
     }
-
-    this.session[test.id][test.side] = {
-      state: 'pending'
-    };
   }
 
   setState(test, status, reason) {
@@ -57,11 +58,11 @@ class Notify extends EventEmitter {
   }
 
   setData(test, key, value) {
-    this.session[test.id][key] = value;
+    this.session[test.id][test.side][key] = value;
   }
 
   getData(test, key) {
-    return this.session[test.id][key];
+    return this.session[test.id][test.side][key];
   }
 
   setTestPassed(test) {
@@ -86,10 +87,16 @@ class Notify extends EventEmitter {
 
   finish(state) {
     this.emit('finish', this.getSuiteState());
+    if (this.callbackPromise) {
+      this.callResolve(state);
+    }
   }
 
   error(err) {
     this.emit('error', err);
+    if (this.callbackPromise) {
+      this.callReject(err);
+    }
   }
 
   getSuiteState() {
@@ -103,6 +110,15 @@ class Notify extends EventEmitter {
     }
 
     return true;
+  }
+
+  then(fn) {
+    this.callbackPromise = new Promise((resolve, reject) => {
+      this.callResolve = resolve;
+      this.callReject = reject;
+    });
+
+    return this.callbackPromise.then(fn);
   }
 }
 

@@ -18,11 +18,20 @@ module.exports = {
   },
   routes: [
     {
-      url: '/v1/test.json'
+      url: '/v1/test.json',
+      tag: 'test',
+      before() {
+        console.log('Before first route');
+      },
+      after() {
+        console.log('After first route');
+      }
     }, {
       url: '/v2/test.json',
+      tag: 'test',
       status: 204
     }, {
+      tag: 'banana',
       left: {
         url: '/v1/banana.json'
       },
@@ -30,5 +39,11 @@ module.exports = {
         url: '/v2/banana.json'
       }
     }
-  ]
+  ],
+  before() {
+    console.log('Before all');
+  },
+  after() {
+    console.log('After all');
+  }
 };

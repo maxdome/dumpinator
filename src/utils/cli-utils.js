@@ -2,6 +2,8 @@
 
 const program = require('commander');
 const cowsay = require('cowsay');
+const minimist = require('minimist');
+const lodash = require('lodash');
 
 class CLIUtils {
   static generalExceptionHandler(err) {
@@ -65,6 +67,60 @@ class CLIUtils {
     }
 
     console.log(''); // eslint-disable-line no-console
+  }
+
+  static parseRouteArguments(rawArgs) {
+    const args = minimist(rawArgs);
+
+    const header = lodash.unionWith(
+      lodash.castArray(lodash.get(args, 'H', [])),
+      lodash.castArray(lodash.get(args, 'header', []))
+    );
+
+    const headerLeft = lodash.unionWith(
+      lodash.castArray(lodash.get(args, 'L', [])),
+      lodash.castArray(lodash.get(args, 'header-left', []))
+    );
+
+    const headerRight = lodash.unionWith(
+      lodash.castArray(lodash.get(args, 'R', [])),
+      lodash.castArray(lodash.get(args, 'header-right', []))
+    );
+
+    const routeConf = {
+      left: {
+        url: rawArgs[2],
+        header: this.extendHeaders(header.concat(headerLeft))
+      },
+      right: {
+        url: rawArgs[3],
+        header: this.extendHeaders(header.concat(headerRight))
+      }
+    };
+
+    return routeConf;
+  }
+
+  static extendHeaders(headers) {
+    const extendedHeader = {};
+
+    if (headers.length) {
+      let keyValue;
+      headers.forEach((val) => {
+        keyValue = val.split(':');
+
+        if (keyValue.length < 2) {
+          throw new Error(`Arguments invalid: "${val}" does not seems to be a valid header!`);
+        }
+
+        keyValue[0] = keyValue[0].trim();
+        keyValue[1] = keyValue[1].trim();
+
+        extendedHeader[keyValue[0]] = keyValue[1];
+      });
+    }
+
+    return extendedHeader;
   }
 }
 

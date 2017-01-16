@@ -5,7 +5,9 @@ const superagent = require('superagent');
 
 class Request {
   constructor(config) {
-    this.config = config || {};
+    config = config || {};
+    this.verbose = config.verbose || false;
+    this.timeout = config.timeout || 10000;
     this.defaults = {
       method: 'GET'
     };
@@ -15,8 +17,12 @@ class Request {
     options = lodash.extend(this.defaults, options);
 
     return new Promise((resolve, reject) => {
+      if (this.verbose) {
+        console.log('[DEBUG] get route:', options.method, options.url); // eslint-disable-line no-console
+      }
+
       this.req = superagent[options.method.toLowerCase()](options.url)
-          .timeout(this.config.timeout)
+          .timeout(this.timeout)
           .set('User-Agent', 'Dumpinator');
 
       if (options.query) {
@@ -35,7 +41,14 @@ class Request {
       this.req.end((err, res) => {
         const responseTime = Date.now() - timer;
         if (err && !res) {
+          if (this.verbose) {
+            console.log('[DEBUG] got error:', options.method, options.url, err); // eslint-disable-line no-console
+          }
           return reject(err);
+        }
+
+        if (this.verbose) {
+          console.log('[DEBUG] got response:', options.method, options.url, res.status, res.error); // eslint-disable-line no-console
         }
 
         return resolve({
