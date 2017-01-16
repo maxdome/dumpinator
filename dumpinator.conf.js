@@ -19,6 +19,7 @@ module.exports = {
   routes: [
     {
       url: '/v1/test.json',
+      tag: 'test',
       before() {
         console.log('Before first route');
       },
@@ -27,8 +28,10 @@ module.exports = {
       }
     }, {
       url: '/v2/test.json',
+      tag: 'test',
       status: 204
     }, {
+      tag: 'banana',
       left: {
         url: '/v1/banana.json'
       },
