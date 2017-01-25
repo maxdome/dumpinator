@@ -48,7 +48,7 @@ class Request {
         }
 
         if (this.verbose) {
-          console.log('[DEBUG] got response:', options.method, options.url, res.status, res.error); // eslint-disable-line no-console
+          console.log('[DEBUG] got response:', options.method, options.url, res.status, res.error || ''); // eslint-disable-line no-console
         }
 
         return resolve({
