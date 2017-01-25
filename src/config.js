@@ -12,9 +12,14 @@ class Config {
     options = options || {};
     this.routes = [];
     this.reporter = options.reporter || {
-      cli: { noColor: options.noColor },
-      html: { output: path.join(process.cwd(), 'dumpinator-report.html') }
+      cli: { noColor: options.noColor }
     };
+
+    if (options.htmlReport) {
+      this.reporter.html = {
+        output: path.join(process.cwd(), 'dumpinator-report.html')
+      };
+    }
 
     if (!lodash.isUndefined(options.rateLimit)) {
       options.rateLimit = parseInt(options.rateLimit, 10);
