@@ -34,7 +34,6 @@ describe('Config', () => {
       });
       const expectedResult = [
         {
-          id: '31e709c7ae486e2990f47c9d73a8beca',
           left: {
             url: 'pages',
             method: 'GET'
@@ -42,10 +41,8 @@ describe('Config', () => {
           right: {
             url: 'pages',
             method: 'GET'
-          },
-          name: 'GET pages'
+          }
         }, {
-          id: '74d26cd23c19e21ce8226d5e43a30e8b',
           left: {
             url: 'assets',
             method: 'GET'
@@ -53,10 +50,8 @@ describe('Config', () => {
           right: {
             url: 'assets',
             method: 'GET'
-          },
-          name: 'GET assets'
+          }
         }, {
-          id: 'ae88ff63663432c8aa737a2924f7c14c',
           left: {
             url: 'components',
             method: 'GET'
@@ -64,8 +59,7 @@ describe('Config', () => {
           right: {
             url: 'components',
             method: 'GET'
-          },
-          name: 'GET components'
+          }
         }
       ];
 
@@ -81,7 +75,6 @@ describe('Config', () => {
 
       const expectedResult = [
         {
-          id: '946042516abd8c77b7e2d3792b6b4659',
           left: {
             status: 204,
             url: 'pages',
@@ -91,10 +84,9 @@ describe('Config', () => {
             status: 204,
             url: 'pages',
             method: 'GET'
-          },
-          name: 'GET pages' },
+          }
+        },
         {
-          id: 'd5f6d895ae39795d0b30b749ea919c76',
           left: {
             status: 204,
             url: 'assets',
@@ -104,10 +96,9 @@ describe('Config', () => {
             status: 204,
             url: 'assets',
             method: 'GET'
-          },
-          name: 'GET assets' },
+          }
+        },
         {
-          id: '8d36737c118e495e4a2d3854c8f40368',
           left: {
             status: 204,
             url: 'components',
@@ -117,9 +108,8 @@ describe('Config', () => {
             status: 204,
             url: 'components',
             method: 'GET'
-          },
-          name: 'GET components' }
-
+          }
+        }
       ];
 
       inspect(config.routes).isEql(expectedResult);
@@ -136,7 +126,6 @@ describe('Config', () => {
 
       const expectedResult = [
         {
-          id: 'de111c99b7146239bc4b62c03a36e18b',
           left: {
             method: 'GET',
             url: 'https://my.api.com/v1/pages',
@@ -148,10 +137,8 @@ describe('Config', () => {
             url: 'http://localhost/v1/pages',
             query: globalQueries,
             header: globalHeaders
-          },
-          name: 'GET /v1/pages'
+          }
         }, {
-          id: '69da42f4f6bf88d08c680cc940677f62',
           left: {
             method: 'GET',
             url: 'https://my.api.com/v1/assets',
@@ -163,10 +150,8 @@ describe('Config', () => {
             url: 'http://localhost/v1/assets',
             query: globalQueries,
             header: globalHeaders
-          },
-          name: 'GET /v1/assets'
+          }
         }, {
-          id: '237aada82c3418942cc861e0b2ac4536',
           left: {
             method: 'GET',
             url: 'https://my.api.com/v1/components',
@@ -178,8 +163,8 @@ describe('Config', () => {
             url: 'http://localhost/v1/components',
             query: globalQueries,
             header: globalHeaders
-          },
-          name: 'GET /v1/components' }
+          }
+        }
       ];
 
       inspect(config.routes).isEql(expectedResult);
@@ -195,7 +180,6 @@ describe('Config', () => {
 
       const expectedResult = [
         {
-          id: 'f3130fa2c71c816a6a7ee9a35b8bbe7f',
           left: {
             method: 'POST',
             url: 'bundle',
@@ -209,8 +193,7 @@ describe('Config', () => {
             query: {
               globalQuery: 456
             }
-          },
-          name: 'POST bundle'
+          }
         }
       ];
 
@@ -289,10 +272,8 @@ describe('Config', () => {
       });
 
       inspect(config.routes).isEql([{
-        id: '2e2b8e3461e5aed3f0c28071828a17e9',
         left: { url: 'http://dumpi.rocks/ping', method: 'GET' },
         right: { url: 'http://dumpi.sucks/ping', method: 'GET' },
-        name: 'GET /ping',
         before: fn
       }]);
     });
@@ -309,10 +290,8 @@ describe('Config', () => {
       });
 
       inspect(config.routes).isEql([{
-        id: '2e2b8e3461e5aed3f0c28071828a17e9',
         left: { url: 'http://dumpi.rocks/ping', method: 'GET' },
         right: { url: 'http://dumpi.sucks/ping', method: 'GET' },
-        name: 'GET /ping',
         after: fn
       }]);
     });
@@ -389,6 +368,233 @@ describe('Config', () => {
         url: 'http://localhost/v1/components',
         side: 'right',
         name: 'GET components'
+      });
+    });
+  });
+
+  describe('addRoute', () => {
+    it('creates a route object', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: { url: 'foo' },
+        right: { url: 'bar' }
+      });
+
+      inspect(route).isEql({
+        left: {
+          url: 'http://dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://dumpi.rocks/bar',
+          method: 'GET'
+        }
+      });
+    });
+
+    it('validate input parameters, all passed', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: { url: 'foo' },
+        right: { url: 'bar' }
+      });
+
+      inspect(route).isEql({
+        left: {
+          url: 'http://dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://dumpi.rocks/bar',
+          method: 'GET'
+        }
+      });
+    });
+
+    it('validate input parameters, should fail', () => {
+      inspect(() => {
+        const route = config.addRoute({ // eslint-disable-line no-unused-vars
+          hustnam: 'http://dumpi.rocks',
+          left: { url: 'foo' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('validate input parameters in left site, should fail', () => {
+      inspect(() => {
+        const route = config.addRoute({ // eslint-disable-line no-unused-vars
+          hostname: 'http://dumpi.rocks',
+          left: { url: 'foo', hustnam: 'http://nonsens.io' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('validate input parameters in right site, should fail', () => {
+      inspect(() => {
+        const route = config.addRoute({ // eslint-disable-line no-unused-vars
+          hostname: 'http://dumpi.rocks',
+          left: { url: 'foo' },
+          right: { url: 'bar', hustnam: 'http://nonsens.io' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('throws an error if method is not allowed', () => {
+      inspect(() => {
+        const route = config.addRoute({ // eslint-disable-line no-unused-vars
+          method: 'GOT',
+          left: { url: 'foo' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('throws an error if before is used in a side level', () => {
+      inspect(() => {
+        const route = config.addRoute({ // eslint-disable-line no-unused-vars
+          method: 'GOT',
+          left: { url: 'foo', before: 'foo' },
+          right: { url: 'bar' }
+        });
+      }).doesThrow(/Invalid configuration/);
+    });
+
+    it('overwrites hostname', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        }
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET'
+        }
+      });
+    });
+
+    it('has a before callback', () => {
+      const fn = () => {};
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        },
+        before: fn
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET'
+        },
+        before: fn
+      });
+    });
+
+    it('has a after callback', () => {
+      const fn = () => {};
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        },
+        after: fn
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET'
+        },
+        after: fn
+      });
+    });
+
+    it('has a ignoreBody property', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        },
+        ignoreBody: ['foo']
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET',
+          ignoreBody: ['foo']
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET',
+          ignoreBody: ['foo']
+        }
+      });
+    });
+
+    it('has a ignoreHeader property', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        },
+        ignoreHeader: ['etag', 'x-dumpinator']
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET',
+          ignoreHeader: ['etag', 'x-dumpinator']
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET',
+          ignoreHeader: ['etag', 'x-dumpinator']
+        }
       });
     });
   });

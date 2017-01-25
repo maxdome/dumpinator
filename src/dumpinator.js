@@ -9,6 +9,7 @@ const Request = require('./request');
 const Stash = require('./stash');
 const Notify = require('./notify');
 const Diff = require('./diff');
+const DpSession = require('./dp-session');
 
 class Dumpinator {
   static run(config) {
@@ -20,19 +21,22 @@ class Dumpinator {
 
     this.loadReporter(config.reporter, notify);
 
+    // new fancy stuff
+    const session = new DpSession(routes);
+
     co(function* runner() {
       if (config.before) {
         if (config.verbose) {
           console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
         }
 
-        const p = config.before(routes, notify);
+        const p = config.before(session.tests, notify);
         if (p) {
           yield p;
         }
       }
 
-      for (const route of routes) {
+      for (const route of session.tests) {
         if (config.verbose) {
           console.log('[DEBUG] add route:', route); // eslint-disable-line no-console
         }
@@ -135,7 +139,7 @@ class Dumpinator {
           console.log('[DEBUG] call after all method'); // eslint-disable-line no-console
         }
 
-        const p = config.after(routes, notify);
+        const p = config.after(session.tests, notify);
         if (p) {
           yield p;
         }
@@ -219,6 +223,7 @@ class Dumpinator {
   }
 
   static diff(testId) {
+    // deprecated! Use test.diff()
     const stashDir = path.join(__dirname, '../tmp/');
     return co(function* dumpinatorDiff() {
       const testFiles = glob.sync(`${testId}*-left.json`, { cwd: stashDir });
