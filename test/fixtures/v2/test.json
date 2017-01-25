@@ -1,0 +1,11 @@
+{
+  "name": "Test",
+  "descrition": "This is just a text with some funy chars .æſaſ¢ææſ„€„ł„@„ſ»„€€“”",
+  "data": [
+    { "item": "one" },
+    { "item": "two" },
+    { "item": "three" }
+  ],
+  "num": 43,
+  "version": "2.0.0"
+}

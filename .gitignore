@@ -1,0 +1,6 @@
+*.log
+node_modules/
+.idea/
+test/tmp/
+tmp/
+dumpinator-report.html

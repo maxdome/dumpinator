@@ -1,10 +1,14 @@
 {
   "name": "dumpinator",
-  "version": "0.0.0",
-  "description": "Dumpinator™ is an automated QA tool for REST APIs. Its mission is to compare a list of HTTP Response Headers & Bodies in different environments & versions. The current version was developed as a development tool that quickly generates API response diffs that give an idea whether major refactorings work as expected. The goal is to develop Dumpinator™ as an independent, scriptable CLI tool that can be used for all sorts of REST APIs. It expects a main configuration file and spec files for each API endpoint that needs to be diff'ed. Each run writes the responses as JSON files in the given directory and outputs an easy-to-read HTML report of the diff. Used in combination with Jenkins, Dumpinator™ can be run in a CI pipeline but also be triggered manually by the QA team each time a new API release is about to be deployed as a replacement for tedious and time consuming regression tests.",
+  "version": "0.0.1",
+  "description": "Dumpinator is an automated QA tool for REST APIs. Its mission is to compare a list of HTTP Response Headers & Bodies in different environments & versions. The current version was developed as a development tool that quickly generates API response diffs that give an idea whether major refactorings work as expected. The goal is to develop Dumpinator as an independent, scriptable CLI tool that can be used for all sorts of REST APIs. It expects a main configuration file and spec files for each API endpoint that needs to be diff'ed. Each run writes the responses as JSON files in the given directory and outputs an easy-to-read HTML report of the diff. Used in combination with Jenkins, Dumpinator can be run in a CI pipeline but also be triggered manually by the QA team each time a new API release is about to be deployed as a replacement for tedious and time consuming regression tests.",
   "main": "index.js",
+  "bin": {
+    "dp": "bin/dp.js"
+  },
   "scripts": {
-    "test": "npm test"
+    "lint": "eslint bin/ src/ test/",
+    "test": "mocha --timeout 3000 --recursive test"
   },
   "repository": {
     "type": "git",
@@ -17,10 +21,49 @@
     "test",
     "testframework"
   ],
-  "author": "Andi Heinkelein <a.heinkelein@it-agenten.com>",
+  "author": {
+    "name": "Maxdome",
+    "url": "http://bit.ly/2f3jfnP"
+  },
+  "contributors": [
+    {
+      "name": "Andi Heinkelein",
+      "email": "andifeind@noname-media.com"
+    },
+    {
+      "name": "Christian Neuhäuser",
+      "email": "chris@type10.com"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/maxdome/dumpinator/issues"
   },
-  "homepage": "https://github.com/maxdome/dumpinator#readme"
+  "homepage": "https://github.com/maxdome/dumpinator#readme",
+  "dependencies": {
+    "argv": "0.0.2",
+    "co": "^4.6.0",
+    "colorfy": "^0.5.0",
+    "commander": "^2.9.0",
+    "cowsay": "^1.1.9",
+    "diff": "^3.1.0",
+    "glob": "^7.1.1",
+    "handlebars": "^4.0.6",
+    "json.sortify": "^2.0.2",
+    "lodash": "^4.17.2",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "promptly": "^2.1.0",
+    "superagent": "^2.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.10.2",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-config-maxdome": "^2.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "express": "^4.14.0",
+    "inspect.js": "^1.3.0",
+    "mocha": "^3.1.2",
+    "sinon": "^1.17.6"
+  }
 }

@@ -1,0 +1,10 @@
+{
+  "routes": [
+    {
+      "url": "/jsonfile1"
+    },
+    {
+      "url": "/jsonfile2"
+    }
+  ]
+}
