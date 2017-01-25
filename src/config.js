@@ -17,7 +17,7 @@ class Config {
 
     if (options.htmlReport) {
       this.reporter.html = {
-        output: path.join(process.cwd(), 'dumpinator-report.html')
+        output: path.join(process.cwd(), 'dumpinator-report')
       };
     }
 

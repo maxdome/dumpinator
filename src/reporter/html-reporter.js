@@ -3,12 +3,13 @@
 const path = require('path');
 const fs = require('fs');
 const handlebars = require('handlebars');
+const mkdirp = require('mkdirp');
 
 class HTMLReporter {
   constructor(options) {
     options = options || {};
 
-    this.output = options.output || path.join(process.cwd(), 'dumpinator-report.html');
+    this.output = options.output || path.join(process.cwd(), 'dumpinator-report');
 
     this.counter = {
       passed: 0,
@@ -41,7 +42,15 @@ class HTMLReporter {
 
   createReport(data) {
     const html = handlebars.compile(fs.readFileSync(path.join(__dirname, '../../templates/html-report.hbs'), { encoding: 'utf8' }));
-    fs.writeFileSync(this.output, html({
+
+    const outputDir = this.output;
+    try {
+      mkdirp.sync(outputDir, 0o755);
+    } catch (err) {
+      // file exists, thats fine
+    }
+
+    fs.writeFileSync(path.join(this.output, 'index.html'), html({
       tests: this.tests,
       counter: this.counter
     }));
