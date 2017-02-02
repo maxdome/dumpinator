@@ -80,8 +80,6 @@ class HTMLReporter {
 
       const diffResult = test.diff();
 
-      // console.log('########### TEST', test, '############### END');
-
       fs.writeFileSync(path.join(this.output, `diff-${test.id}.html`), html(Object.assign({
         headerDiff: this.getDiffArray(diffResult.headerDiff),
         bodyDiff: this.getDiffArray(diffResult.bodyDiff),
@@ -91,7 +89,7 @@ class HTMLReporter {
   }
 
   diff(diff) {
-
+    // do nothing
   }
 
   getDiffArray(diff) {

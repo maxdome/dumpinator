@@ -106,12 +106,22 @@
       .testState passed {
         text-decoration: blink
       }
+
+      .link:link,
+      .link:active {
+        text-decoration: none;
+        color: blue;
+      }
+
+      .link:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <h1>Dumpinator diff of test {{name}}</h1>
 
-    <a href="./">« Test results</a>
+    <a class="link" href="./">« Test results</a>
     <br>
     <div class="testState {{state}}">
       {{#if isFailed}}
@@ -121,21 +131,37 @@
       {{/if}}
     </div>
 
-    <h3>Header diff</h3>
+    <h3>Header diff:</h3>
     <ol class="headerDiff diffView">
       {{#each headerDiff}}
         <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
       {{/each}}
     </ol>
 
-    <h3>Body diff</h3>
+    <h3>Body diff:</h3>
     <ol class="bodyDiff diffView">
       {{#each bodyDiff}}
         <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
       {{/each}}
     </ol>
 
-    <a href="./">« Test results</a>
+    <h3>Statistics:</h3>
+    <div class="statistics">
+      <div>
+        Left: status: {{left.response.meta.status}} response time: {{left.response.meta.responseTime}}ms
+        {{#if left.response.meta.error}}
+          error: {{left.response.meta.error}}
+        {{/if}}
+      </div>
+      <div>
+        Right: status: {{right.response.meta.status}} response time: {{right.response.meta.responseTime}}ms
+        {{#if right.response.meta.error}}
+          error: {{right.response.meta.error}}
+        {{/if}}
+      </div>
+    </div>
+    <br>
+    <a class="link" href="./">« Test results</a>
     <br>
   </body>
 </html>
