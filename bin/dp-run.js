@@ -34,11 +34,8 @@ if (program.config) {
   config.load();
 }
 
-const notify = Dumpinator.run(config);
-notify.on('finish', (allPassed) => {
+Dumpinator.run(config).then((allPassed) => {
   CLIUtils[allPassed ? 'generalSuccessHandler' : 'generalErrorHandler']();
-});
-
-notify.on('error', (err) => {
+}).catch((err) => {
   CLIUtils.generalExceptionHandler(err);
 });

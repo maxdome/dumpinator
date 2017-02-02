@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Dumpinator report</title>
+    <title>Dumpinator diff of test {{name}}</title>
     <style type="text/css">
       body {
         font-size: 14px;
@@ -76,39 +76,51 @@
         list-style: none;
         margin: 0;
       }
+
+      .diffView {
+        background-color: #ddd;
+        font-family: monospace;
+      }
+
+      .diffView li {
+        white-space: pre;
+        background-color: #f3f3f3;
+      }
+
+      .diffView .added {
+        background-color: #070;
+        color: #fff;
+        display: inline-block;
+      }
+
+      .diffView .removed {
+        background-color: #900;
+        color: #fff;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
-    <h1>Dumpinator report</h1>
-    <ul class="result-listing">
-      {{#each tests}}
-        <li class="test-result state-{{state}}">
-          <span class="name">{{name}}</span>
-          <span class="id"><a href="diff-{{id}}.html">{{shortId}}</a></span>
-          <span class="state">{{state}}</span>
-          <ul>
-            {{#if left.reason}}
-              <li>{{left.state}} - {{left.reason}}</li>
-            {{/if}}
-            {{#if right.reason}}
-              <li>{{right.state}} - {{right.reason}}</li>
-            {{/if}}
-          </ul>
-        </li>
-      {{/each}}
-    </ul>
-    <ul class="test-summary">
-      <li class="item"><span class="done">{{counter.total}}</span> done</li>
-      <li class="item"><span class="passed">{{counter.passed}}</span> passed</li>
-      <li class="item"><span class="failed">{{counter.failed}}</span> failed</li>
-    </ul>
+    <h1>Dumpinator diff of test {{name}}</h1>
 
-    {{#unless counter.failed}}
-      <div style="position: relative; margin-top: 20px">
-        <div style="position: absolute; left: 15px; top: 23px">Hell, yeah</div>
-        <img src="https://openclipart.org/download/81109/speech-bubble.svg" width="100"><br>
-        <img style="margin-left: 90px" src="https://openclipart.org/download/194695/happy-cow.svg" width="100">
-      </div>
-    {{/unless}}
+    {{#if isFailed}}
+      Test failed! {{message}}
+    {{else}}
+      Test passed!
+    {{/if}}
+
+    <h3>Header diff</h3>
+    <ol class="headerDiff diffView">
+      {{#each headerDiff}}
+        <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
+      {{/each}}
+    </ol>
+
+    <h3>Body diff</h3>
+    <ol class="bodyDiff diffView">
+      {{#each bodyDiff}}
+        <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
+      {{/each}}
+    </ol>
   </body>
 </html>

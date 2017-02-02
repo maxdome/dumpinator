@@ -22,12 +22,12 @@ class HTMLReporter {
     this.tests = [];
   }
 
-  report(notify) {
-    notify.on('test.add', (test) => {
+  report(session) {
+    session.on('test.add', (test) => {
       this.tests.push(test);
     });
 
-    notify.on('test.finish', (test) => {
+    session.on('test.finish', (test) => {
       if (test.state === 'passed') {
         this.counter.passed += 1;
       } else {
@@ -35,12 +35,13 @@ class HTMLReporter {
       }
     });
 
-    notify.on('finish', () => {
-      this.createReport(notify.session);
+    session.on('finish', () => {
+      this.createReport(session);
+      this.createDiffReport(session);
     });
   }
 
-  createReport(data) {
+  createReport(session) {
     const html = handlebars.compile(fs.readFileSync(path.join(__dirname, '../../templates/html-report.hbs'), { encoding: 'utf8' }));
 
     const outputDir = this.output;
@@ -50,14 +51,73 @@ class HTMLReporter {
       // file exists, thats fine
     }
 
+    const tests = session.tests.map((test) => {
+      test.shortId = test.id.substr(0, 8);
+
+      return test;
+    });
+
     fs.writeFileSync(path.join(this.output, 'index.html'), html({
-      tests: this.tests,
+      tests,
       counter: this.counter
     }));
   }
 
+  createDiffReport(session) {
+    const html = handlebars.compile(fs.readFileSync(path.join(__dirname, '../../templates/html-diff.hbs'), { encoding: 'utf8' }));
+
+    const outputDir = path.join(this.output, 'diff');
+    try {
+      mkdirp.sync(outputDir, 0o755);
+    } catch (err) {
+      // file exists, thats fine
+    }
+
+    for (const test of session.tests) {
+      if (true) {
+        console.log('[DEBUG] create diff report for item ', test.id); // eslint-disable-line no-console
+      }
+
+      const diffResult = test.diff();
+
+      console.log('########### TEST', test, '############### END');
+
+      fs.writeFileSync(path.join(this.output, `diff-${test.id}.html`), html(Object.assign({
+        headerDiff: this.getDiffArray(diffResult.headerDiff),
+        bodyDiff: this.getDiffArray(diffResult.bodyDiff),
+        isFailed: test.status === 'failed'
+      }, test)));
+    }
+  }
+
   diff(diff) {
 
+  }
+
+  getDiffArray(diff) {
+    const diffArray = [];
+    let lineNum = 0;
+
+    for (const part of diff) {
+      const lines = part.value.replace(/\n$/, '').split('\n');
+      for (const line of lines) {
+        let cssClass = '';
+        if (part.added) {
+          cssClass = 'added';
+        } else if (part.removed) {
+          cssClass = 'removed';
+        }
+
+        diffArray.push({
+          value: line,
+          cssClass,
+          number: (lineNum += 1)
+        });
+      }
+    }
+
+    console.log(diffArray);
+    return diffArray;
   }
 }
 

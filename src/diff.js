@@ -6,32 +6,30 @@ const sortify = require('json.sortify');
 
 class Diff {
   diff(left, right, ignore, lowerCaseKeys) {
-    return new Promise((resolve, reject) => {
-      let diffResult;
+    let diffResult;
 
-      if (typeof left !== typeof right) {
-        throw new Error('Cannot compare two different source types!');
-      }
+    if (typeof left !== typeof right) {
+      throw new Error('Cannot compare two different source types!');
+    }
 
-      if (ignore) {
-        ignore.forEach(item => lodash.unset(left, item));
-        ignore.forEach(item => lodash.unset(right, item));
-      }
+    if (ignore) {
+      ignore.forEach(item => lodash.unset(left, item));
+      ignore.forEach(item => lodash.unset(right, item));
+    }
 
-      if (lowerCaseKeys) {
-        left = this.lowerCaseKeysRecursive(left);
-        right = this.lowerCaseKeysRecursive(right);
-      }
+    if (lowerCaseKeys) {
+      left = this.lowerCaseKeysRecursive(left);
+      right = this.lowerCaseKeysRecursive(right);
+    }
 
-      if (typeof left === 'object') {
-        // diffResult = jsdiff.diffLines(sortify(left, null, '  '), sortify(right, null, '  '));
-        diffResult = jsdiff.diffJson(left, right);
-      } else {
-        diffResult = jsdiff.diffLines(left, right);
-      }
+    if (typeof left === 'object') {
+      // diffResult = jsdiff.diffLines(sortify(left, null, '  '), sortify(right, null, '  '));
+      diffResult = jsdiff.diffJson(left, right);
+    } else {
+      diffResult = jsdiff.diffLines(left, right);
+    }
 
-      resolve(diffResult);
-    });
+    return diffResult;
   }
 
   compare(left, right, ignore, lowerCaseKeys) {

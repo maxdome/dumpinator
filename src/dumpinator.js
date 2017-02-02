@@ -5,153 +5,19 @@
 const path = require('path');
 const co = require('co');
 const glob = require('glob');
-const Request = require('./request');
 const Stash = require('./stash');
-const Notify = require('./notify');
 const Diff = require('./diff');
-const DpSession = require('./dp-session');
+const Session = require('./session');
 
 class Dumpinator {
   static run(config) {
-    const parallelRequests = 2;
-    const jobs = [];
-    const notify = new Notify();
-    const routes = config.routes;
-    const requestTimeout = config.timeout;
-
-    this.loadReporter(config.reporter, notify);
-
     // new fancy stuff
-    const session = new DpSession(routes);
+    const session = new Session(config);
 
-    co(function* runner() {
-      if (config.before) {
-        if (config.verbose) {
-          console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
-        }
+    // load reporter
+    this.loadReporter(config.reporter, session);
 
-        const p = config.before(session.tests, notify);
-        if (p) {
-          yield p;
-        }
-      }
-
-      for (const route of session.tests) {
-        if (config.verbose) {
-          console.log('[DEBUG] add route:', route); // eslint-disable-line no-console
-        }
-
-        notify.addTest(route);
-
-        jobs.push(co(function* task() {
-          if (config.beforeEach) {
-            if (config.verbose) {
-              console.log('[DEBUG] call before each route callback'); // eslint-disable-line no-console
-            }
-
-            const p = config.beforeEach(route, notify);
-            if (p) {
-              yield p;
-            }
-          }
-
-          if (route.before) {
-            if (config.verbose) {
-              console.log('[DEBUG] call before route callback'); // eslint-disable-line no-console
-            }
-
-            const p = route.before(route, notify);
-            if (p) {
-              yield p;
-            }
-          }
-
-          for (const side of ['left', 'right']) {
-            const test = Dumpinator.createTest(route, side);
-            const request = new Request({
-              verbose: config.verbose,
-              timeout: requestTimeout
-            });
-            let response;
-            let finish = false;
-            try {
-              response = yield request.load(test);
-            } catch (err) {
-              notify.setState(test, 'download-failed', err.message);
-              finish = true;
-            }
-
-            if (!finish) {
-              const stash = new Stash(path.join(__dirname, `../tmp/${test.id}-${test.side}.json`));
-              yield stash.add(Dumpinator.extendResponse(response, test));
-              notify.setState(test, 'downloaded');
-              notify.setData(test, 'responseTime', response.meta.responseTime);
-
-              if (test.status && test.status !== response.meta.status) {
-                notify.setState(test, 'failed', `HTTP status code ${test.status} expected, but got ${response.meta.status}`);
-
-                finish = true;
-              }
-            }
-
-            if (!finish) {
-              if (notify.getState(test) === 'downloaded') {
-                const testResult = yield Dumpinator.compare(test);
-                if (testResult === null) {
-                  notify.setTestPassed(test);
-                } else {
-                  notify.setTestFailed(test);
-                }
-              } else if (notify.getState(test) === 'download-failed') {
-                notify.setTestFailed(test);
-              }
-            }
-          }
-        }));
-
-        if (route.after) {
-          if (config.verbose) {
-            console.log('[DEBUG] call after route callback'); // eslint-disable-line no-console
-          }
-
-          const p = route.after(route, notify);
-          if (p) {
-            yield p;
-          }
-        }
-
-        if (config.afterEach) {
-          if (config.verbose) {
-            console.log('[DEBUG] call after each callback'); // eslint-disable-line no-console
-          }
-
-          const p = config.afterEach(route, notify);
-          if (p) {
-            yield p;
-          }
-        }
-      }
-
-      yield this.parallelize(jobs, parallelRequests);
-
-      if (config.after) {
-        if (config.verbose) {
-          console.log('[DEBUG] call after all method'); // eslint-disable-line no-console
-        }
-
-        const p = config.after(session.tests, notify);
-        if (p) {
-          yield p;
-        }
-      }
-    }.bind(this)).then((res) => {
-      notify.finish();
-    }).catch((err) => {
-      notify.error(err);
-      throw err;
-    });
-
-    return notify;
+    return session.run();
   }
 
   /**
@@ -188,18 +54,20 @@ class Dumpinator {
     return Promise.all(slots).then(() => results);
   }
 
-  static loadReporter(config, notify) {
-    if (config.cli) {
-      const CLIReporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
-      const cliReporter = new CLIReporter(config.cli);
-      cliReporter.report(notify);
-    }
+  static loadReporter(config, session) {
+    Object.keys(config).forEach((reporterName) => {
+      let Reporter;
+      try {
+        // eslint-disable-next-line import/no-dynamic-require, global-require
+        Reporter = require(`./reporter/${reporterName}-reporter`);
+      } catch (err) {
+        // reporter not found
+        throw new Error(`Reporter '${reporterName}' not found!`);
+      }
 
-    if (config.html) {
-      const HTMLReporter = require('./reporter/html-reporter'); // eslint-disable-line global-require
-      const htmlReporter = new HTMLReporter(config.html);
-      htmlReporter.report(notify);
-    }
+      const reporter = new Reporter(config[reporterName]);
+      reporter.report(session);
+    });
   }
 
   static compare(test) {
