@@ -98,16 +98,28 @@
         color: #fff;
         display: inline-block;
       }
+
+      .testState {
+        float: right;
+      }
+
+      .testState passed {
+        text-decoration: blink
+      }
     </style>
   </head>
   <body>
     <h1>Dumpinator diff of test {{name}}</h1>
 
-    {{#if isFailed}}
-      Test failed! {{message}}
-    {{else}}
-      Test passed!
-    {{/if}}
+    <a href="./">« Test results</a>
+    <br>
+    <div class="testState {{state}}">
+      {{#if isFailed}}
+        Test failed! {{message}}
+      {{else}}
+        Test passed!
+      {{/if}}
+    </div>
 
     <h3>Header diff</h3>
     <ol class="headerDiff diffView">
@@ -122,5 +134,8 @@
         <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
       {{/each}}
     </ol>
+
+    <a href="./">« Test results</a>
+    <br>
   </body>
 </html>

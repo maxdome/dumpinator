@@ -29,7 +29,7 @@ class Session extends EventEmitter {
       this.tests.push(new Test(test));
 
       if (this.verbose) {
-        console.log('[DEBUG] add test:', route); // eslint-disable-line no-console
+        console.log('[DEBUG] add test:', test); // eslint-disable-line no-console
       }
 
       this.emit('test.add', test);

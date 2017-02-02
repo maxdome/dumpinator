@@ -74,13 +74,13 @@ class HTMLReporter {
     }
 
     for (const test of session.tests) {
-      if (true) {
+      if (this.verbose) {
         console.log('[DEBUG] create diff report for item ', test.id); // eslint-disable-line no-console
       }
 
       const diffResult = test.diff();
 
-      console.log('########### TEST', test, '############### END');
+      // console.log('########### TEST', test, '############### END');
 
       fs.writeFileSync(path.join(this.output, `diff-${test.id}.html`), html(Object.assign({
         headerDiff: this.getDiffArray(diffResult.headerDiff),
@@ -116,7 +116,7 @@ class HTMLReporter {
       }
     }
 
-    console.log(diffArray);
+    // console.log(diffArray);
     return diffArray;
   }
 }
