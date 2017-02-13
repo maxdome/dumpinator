@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const path = require('path');
 
 const co = require('co');
-const glob = require('glob');
 
 const Route = require('./route');
 const Stash = require('./stash');
@@ -39,16 +38,7 @@ class Test {
 
   run() {
     return co(function* runGen() {
-      if (this.before) {
-        if (this.verbose) {
-          console.log('[DEBUG] call before this callback'); // eslint-disable-line no-console
-        }
-
-        const p = this.before(this);
-        if (p) {
-          yield p;
-        }
-      }
+      yield this.callHook('before');
 
       for (const side of ['left', 'right']) {
         const response = yield this[side].load();
@@ -56,6 +46,7 @@ class Test {
 
         if (this[side].state === 'download-failed') {
           this.state = 'failed';
+          yield this.callHook('after');
           return;
         }
 
@@ -83,16 +74,7 @@ class Test {
         this.message = 'Bodies don\'t match';
       }
 
-      if (this.after) {
-        if (this.verbose) {
-          console.log('[DEBUG] call after test callback'); // eslint-disable-line no-console
-        }
-
-        const p = this.after(this);
-        if (p) {
-          yield p;
-        }
-      }
+      yield this.callHook('after');
 
       return this.state === 'passed';
     }.bind(this));
@@ -109,6 +91,21 @@ class Test {
         right: this.right.response.meta
       }
     };
+  }
+
+  callHook(hook) {
+    if (this[hook]) {
+      if (this.verbose) {
+        console.log(`[DEBUG] call ${hook} test callback`); // eslint-disable-line no-console
+      }
+
+      const p = this[hook](this);
+      if (p) {
+        return p;
+      }
+    }
+
+    return Promise.resolve();
   }
 }
 

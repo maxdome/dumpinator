@@ -1,8 +1,10 @@
 'use strict';
 
 const EventEmitter = require('events');
+const path = require('path');
 
 const co = require('co');
+const glob = require('glob');
 
 const Test = require('./test');
 
@@ -51,7 +53,7 @@ class Session extends EventEmitter {
       }
 
       // run all tests
-      yield this.parallelize(this.tests, this.parallelRequests);
+      yield this.parallelize(this.tests, 5 /*this.parallelRequests*/);
 
       if (this.after) {
         if (this.verbose) {
@@ -70,6 +72,55 @@ class Session extends EventEmitter {
       return state;
     }).catch((err) => {
       this.emit('error', err);
+    });
+  }
+
+  /**
+   * Load session from stash
+   */
+  load(stashId) {
+    const stashDir = path.join(__dirname, '../tmp/');
+    return co(function* LoadGen() {
+      const testFiles = glob.sync(`${stashId}*-left.json`, { cwd: stashDir });
+
+      if (testFiles.length === 0) {
+        return {
+          type: 'error',
+          code: 1001,
+          msg: 'No tests found. Check the id.'
+        };
+      } else if (testFiles.length > 1) {
+        return {
+          type: 'error',
+          code: 1002,
+          msg: 'Multiple tests found. Provide an unique id.',
+          testFiles,
+          query: stashId
+        };
+      }
+
+      const leftStash = new Stash(path.join(stashDir, testFiles[0]));
+      const left = yield leftStash.fetch();
+
+      const rightStash = new Stash(path.join(stashDir, testFiles[0].replace('-left', '-right')));
+      const right = yield rightStash.fetch();
+
+      this.tests.push(new Test({
+        left: left.test,
+        right: right.test
+      }));
+
+      this.test.left.response = {
+        headers: left.headers,
+        body: left.body,
+        meta: left.meta
+      }
+
+      this.test.right.response = {
+        headers: right.headers,
+        body: right.body,
+        meta: right.meta
+      }
     });
   }
 
@@ -124,7 +175,9 @@ class Session extends EventEmitter {
             }
           }
 
+          console.log('##START');
           const res = yield next.run();
+          console.log('##END');
           this.emit(`test.${(res ? 'pass' : 'fail')}`, next);
           this.emit('test.finish', next);
 
