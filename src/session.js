@@ -7,6 +7,7 @@ const co = require('co');
 const glob = require('glob');
 
 const Test = require('./test');
+const Stash = require('./stash');
 
 class Session extends EventEmitter {
   constructor(conf) {
@@ -53,7 +54,7 @@ class Session extends EventEmitter {
       }
 
       // run all tests
-      yield this.parallelize(this.tests, 5 /*this.parallelRequests*/);
+      yield this.parallelize(this.tests, this.parallelRequests);
 
       if (this.after) {
         if (this.verbose) {
@@ -114,13 +115,13 @@ class Session extends EventEmitter {
         headers: left.headers,
         body: left.body,
         meta: left.meta
-      }
+      };
 
       this.test.right.response = {
         headers: right.headers,
         body: right.body,
         meta: right.meta
-      }
+      };
     });
   }
 
@@ -175,9 +176,7 @@ class Session extends EventEmitter {
             }
           }
 
-          console.log('##START');
           const res = yield next.run();
-          console.log('##END');
           this.emit(`test.${(res ? 'pass' : 'fail')}`, next);
           this.emit('test.finish', next);
 

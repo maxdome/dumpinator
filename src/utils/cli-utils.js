@@ -73,18 +73,18 @@ class CLIUtils {
     const args = minimist(rawArgs);
 
     const header = lodash.unionWith(
-      lodash.castArray(lodash.get(args, 'H', [])),
-      lodash.castArray(lodash.get(args, 'header', []))
+      lodash.castArray(lodash.get(args._, 'H', [])),
+      lodash.castArray(lodash.get(args._, 'header', []))
     );
 
     const headerLeft = lodash.unionWith(
-      lodash.castArray(lodash.get(args, 'L', [])),
-      lodash.castArray(lodash.get(args, 'header-left', []))
+      lodash.castArray(lodash.get(args._, 'L', [])),
+      lodash.castArray(lodash.get(args._, 'header-left', []))
     );
 
     const headerRight = lodash.unionWith(
-      lodash.castArray(lodash.get(args, 'R', [])),
-      lodash.castArray(lodash.get(args, 'header-right', []))
+      lodash.castArray(lodash.get(args._, 'R', [])),
+      lodash.castArray(lodash.get(args._, 'header-right', []))
     );
 
     const routeConf = {

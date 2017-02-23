@@ -8,6 +8,7 @@ const glob = require('glob');
 const Stash = require('./stash');
 const Diff = require('./diff');
 const Session = require('./session');
+const Reporter = require('./reporter/cli-reporter');
 
 class Dumpinator {
   static run(config) {
@@ -18,6 +19,28 @@ class Dumpinator {
     this.loadReporter(config.reporter, session);
 
     return session.run();
+  }
+
+  static runDiff(config) {
+    // new fancy stuff
+    const session = new Session(config);
+
+    // load reporter
+    this.loadReporter(config.reporter, session);
+
+    return co(function* runDiffGenerator() {
+      const allPassed = yield session.run();
+      if (!allPassed) {
+        const test = session.tests[0];
+        const reporter = new Reporter({
+          noColor: config.noColor,
+          showFullDiff: config.showFullDiff
+        });
+        reporter.diff(test.diff());
+      }
+
+      return allPassed;
+    });
   }
 
   /**
@@ -56,16 +79,16 @@ class Dumpinator {
 
   static loadReporter(config, session) {
     Object.keys(config).forEach((reporterName) => {
-      let Reporter;
+      let ReporterModule;
       try {
         // eslint-disable-next-line import/no-dynamic-require, global-require
-        Reporter = require(`./reporter/${reporterName}-reporter`);
+        ReporterModule = require(`./reporter/${reporterName}-reporter`);
       } catch (err) {
         // reporter not found
         throw new Error(`Reporter '${reporterName}' not found!`);
       }
 
-      const reporter = new Reporter(config[reporterName]);
+      const reporter = new ReporterModule(config[reporterName]);
       reporter.report(session);
     });
   }
@@ -132,7 +155,6 @@ class Dumpinator {
   }
 
   static reportDiff(diff, options) {
-    const Reporter = require('./reporter/cli-reporter'); // eslint-disable-line global-require
     const reporter = new Reporter(options);
     reporter.diff(diff);
   }
