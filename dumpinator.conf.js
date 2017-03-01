@@ -1,9 +1,8 @@
 'use strict';
 
 const path = require('path');
-const spawn = require('child_process').spawn;
-
 const co = require('co');
+const colorfy = require('colorfy');
 
 const Dumpinator = require('./src/dumpinator');
 
@@ -11,7 +10,12 @@ let ps1;
 let ps2;
 
 function startApp(cwd, port) {
-  console.log('[START] Start app at port', port, 'in dir', cwd); // eslint-disable-line no-console
+  colorfy()
+  .yellow('dp start app at port')
+  .lgrey(port)
+  .txt('in dir')
+  .azure(cwd)
+  .print();
 
   const env = process.env;
   env.PORT = port;
@@ -22,6 +26,12 @@ function startApp(cwd, port) {
     listenFor: [
       'Server listen at port'
     ]
+  }).then((ps) => {
+    colorfy()
+    .yellow(' ... started with pid')
+    .lgrey(ps.pid)
+    .print();
+    return ps;
   });
 }
 
@@ -29,6 +39,15 @@ function installApp(cwd) {
   return Dumpinator.runShellTask('npm', ['install'], {
     cwd
   });
+}
+
+function killProcess(ps) {
+  colorfy()
+  .yellow('dp kill process')
+  .lgrey(ps.pid)
+  .print();
+
+  ps.kill();
 }
 
 module.exports = {
@@ -84,10 +103,8 @@ module.exports = {
     });
   },
   after() {
-    console.log('[KILL] left process');  // eslint-disable-line no-console
-    ps1.kill();
-    console.log('[KILL] right process');  // eslint-disable-line no-console
-    ps2.kill();
+    killProcess(ps1);
+    killProcess(ps2);
   },
   beforeEach() {
     console.log('Before each');  // eslint-disable-line no-console
