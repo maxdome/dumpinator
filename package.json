@@ -57,11 +57,11 @@
     "mkdirp-then": "^1.2.0",
     "promptly": "^2.1.0",
     "rmdir": "^1.2.0",
-    "superagent": "^3.4.1"
+    "superagent": "^3.5.0"
   },
   "devDependencies": {
-    "eslint": "^3.10.2",
-    "eslint-config-airbnb-base": "^11.0.1",
+    "eslint": "^3.16.1",
+    "eslint-config-airbnb-base": "^11.1.0",
     "eslint-config-maxdome": "^2.0.0",
     "eslint-plugin-import": "^2.2.0",
     "express": "^4.14.0",
