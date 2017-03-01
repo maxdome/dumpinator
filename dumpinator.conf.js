@@ -5,6 +5,8 @@ const spawn = require('child_process').spawn;
 
 const co = require('co');
 
+const Dumpinator = require('./src/dumpinator');
+
 let ps1;
 let ps2;
 
@@ -13,54 +15,19 @@ function startApp(cwd, port) {
 
   const env = process.env;
   env.PORT = port;
-  return new Promise((resolve, reject) => {
-    const ps = spawn('node', ['examples/server.js'], {
-      cwd,
-      env
-    });
 
-    ps.stdout.on('data', (data) => {
-      console.log(`[DP RUN] ${data}`); // eslint-disable-line no-console
-      if (/Server listen at port/.test(`${data}`)) {
-        return resolve(ps);
-      }
-    });
-
-    ps.stderr.on('data', (data) => {
-      console.log(`[DP RUN ERROR] ${data}`); // eslint-disable-line no-console
-    });
-
-    ps.on('close', (code) => {
-      if (code) {
-        return reject(code);
-      }
-
-      return resolve(ps);
-    });
+  return Dumpinator.runShellTask('node', ['examples/server.js'], {
+    cwd,
+    env,
+    listenFor: [
+      'Server listen at port'
+    ]
   });
 }
 
 function installApp(cwd) {
-  return new Promise((resolve, reject) => {
-    const ps = spawn('npm', ['install'], {
-      cwd
-    });
-
-    ps.stdout.on('data', (data) => {
-      console.log(`[DP RUN] ${data}`); // eslint-disable-line no-console
-    });
-
-    ps.stderr.on('data', (data) => {
-      console.log(`[DP RUN ERROR] ${data}`); // eslint-disable-line no-console
-    });
-
-    ps.on('close', (code) => {
-      if (code) {
-        return reject(code);
-      }
-
-      return resolve(ps);
-    });
+  return Dumpinator.runShellTask('npm', ['install'], {
+    cwd
   });
 }
 

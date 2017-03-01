@@ -1,11 +1,10 @@
 'use strict';
 
 const path = require('path');
-const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const mkdirp = require('mkdirp-then');
 const rmdir = require('rmdir');
-
+const utils = require('./utils/utils');
 const co = require('co');
 
 class GitHelper {
@@ -24,19 +23,21 @@ class GitHelper {
       if (!gitUrl) {
         gitUrl = yield this.getGitUrl();
       }
-      console.log('[DP GIT] Clone from:', gitUrl); // eslint-disable-line no-console
+
+      if (this.verbose) {
+        console.log('[DP GIT] Clone from:', gitUrl); // eslint-disable-line no-console
+      }
 
       yield this.clean();
       yield mkdirp(this.leftDir);
       yield mkdirp(this.rightDir);
-      yield this.runShellTask('git', ['clone', gitUrl, '.'], {
+      yield this.gitClone(gitUrl, {
         cwd: this.leftDir
       });
       yield this.gitCheckout(gitTags[0] || 'HEAD', {
         cwd: this.leftDir
       });
-
-      yield this.runShellTask('git', ['clone', gitUrl, '.'], {
+      yield this.gitClone(gitUrl, {
         cwd: this.rightDir
       });
       yield this.gitCheckout(gitTags[1] || 'HEAD', {
@@ -45,32 +46,12 @@ class GitHelper {
     }.bind(this));
   }
 
-  runShellTask(command, args, opts) {
-    opts = opts || {};
-    console.log(`[DP GIT RUN] ${command} ${args.join(' ')} in dir: (${opts.cwd})`);  // eslint-disable-line no-console
-    return new Promise((resolve, reject) => {
-      const cld = spawn(command, args, opts);
-
-      cld.stdout.on('data', (data) => {
-        console.log(`[DP GIT] ${data}`); // eslint-disable-line no-console
-      });
-
-      cld.stderr.on('data', (data) => {
-        console.log(`[DP GIT ERROR] ${data}`); // eslint-disable-line no-console
-      });
-
-      cld.on('close', (code) => {
-        if (code) {
-          return reject(code);
-        }
-
-        return resolve(code);
-      });
-    });
+  gitClone(url, opts) {
+    return utils.runShellTask('git', ['clone', '-q', url, '.'], opts);
   }
 
   gitCheckout(tag, opts) {
-    return this.runShellTask('git', ['checkout', tag], opts);
+    return utils.runShellTask('git', ['checkout', '-q', tag], opts);
   }
 
   getGitUrl() {

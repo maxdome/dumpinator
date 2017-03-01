@@ -19,8 +19,6 @@ program
 
 const options = program.parse(process.argv);
 
-console.log('ARGS', options);
-
 const config = new Config({
   rateLimit: program.rate,
   tag: program.tag,
