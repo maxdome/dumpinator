@@ -8,6 +8,7 @@ const glob = require('glob');
 
 const Test = require('./test');
 const Stash = require('./stash');
+const GitHelper = require('./git-helper');
 
 class Session extends EventEmitter {
   constructor(conf) {
@@ -25,6 +26,7 @@ class Session extends EventEmitter {
     this.afterEach = conf.afterEach || null;
     this.routes = conf.routes || [];
     this.parallelRequests = conf.parallelRequests || 2;
+    this.gitTags = conf.gitTags || null;
   }
 
   addTests(routes) {
@@ -42,6 +44,10 @@ class Session extends EventEmitter {
   run() {
     this.addTests(this.routes);
     return co(function* sessionRunner() {
+      if (this.gitTags) {
+        const git = new GitHelper();
+        yield git.clone(this.gitTags);
+      }
       if (this.before) {
         if (this.verbose) {
           console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console

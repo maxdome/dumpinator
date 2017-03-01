@@ -34,6 +34,7 @@ class Config {
     this.tag = options.tag || null;
     this.verbose = options.verbose || false;
     this.noColor = options.noColor || process.env.isTTY;
+    this.gitTags = options.gitTags || null;
   }
 
   load(file) {
@@ -71,7 +72,7 @@ class Config {
     const routes = lodash.get(input, 'routes', []);
 
     lodash.each(input, (val, key) => {
-      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after', 'beforeEach', 'afterEach'], key)) {
+      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after', 'beforeEach', 'afterEach', 'gitTags'], key)) {
         throw new Error(`Config invalid: Key "${key}" is not allowed!`);
       }
     });

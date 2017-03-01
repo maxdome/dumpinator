@@ -72,6 +72,14 @@ class CLIUtils {
   static parseRouteArguments(rawArgs) {
     const args = minimist(rawArgs);
 
+    // check for gitTags
+    const reg = /^http(s)?:\/\//;
+    if (!reg.test(rawArgs[2])) {
+      return {
+        gitTags: [rawArgs[2], rawArgs[3] || 'HEAD']
+      };
+    }
+
     const header = lodash.unionWith(
       lodash.castArray(lodash.get(args, 'H', [])),
       lodash.castArray(lodash.get(args, 'header', []))

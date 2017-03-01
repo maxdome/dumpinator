@@ -22,7 +22,7 @@ describe('CLIUtils', () => {
   });
 
   describe('parseRouteArguments', () => {
-    it('returns a route config object', () => {
+    it('returns a route config object, using urls', () => {
       const args = [
         '/home/dumpi/Applications/nvm/versions/node/v4.2.3/bin/node',
         '/home/dumpi/Applications/nvm/versions/node/v4.2.3/lib/node_modules/dumpinator/bin/dp-diff',
@@ -53,6 +53,20 @@ describe('CLIUtils', () => {
             'basic-auth': 'RHVtcGluYXRvcmlzdGdlaWwh'
           }
         }
+      });
+    });
+
+    it('returns a route config object, using git tags', () => {
+      const args = [
+        '/home/dumpi/Applications/nvm/versions/node/v4.2.3/bin/node',
+        '/home/dumpi/Applications/nvm/versions/node/v4.2.3/lib/node_modules/dumpinator/bin/dp-diff',
+        'v1.13.4',
+        'v1.14.0'
+      ];
+
+      const routeConfig = CLIUtils.parseRouteArguments(args);
+      inspect(routeConfig).isEql({
+        gitTags: ['v1.13.4', 'v1.14.0']
       });
     });
 

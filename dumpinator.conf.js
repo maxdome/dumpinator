@@ -1,12 +1,76 @@
 'use strict';
 
+const path = require('path');
+const spawn = require('child_process').spawn;
+
+const co = require('co');
+
+let ps1;
+let ps2;
+
+function startApp(cwd, port) {
+  console.log('[START] Start app at port', port);
+
+  return new Promise((resolve, reject) => {
+    const ps = spawn('node', ['examples/server.js'], {
+      cwd,
+      env: Object.assign({
+        PORT: port
+      }, process.env)
+    });
+
+    ps.stdout.on('data', (data) => {
+      console.log(`[DP GIT] ${data}`); // eslint-disable-line no-console
+      if (/Server listen at port/.test(`${data}`)) {
+        return resolve(ps);
+      }
+    });
+
+    ps.stderr.on('data', (data) => {
+      console.log(`[DP GIT ERROR] ${data}`); // eslint-disable-line no-console
+    });
+
+    ps.on('close', (code) => {
+      if (code) {
+        return reject(code);
+      }
+
+      return resolve(ps);
+    });
+  });
+}
+
+function installApp(cwd) {
+  return new Promise((resolve, reject) => {
+    const ps = spawn('npm', ['install'], {
+      cwd
+    });
+
+    ps.stdout.on('data', (data) => {
+      console.log(`[DP GIT] ${data}`); // eslint-disable-line no-console
+    });
+
+    ps.stderr.on('data', (data) => {
+      console.log(`[DP GIT ERROR] ${data}`); // eslint-disable-line no-console
+    });
+
+    ps.on('close', (code) => {
+      if (code) {
+        return reject(code);
+      }
+
+      return resolve(ps);
+    });
+  });
+}
+
 module.exports = {
   defaults: {
     left: {
-      hostname: 'http://localhost:3333'
+      hostname: 'http://localhost:3100'
     },
     right: {
-      hostname: 'http://localhost:3333'
+      hostname: 'http://localhost:3200'
     },
     status: 200,
     ignoreBody: [
@@ -21,10 +85,10 @@ module.exports = {
       url: '/v1/test.json',
       tag: 'test',
       before() {
-        console.log('Before first route');
+
       },
       after() {
-        console.log('After first route');
+
       }
     }, {
       url: '/v2/test.json',
@@ -41,10 +105,19 @@ module.exports = {
     }
   ],
   before() {
-    console.log('Before all');
+    return co(function* g() {
+      yield installApp(path.join(process.cwd(), '.dumpinator-tmp/left/'));
+      yield installApp(path.join(process.cwd(), '.dumpinator-tmp/left/'));
+      ps1 = yield startApp(path.join(process.cwd(), '.dumpinator-tmp/left/'), 3100);
+      ps2 = yield startApp(path.join(process.cwd(), '.dumpinator-tmp/right/'), 3200);
+      console.log('BEFORE DONE');
+    });
   },
   after() {
-    console.log('After all');
+    console.log('[KILL] left process');
+    ps1.kill();
+    console.log('[KILL] right process');
+    ps2.kill();
   },
   beforeEach() {
     console.log('Before each');

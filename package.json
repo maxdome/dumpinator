@@ -54,6 +54,7 @@
     "lodash": "^4.17.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "mkdirp-then": "^1.2.0",
     "promptly": "^2.1.0",
     "superagent": "^3.4.1"
   },

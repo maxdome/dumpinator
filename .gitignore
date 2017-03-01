@@ -5,3 +5,4 @@ test/tmp/
 tmp/
 dumpinator-report.html
 dumpinator-report/
+.dumpinator-tmp/
