@@ -9,14 +9,14 @@ let ps1;
 let ps2;
 
 function startApp(cwd, port) {
-  console.log('[START] Start app at port', port);
+  console.log('[START] Start app at port', port, 'in dir', cwd); // eslint-disable-line no-console
 
+  const env = process.env;
+  env.PORT = port;
   return new Promise((resolve, reject) => {
     const ps = spawn('node', ['examples/server.js'], {
       cwd,
-      env: Object.assign({
-        PORT: port
-      }, process.env)
+      env
     });
 
     ps.stdout.on('data', (data) => {
@@ -78,6 +78,10 @@ module.exports = {
       'properties.age'
     ],
     ignoreHeader: [
+      'etag',
+      'last-modified',
+      'date',
+      'x-date'
     ]
   },
   routes: [
@@ -113,15 +117,15 @@ module.exports = {
     });
   },
   after() {
-    console.log('[KILL] left process');
+    console.log('[KILL] left process');  // eslint-disable-line no-console
     ps1.kill();
-    console.log('[KILL] right process');
+    console.log('[KILL] right process');  // eslint-disable-line no-console
     ps2.kill();
   },
   beforeEach() {
-    console.log('Before each');
+    console.log('Before each');  // eslint-disable-line no-console
   },
   afterEach() {
-    console.log('After each');
+    console.log('After each');  // eslint-disable-line no-console
   }
 };

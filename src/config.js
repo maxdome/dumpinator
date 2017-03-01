@@ -162,12 +162,11 @@ class Config {
     const ALLOWED_SITE_KEYS = [
       'method',
       'hostname', 'url', 'header',
-      'query', 'ignoreBody',
-      'ignoreHeader', 'status'
+      'query', 'status'
     ];
 
     const ALLOWED_ROUTE_KEYS = [
-      'name', 'tag', 'before', 'after'
+      'name', 'tag', 'before', 'after', 'ignoreBody', 'ignoreHeader'
     ];
 
     const ALLOWED_METHODS = [
@@ -235,14 +234,14 @@ class Config {
     };
 
     // set optional test properties
-    ['before', 'after', 'name'].forEach((prop) => {
+    ['before', 'after', 'name', 'ignoreBody', 'ignoreHeader'].forEach((prop) => {
       if (prop in route) {
         newRoute[prop] = route[prop];
       }
     });
 
     // set optional site properties
-    ['ignoreBody', 'ignoreHeader', 'status', 'header', 'query'].forEach((prop) => {
+    ['status', 'header', 'query'].forEach((prop) => {
       if (!newRoute.left[prop]) {
         const param = this.getParam(route, 'left', prop);
         if (param) {

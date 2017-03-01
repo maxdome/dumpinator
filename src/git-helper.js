@@ -47,7 +47,7 @@ class GitHelper {
 
   runShellTask(command, args, opts) {
     opts = opts || {};
-    console.log(`[DP GIT RUN] ${command} ${args.join(' ')} in dir: (${opts.cwd})`);
+    console.log(`[DP GIT RUN] ${command} ${args.join(' ')} in dir: (${opts.cwd})`);  // eslint-disable-line no-console
     return new Promise((resolve, reject) => {
       const cld = spawn(command, args, opts);
 
