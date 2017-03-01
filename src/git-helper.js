@@ -4,6 +4,7 @@ const path = require('path');
 const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const mkdirp = require('mkdirp-then');
+const rmdir = require('rmdir');
 
 const co = require('co');
 
@@ -25,29 +26,23 @@ class GitHelper {
       }
       console.log('[DP GIT] Clone from:', gitUrl); // eslint-disable-line no-console
 
-      // yield mkdirp(this.leftDir);
-      // yield mkdirp(this.rightDir);
-      // yield this.runShellTask('git', ['clone', gitUrl, '.'], {
-      //   cwd: this.leftDir
-      // });
-      // yield this.gitCheckout(gitTags[0]);
-      //
-      // yield this.runShellTask('git', ['clone', gitUrl, '.'] || 'HEAD', {
-      //   cwd: this.rightDir
-      // });
-      // yield this.gitCheckout(gitTags[1]);
+      yield this.clean();
+      yield mkdirp(this.leftDir);
+      yield mkdirp(this.rightDir);
+      yield this.runShellTask('git', ['clone', gitUrl, '.'], {
+        cwd: this.leftDir
+      });
+      yield this.gitCheckout(gitTags[0]);
+
+      yield this.runShellTask('git', ['clone', gitUrl, '.'] || 'HEAD', {
+        cwd: this.rightDir
+      });
+      yield this.gitCheckout(gitTags[1]);
     }.bind(this));
-
-    // checkout left
-
-    // checkout right
-
-    // start left
-
-    // start right
   }
 
   runShellTask(command, args, opts) {
+    opts = opts || {};
     console.log(`[DP GIT RUN] ${command} ${args.join(' ')} in dir: (${opts.cwd})`);
     return new Promise((resolve, reject) => {
       const cld = spawn(command, args, opts);
@@ -82,6 +77,18 @@ class GitHelper {
         }
 
         resolve(stdout.trim());
+      });
+    });
+  }
+
+  clean() {
+    return new Promise((resolve, reject) => {
+      rmdir(this.tmpDir, (err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
       });
     });
   }

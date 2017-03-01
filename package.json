@@ -56,6 +56,7 @@
     "mkdirp": "^0.5.1",
     "mkdirp-then": "^1.2.0",
     "promptly": "^2.1.0",
+    "rmdir": "^1.2.0",
     "superagent": "^3.4.1"
   },
   "devDependencies": {

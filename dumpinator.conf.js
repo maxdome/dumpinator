@@ -107,10 +107,9 @@ module.exports = {
   before() {
     return co(function* g() {
       yield installApp(path.join(process.cwd(), '.dumpinator-tmp/left/'));
-      yield installApp(path.join(process.cwd(), '.dumpinator-tmp/left/'));
+      yield installApp(path.join(process.cwd(), '.dumpinator-tmp/right/'));
       ps1 = yield startApp(path.join(process.cwd(), '.dumpinator-tmp/left/'), 3100);
       ps2 = yield startApp(path.join(process.cwd(), '.dumpinator-tmp/right/'), 3200);
-      console.log('BEFORE DONE');
     });
   },
   after() {
