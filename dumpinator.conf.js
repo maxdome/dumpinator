@@ -20,14 +20,14 @@ function startApp(cwd, port) {
     });
 
     ps.stdout.on('data', (data) => {
-      console.log(`[DP GIT] ${data}`); // eslint-disable-line no-console
+      console.log(`[DP RUN] ${data}`); // eslint-disable-line no-console
       if (/Server listen at port/.test(`${data}`)) {
         return resolve(ps);
       }
     });
 
     ps.stderr.on('data', (data) => {
-      console.log(`[DP GIT ERROR] ${data}`); // eslint-disable-line no-console
+      console.log(`[DP RUN ERROR] ${data}`); // eslint-disable-line no-console
     });
 
     ps.on('close', (code) => {
@@ -47,11 +47,11 @@ function installApp(cwd) {
     });
 
     ps.stdout.on('data', (data) => {
-      console.log(`[DP GIT] ${data}`); // eslint-disable-line no-console
+      console.log(`[DP RUN] ${data}`); // eslint-disable-line no-console
     });
 
     ps.stderr.on('data', (data) => {
-      console.log(`[DP GIT ERROR] ${data}`); // eslint-disable-line no-console
+      console.log(`[DP RUN ERROR] ${data}`); // eslint-disable-line no-console
     });
 
     ps.on('close', (code) => {

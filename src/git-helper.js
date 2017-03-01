@@ -32,12 +32,16 @@ class GitHelper {
       yield this.runShellTask('git', ['clone', gitUrl, '.'], {
         cwd: this.leftDir
       });
-      yield this.gitCheckout(gitTags[0]);
+      yield this.gitCheckout(gitTags[0] || 'HEAD', {
+        cwd: this.leftDir
+      });
 
-      yield this.runShellTask('git', ['clone', gitUrl, '.'] || 'HEAD', {
+      yield this.runShellTask('git', ['clone', gitUrl, '.'], {
         cwd: this.rightDir
       });
-      yield this.gitCheckout(gitTags[1]);
+      yield this.gitCheckout(gitTags[1] || 'HEAD', {
+        cwd: this.rightDir
+      });
     }.bind(this));
   }
 
@@ -65,8 +69,8 @@ class GitHelper {
     });
   }
 
-  gitCheckout(tag) {
-    return this.runShellTask('git', ['checkout', tag]);
+  gitCheckout(tag, opts) {
+    return this.runShellTask('git', ['checkout', tag], opts);
   }
 
   getGitUrl() {
@@ -85,7 +89,7 @@ class GitHelper {
     return new Promise((resolve, reject) => {
       rmdir(this.tmpDir, (err) => {
         if (err) {
-          return reject(err);
+          // return reject(err);
         }
 
         resolve();
