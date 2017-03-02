@@ -311,7 +311,7 @@ class Config {
       routePath = route.url.replace(/^\//, '');
     }
 
-    return `${routeHost}/${routePath}`;
+    return routeHost ? `${routeHost}/${routePath}` : routePath;
   }
 }
 
