@@ -17,8 +17,8 @@ class CLIReporter {
     };
   }
 
-  report(notify) {
-    notify.on('test.finish', (test) => {
+  report(session) {
+    session.on('test.finish', (test) => {
       const msg = cf();
       if (test.state === 'passed') {
         this.counter.passed += 1;
@@ -28,7 +28,7 @@ class CLIReporter {
         msg.red('✗');
       }
 
-      msg.dgrey('Route').grey(`${test.name}`).grey(`(${test.id})`).txt('-');
+      msg.dgrey('Route').grey(`${test.name}`).grey(`(${test.id.substr(0, 8)})`).txt('-');
 
       if (test.state === 'passed') {
         msg.green('passed');
@@ -57,7 +57,7 @@ class CLIReporter {
       msg.print(this.colorsEnabled);
     });
 
-    notify.on('finish', () => {
+    session.on('finish', () => {
       cf().nl().azure(`${this.counter.total}`).grey(['test done', 'tests done', this.counter.total])
         .nl()
         .green(`${this.counter.passed}`)

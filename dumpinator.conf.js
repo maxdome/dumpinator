@@ -45,5 +45,11 @@ module.exports = {
   },
   after() {
     console.log('After all');
+  },
+  beforeEach() {
+    console.log('Before each');
+  },
+  afterEach() {
+    console.log('After each');
   }
 };

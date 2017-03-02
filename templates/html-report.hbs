@@ -84,7 +84,7 @@
       {{#each tests}}
         <li class="test-result state-{{state}}">
           <span class="name">{{name}}</span>
-          <span class="id">{{id}}</span>
+          <span class="id"><a href="diff-{{id}}.html">{{shortId}}</a></span>
           <span class="state">{{state}}</span>
           <ul>
             {{#if left.reason}}

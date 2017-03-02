@@ -1,28 +1,32 @@
 'use strict';
 
 class CLIReporter {
-  constructor(notify) {
-    this.report(notify);
+  constructor(options) {
+    options = options || {};
   }
 
-  report(notify) {
-    notify.on('test.add', (test) => {
+  report(session) {
+    session.on('test.add', (test) => {
       console.log('Test add: ', test); // eslint-disable-line no-console
     });
 
-    notify.on('test.state', (test) => {
-      console.log('Test state: ', test); // eslint-disable-line no-console
+    session.on('test.pass', (test) => {
+      console.log('Test passed: ', test); // eslint-disable-line no-console
     });
 
-    notify.on('test.finish', (test) => {
-      console.log(`Route test: ${test.name} ${test.state}`); // eslint-disable-line no-console
+    session.on('test.fail', (test) => {
+      console.log('Test failed: ', test); // eslint-disable-line no-console
     });
 
-    notify.on('finish', () => {
+    session.on('test.finish', (test) => {
+      console.log(`Test finished: ${test.name} ${test.state}`); // eslint-disable-line no-console
+    });
+
+    session.on('finish', () => {
       console.log('All tests done :D'); // eslint-disable-line no-console
     });
 
-    notify.on('error', (err) => {
+    session.on('error', (err) => {
       console.log('Something went wrong :( ', err); // eslint-disable-line no-console
     });
 

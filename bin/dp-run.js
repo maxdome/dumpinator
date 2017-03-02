@@ -13,6 +13,7 @@ program
   .option('-r, --rate [rateLimit]', 'rate limit for concurrent requests')
   .option('-t, --tag [tag]', 'only include routes with this tag')
   .option('-C, --no-color', 'disable cli colors')
+  .option('-m, --html', 'write a html report')
   .option('-v, --verbose', 'be more verbose');
 
 const options = program.parse(process.argv);
@@ -21,6 +22,7 @@ const config = new Config({
   rateLimit: program.rate,
   tag: program.tag,
   verbose: program.verbose,
+  htmlReport: program.html,
   noColor: ('color' in options) ? !options.color : undefined
 });
 
@@ -32,11 +34,8 @@ if (program.config) {
   config.load();
 }
 
-const notify = Dumpinator.run(config);
-notify.on('finish', (allPassed) => {
+Dumpinator.run(config).then((allPassed) => {
   CLIUtils[allPassed ? 'generalSuccessHandler' : 'generalErrorHandler']();
-});
-
-notify.on('error', (err) => {
+}).catch((err) => {
   CLIUtils.generalExceptionHandler(err);
 });

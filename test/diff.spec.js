@@ -82,10 +82,7 @@ describe('Diff', () => {
       const diff = new Diff();
       const diffResult = diff.diff(left, right);
 
-      inspect(diffResult).isPromise();
-      return diffResult.then((res) => {
-        inspect(res).isArray();
-      });
+      inspect(diffResult).isArray();
     });
   });
 

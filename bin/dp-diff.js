@@ -25,33 +25,17 @@ const options = program.parse(process.argv);
 if (options.args.length === 2) {
   const config = new Config({
     noColor: ('color' in options) ? !options.color : undefined,
-    full: options.full
+    showFullDiff: !!options.full,
+    verbose: program.verbose
   });
 
   const routeConf = CLIUtils.parseRouteArguments(process.argv);
   config.addRoute(routeConf);
 
-  const notify = Dumpinator.run(config);
-
-  notify.on('error', (err) => {
+  Dumpinator.runDiff(config).then((allPassed) => {
+    CLIUtils[allPassed ? 'generalSuccessHandler' : 'generalErrorHandler']();
+  }).catch((err) => {
     CLIUtils.generalExceptionHandler(err);
-  });
-
-  notify.on('finish', (result) => {
-    if (result) {
-      CLIUtils.generalSuccessHandler();
-      return;
-    }
-
-
-    Dumpinator.diff(Object.keys(notify.session)[0]).then((diff) => {
-      Dumpinator.reportDiff(diff, {
-        showFullDiff: !!options.full,
-        noColor: !options.color
-      });
-    }).catch((err) => {
-      CLIUtils.generalExceptionHandler(err);
-    });
   });
 } else if (options.args.length === 1) {
   const resultId = options.args[0];

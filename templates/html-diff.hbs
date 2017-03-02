@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dumpinator diff of test {{name}}</title>
+    <style type="text/css">
+      body {
+        font-size: 14px;
+        font-family: sans-serif;
+      }
+
+      .result-listing {
+        padding: 0;
+      }
+
+      .test-result {
+        list-style: none;
+        margin: 0;
+      }
+
+      .test-result.state-passed .state {
+        color: #040;
+        font-weight: bold;
+      }
+
+      .test-result.state-failed .state {
+        color: #800;
+        font-weight: bold;
+      }
+
+      .test-result .id {
+        color: #003e90;
+        font-style: italic;;
+      }
+
+      .test-result.state-passed::before {
+        content: '✔';
+        color: #040;
+        display: inline-block;
+        width: 16px;
+      }
+
+      .test-result.state-failed::before {
+        content: '✘';
+        color: #800;
+        display: inline-block;
+        width: 16px;
+      }
+
+      .test-summary {
+        position: fixed;
+        right: 10px;
+        top: 10px;
+        padding: 0;
+        background-color: #eee;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .test-summary .done {
+        color: #003e90;
+        font-weight: bold;
+      }
+
+      .test-summary .passed {
+        color: #040;
+        font-weight: bold;
+      }
+
+      .test-summary .failed {
+        color: #800;
+        font-weight: bold;
+      }
+
+      .test-summary .item {
+        list-style: none;
+        margin: 0;
+      }
+
+      .diffView {
+        background-color: #ddd;
+        font-family: monospace;
+      }
+
+      .diffView li {
+        white-space: pre;
+        background-color: #f3f3f3;
+      }
+
+      .diffView .added {
+        background-color: #070;
+        color: #fff;
+        display: inline-block;
+      }
+
+      .diffView .removed {
+        background-color: #900;
+        color: #fff;
+        display: inline-block;
+      }
+
+      .testState {
+        float: right;
+      }
+
+      .testState passed {
+        text-decoration: blink
+      }
+
+      .link:link,
+      .link:active {
+        text-decoration: none;
+        color: blue;
+      }
+
+      .link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dumpinator diff of test {{name}}</h1>
+
+    <a class="link" href="./index.html">« Test results</a>
+    <br>
+    <div class="testState {{state}}">
+      {{#if isFailed}}
+        Test failed! {{message}}
+      {{else}}
+        Test passed!
+      {{/if}}
+    </div>
+
+    <h3>Header diff:</h3>
+    <ol class="headerDiff diffView">
+      {{#each headerDiff}}
+        <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
+      {{/each}}
+    </ol>
+
+    <h3>Body diff:</h3>
+    <ol class="bodyDiff diffView">
+      {{#each bodyDiff}}
+        <li class="diffLine"><span class="{{cssClass}}">{{value}}</span></li>
+      {{/each}}
+    </ol>
+
+    <h3>Statistics:</h3>
+    <div class="statistics">
+      <div>
+        Left: status: {{left.response.meta.status}} response time: {{left.response.meta.responseTime}}ms
+        {{#if left.response.meta.error}}
+          error: {{left.response.meta.error}}
+        {{/if}}
+      </div>
+      <div>
+        Right: status: {{right.response.meta.status}} response time: {{right.response.meta.responseTime}}ms
+        {{#if right.response.meta.error}}
+          error: {{right.response.meta.error}}
+        {{/if}}
+      </div>
+    </div>
+    <br>
+    <a class="link" href="./index.html">« Test results</a>
+    <br>
+  </body>
+</html>
