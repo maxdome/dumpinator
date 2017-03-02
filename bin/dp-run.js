@@ -27,7 +27,7 @@ const config = new Config({
   noColor: ('color' in options) ? !options.color : undefined
 });
 
-if (options.args) {
+if (options.args.length) {
   config.gitTags = options.args;
 }
 

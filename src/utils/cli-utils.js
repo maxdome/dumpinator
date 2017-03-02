@@ -1,9 +1,12 @@
 'use strict';
 
+const querystring = require('querystring');
+
 const program = require('commander');
 const cowsay = require('cowsay');
 const minimist = require('minimist');
 const lodash = require('lodash');
+const colorfy = require('colorfy');
 
 class CLIUtils {
   static generalExceptionHandler(err) {
@@ -129,6 +132,46 @@ class CLIUtils {
     }
 
     return extendedHeader;
+  }
+
+  static printResponse(res) {
+    const cf = colorfy();
+    for (const site of ['left', 'right']) {
+      const request = res[site].request;
+      const meta = res[site].meta;
+      cf.orange(site.toUpperCase()).txt(request.method)
+        .txt('- status:').lgrey(meta.status)
+        .txt('response time:').lgrey(meta.responseTime).txt('ms', 'trim').nl();
+
+      cf.grey('URL:').txt(request.url).nl();
+      if (request.query) {
+        cf.grey('QUERY:');
+        let isFirst = true;
+        for (const key of Object.keys(request.query)) {
+          if (isFirst) {
+            isFirst = false;
+          } else {
+            cf.yellow('&', 'trim');
+          }
+
+          cf.lgrey(key).txt('=', 'trim').llgrey(querystring.escape(request.query[key]));
+        }
+
+        cf.nl();
+      }
+
+      if (request.body) {
+        cf.grey('BODY:').txt(request.body).nl();
+      }
+
+      for (const key of Object.keys(request.header)) {
+        cf.grey(`${key.toUpperCase()}:`).txt(request.header[key]).nl();
+      }
+
+      cf.nl();
+    }
+
+    cf.print();
   }
 }
 

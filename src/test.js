@@ -52,6 +52,8 @@ class Test {
         }
 
         this.state = this[side].state;
+        response.ignoreBody = this.ignoreBody;
+        response.ignoreHeader = this.ignoreHeader;
 
         if (response) {
           const stash = new Stash(path.join(__dirname, `../tmp/${this.id}-${side}.json`));
@@ -82,10 +84,7 @@ class Test {
   }
 
   diff() {
-    const diff = new Diff({
-      ignoreHeader: this.ignoreHeader,
-      ignoreBody: this.ignoreBody
-    });
+    const diff = new Diff();
 
     return {
       type: 'diff',

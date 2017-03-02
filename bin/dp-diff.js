@@ -14,7 +14,8 @@ program
   .option('-H, --header [header]', 'add a HTTP header to both sides')
   .option('-L, --header-left [headerLeft]', 'add a HTTP header to left side')
   .option('-R, --header-right [headerRight]', 'add a HTTP header to right side')
-  .option('-v, --verbose', 'be more verbose');
+  .option('-v, --verbose', 'be more verbose')
+  .option('-S, --show-ignored', 'Show ignored values in response');
 
 program
   .command('diff <left> <right>', 'compare the given routes')
@@ -26,6 +27,7 @@ if (options.args.length === 2) {
   const config = new Config({
     noColor: ('color' in options) ? !options.color : undefined,
     showFullDiff: !!options.full,
+    showIgnored: !!options.showIgnored,
     verbose: program.verbose
   });
 
@@ -40,10 +42,13 @@ if (options.args.length === 2) {
 } else if (options.args.length === 1) {
   const resultId = options.args[0];
 
-  Dumpinator.diff(resultId).then((diff) => {
+  Dumpinator.diff(resultId, {
+    showIgnored: !!options.showIgnored
+  }).then((diff) => {
     Dumpinator.reportDiff(diff, {
       showFullDiff: !!options.full,
-      noColor: !options.color
+      noColor: !options.color,
+      showIgnored: !!options.showIgnored
     });
   }).catch((err) => {
     CLIUtils.generalExceptionHandler(err);

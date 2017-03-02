@@ -49,7 +49,7 @@ class CLIReporter {
       if (extended) {
         msg.nl().txt(' ');
         ['left', 'right'].forEach((side) => {
-          const time = test[side].responseTime;
+          const time = test[side].response.meta.responseTime;
           msg.grey(`${side}:`).llgrey('⌛').grey(`${time || 0}ms`);
         });
       }
@@ -85,7 +85,6 @@ class CLIReporter {
       if (diff.msg) {
         colorized.txt(diff.msg, 'trim').nl();
       }
-
 
       if (diff.testFiles) {
         const highlightStr = diff.query.length;
