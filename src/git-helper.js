@@ -56,7 +56,7 @@ class GitHelper {
 
   getGitUrl() {
     return new Promise((resolve, reject) => {
-      exec('git remote get-url origin', (err, stdout, stderr) => {
+      exec('git config --get remote.origin.url', (err, stdout, stderr) => {
         if (err || stderr) {
           return reject(err || stderr);
         }
