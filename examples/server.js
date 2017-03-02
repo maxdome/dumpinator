@@ -16,6 +16,7 @@ app.use('/v2', (req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, '../test/fixtures/')));
-app.listen(3333, '127.0.0.1');
+const port = process.env.PORT || 3333;
+app.listen(port, '127.0.0.1');
 
-console.log('Server listen at port 3333'); // eslint-disable-line no-console
+console.log(`Server listen at port ${port}`); // eslint-disable-line no-console

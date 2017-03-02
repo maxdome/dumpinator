@@ -9,6 +9,7 @@ const Config = require('../src/config');
 const CLIUtils = require('../src/utils/cli-utils');
 
 program
+  .usage('[options] [gitTag] [gitTag]')
   .option('-c, --config [config]', 'set a custom config')
   .option('-r, --rate [rateLimit]', 'rate limit for concurrent requests')
   .option('-t, --tag [tag]', 'only include routes with this tag')
@@ -25,6 +26,10 @@ const config = new Config({
   htmlReport: program.html,
   noColor: ('color' in options) ? !options.color : undefined
 });
+
+if (options.args) {
+  config.gitTags = options.args;
+}
 
 config.timeout = 30000;
 

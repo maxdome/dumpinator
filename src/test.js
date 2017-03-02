@@ -20,6 +20,7 @@ class Test {
 
     this.before = conf.before || null;
     this.after = conf.after || null;
+    this.ignoreBody = conf.ignoreBody || null;
     this.ignoreHeader = conf.ignoreHeader || null;
   }
 
@@ -81,11 +82,15 @@ class Test {
   }
 
   diff() {
-    const diff = new Diff();
+    const diff = new Diff({
+      ignoreHeader: this.ignoreHeader,
+      ignoreBody: this.ignoreBody
+    });
+
     return {
       type: 'diff',
-      bodyDiff: diff.diff(this.left.response.body, this.right.response.body),
-      headerDiff: diff.diff(this.left.response.headers, this.right.response.headers),
+      bodyDiff: diff.diff(this.left.response.body, this.right.response.body, this.ignoreBody),
+      headerDiff: diff.diff(this.left.response.headers, this.right.response.headers, this.ignoreHeader, true),
       meta: {
         left: this.left.response.meta,
         right: this.right.response.meta

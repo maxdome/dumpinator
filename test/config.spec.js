@@ -559,14 +559,13 @@ describe('Config', () => {
       inspect(route).hasProps({
         left: {
           url: 'http://test.dumpi.rocks/foo',
-          method: 'GET',
-          ignoreBody: ['foo']
+          method: 'GET'
         },
         right: {
           url: 'http://stage.dumpi.rocks/bar',
-          method: 'GET',
-          ignoreBody: ['foo']
-        }
+          method: 'GET'
+        },
+        ignoreBody: ['foo']
       });
     });
 
@@ -587,14 +586,13 @@ describe('Config', () => {
       inspect(route).hasProps({
         left: {
           url: 'http://test.dumpi.rocks/foo',
-          method: 'GET',
-          ignoreHeader: ['etag', 'x-dumpinator']
+          method: 'GET'
         },
         right: {
           url: 'http://stage.dumpi.rocks/bar',
-          method: 'GET',
-          ignoreHeader: ['etag', 'x-dumpinator']
-        }
+          method: 'GET'
+        },
+        ignoreHeader: ['etag', 'x-dumpinator']
       });
     });
   });

@@ -9,8 +9,9 @@ const Stash = require('./stash');
 const Diff = require('./diff');
 const Session = require('./session');
 const Reporter = require('./reporter/cli-reporter');
+const Utils = require('./utils/utils');
 
-class Dumpinator {
+class Dumpinator extends Utils {
   static run(config) {
     // new fancy stuff
     const session = new Session(config);
