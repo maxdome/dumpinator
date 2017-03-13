@@ -296,17 +296,22 @@ class Config {
   }
 
   getUrl(route, site) {
+    let routeHost;
+    let routePath;
+
     if (route[site] && route[site].hostname) {
-      const hostname = route[site].hostname.replace(/\/$/, '');
-      return `${hostname}/${route[site].url || route.url}`;
+      routeHost = route[site].hostname.replace(/\/$/, '');
+    } else if (route.hostname) {
+      routeHost = route.hostname.replace(/\/$/, '');
     }
 
-    if (route.hostname) {
-      const hostname = route.hostname.replace(/\/$/, '');
-      return `${hostname}/${route[site].url || route.url}`;
+    if (route[site] && route[site].url) {
+      routePath = route[site].url.replace(/^\//, '');
+    } else {
+      routePath = route.url.replace(/^\//, '');
     }
 
-    return route[site] && route[site].url ? route[site].url : route.url;
+    return routeHost ? `${routeHost}/${routePath}` : routePath;
   }
 }
 

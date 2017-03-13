@@ -114,8 +114,9 @@ class Dumpinator extends Utils {
     });
   }
 
-  static diff(testId) {
-    // deprecated! Use test.diff()
+  static diff(testId, options) {
+    options = options || {};
+
     const stashDir = path.join(__dirname, '../tmp/');
     return co(function* dumpinatorDiff() {
       const testFiles = glob.sync(`${testId}*-left.json`, { cwd: stashDir });
@@ -145,8 +146,8 @@ class Dumpinator extends Utils {
       const diff = new Diff();
       return {
         type: 'diff',
-        bodyDiff: yield diff.diff(left.body, right.body),
-        headerDiff: yield diff.diff(left.headers, right.headers),
+        bodyDiff: yield diff.diff(left.body, right.body, options.showIgnored ? null : left.ignoreBody),
+        headerDiff: yield diff.diff(left.headers, right.headers, options.showIgnored ? null : left.ignoreHeader),
         meta: {
           left: left.meta,
           right: right.meta
@@ -171,6 +172,42 @@ class Dumpinator extends Utils {
       id: route.id,
       name: route.name
     }, route[side]);
+  }
+
+  static show(testId, options) {
+    return co(function*() {
+      options = options || {};
+
+      const stashDir = path.join(__dirname, '../tmp/');
+      const testFiles = glob.sync(`${testId}*-left.json`, { cwd: stashDir });
+
+      if (testFiles.length === 0) {
+        return {
+          type: 'error',
+          code: 1001,
+          msg: 'No tests found. Check the id.'
+        };
+      } else if (testFiles.length > 1) {
+        return {
+          type: 'error',
+          code: 1002,
+          msg: 'Multiple tests found. Provide an unique id.',
+          testFiles,
+          query: testId
+        };
+      }
+
+      const leftStash = new Stash(path.join(stashDir, testFiles[0]));
+      const left = yield leftStash.fetch();
+
+      const rightStash = new Stash(path.join(stashDir, testFiles[0].replace('-left', '-right')));
+      const right = yield rightStash.fetch();
+
+      return {
+        left,
+        right
+      }
+    });
   }
 }
 

@@ -9,7 +9,17 @@ class Diff {
     let diffResult;
 
     if (typeof left !== typeof right) {
-      throw new Error('Cannot compare two different source types!');
+      if (typeof left === 'object') {
+        left = JSON.stringify(left);
+      } else {
+        left = String(left);
+      }
+
+      if (typeof right === 'object') {
+        right = JSON.stringify(right);
+      } else {
+        right = String(right);
+      }
     }
 
     if (ignore) {
@@ -23,7 +33,6 @@ class Diff {
     }
 
     if (typeof left === 'object') {
-      // diffResult = jsdiff.diffLines(sortify(left, null, '  '), sortify(right, null, '  '));
       diffResult = jsdiff.diffJson(left, right);
     } else {
       diffResult = jsdiff.diffLines(left, right);
@@ -34,7 +43,7 @@ class Diff {
 
   compare(left, right, ignore, lowerCaseKeys) {
     if (typeof left !== typeof right) {
-      throw new Error('Cannot compare two different source types!');
+      return false;
     }
 
     if (ignore) {

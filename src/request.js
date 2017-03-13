@@ -51,8 +51,10 @@ class Request {
           console.log('[DEBUG] got response:', options.method, options.url, res.status, res.error || ''); // eslint-disable-line no-console
         }
 
+        const meta = this.getRequestMeta(res, responseTime);
         return resolve({
-          meta: this.getRequestMeta(res, responseTime),
+          meta,
+          request: options,
           headers: res.header,
           body: /^application.+json/.test(res.type) ? res.body : JSON.stringify(res.text)
         });

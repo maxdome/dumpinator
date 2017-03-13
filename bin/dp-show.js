@@ -4,8 +4,8 @@
 
 const program = require('commander');
 
-// const Dumpinator = require('../src/dumpinator');
-// const CLIUtils = require('../src/utils/cli-utils');
+const Dumpinator = require('../src/dumpinator');
+const CLIUtils = require('../src/utils/cli-utils');
 
 program
   .option('-C, --no-color', 'disable cli colors')
@@ -15,7 +15,20 @@ program
 program
   .command('<id>', 'show a result of the given id');
 
-// const options = program.parse(process.argv);
+const options = program.parse(process.argv);
+const resultId = options.args[0];
 
-console.log('No sorry, I can\'t show you the result. Nobody has implemented it yet.'); // eslint-disable-line no-console
-console.log('Will you implement it? Would be nice :D'); // eslint-disable-line no-console
+if (!resultId) {
+  console.log('Give me a result id or go away!'); // eslint-disable-line no-console
+  process.exit(1);
+}
+
+Dumpinator.show(resultId, {
+  noColor: !program.color,
+  fullResponse: program.full,
+  verbose: program.verbose
+}).then((res) => {
+  CLIUtils.printResponse(res);
+}).catch((err) => {
+  CLIUtils.generalExceptionHandler(err);
+});
