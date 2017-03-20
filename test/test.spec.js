@@ -75,11 +75,10 @@ describe('Test', () => {
       return p.then(() => {
         if (test.state === 'failed') {
           inspect(test.left.response.headers).isEql(test.right.response.headers);
-          inspect(test.left.response.body).isNotEql(test.right.response.body);
         }
 
+        inspect(test.state).isEql('failed');
         inspect(fn).wasCalledOnce();
-        // inspect(fn).wasCalledWith({});
         inspect(test.left.response.body).isEql({
           foo: 'bla'
         });
