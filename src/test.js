@@ -43,6 +43,10 @@ class Test {
 
       for (const side of ['left', 'right']) {
         const response = yield this[side].load();
+        if (typeof this[side].transform === 'function') {
+          response.body = this[side].transform(response.body);
+        }
+
         this[side].response = response;
 
         if (this[side].state === 'download-failed') {

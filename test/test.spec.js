@@ -64,5 +64,26 @@ describe('Test', () => {
         inspect(test.state).isEql('passed');
       });
     });
+
+    it('runs a test with a transform method', () => {
+      const fn = sinon.stub();
+      fn.returns({ foo: 'bla' });
+      test.left.transform = fn;
+
+      const p = test.run();
+      inspect(p).isPromise();
+      return p.then(() => {
+        if (test.state === 'failed') {
+          inspect(test.left.response.headers).isEql(test.right.response.headers);
+          inspect(test.left.response.body).isNotEql(test.right.response.body);
+        }
+
+        inspect(fn).wasCalledOnce();
+        // inspect(fn).wasCalledWith({});
+        inspect(test.left.response.body).isEql({
+          foo: 'bla'
+        });
+      });
+    });
   });
 });

@@ -72,7 +72,7 @@ class Config {
     const routes = lodash.get(input, 'routes', []);
 
     lodash.each(input, (val, key) => {
-      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after', 'beforeEach', 'afterEach', 'gitTags'], key)) {
+      if (!lodash.includes(['options', 'defaults', 'routes', 'before', 'after', 'beforeEach', 'afterEach', 'gitTags', 'transform'], key)) {
         throw new Error(`Config invalid: Key "${key}" is not allowed!`);
       }
     });
@@ -162,11 +162,11 @@ class Config {
     const ALLOWED_SITE_KEYS = [
       'method',
       'hostname', 'url', 'header',
-      'query', 'status'
+      'query', 'status', 'transform'
     ];
 
     const ALLOWED_ROUTE_KEYS = [
-      'name', 'tag', 'before', 'after', 'ignoreBody', 'ignoreHeader'
+      'name', 'tag', 'before', 'after', 'ignoreBody', 'ignoreHeader', 'transform'
     ];
 
     const ALLOWED_METHODS = [
@@ -241,7 +241,7 @@ class Config {
     });
 
     // set optional site properties
-    ['status', 'header', 'query'].forEach((prop) => {
+    ['status', 'header', 'query', 'transform'].forEach((prop) => {
       if (!newRoute.left[prop]) {
         const param = this.getParam(route, 'left', prop);
         if (param) {

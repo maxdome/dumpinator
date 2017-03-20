@@ -595,5 +595,62 @@ describe('Config', () => {
         ignoreHeader: ['etag', 'x-dumpinator']
       });
     });
+
+    it('has a global transform method', () => {
+      const fn = () => {};
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar'
+        },
+        transform: fn
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET',
+          transform: fn
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET',
+          transform: fn
+        }
+      });
+    });
+
+    it('has a route level transform method', () => {
+      const fn = () => {};
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks',
+          url: 'bar',
+          transform: fn
+        }
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks/bar',
+          method: 'GET',
+          transform: fn
+        }
+      });
+    });
   });
 });
