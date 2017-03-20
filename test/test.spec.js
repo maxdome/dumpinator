@@ -66,8 +66,11 @@ describe('Test', () => {
     });
 
     it('runs a test with a transform method', () => {
-      const fn = sinon.stub();
-      fn.returns({ foo: 'bla' });
+      const fn = sinon.spy((data) => {
+        const transformed = data;
+        transformed.body = '{foo:"bla"}';
+        return transformed;
+      });
       test.left.transform = fn;
 
       const p = test.run();
@@ -79,9 +82,7 @@ describe('Test', () => {
 
         inspect(test.state).isEql('failed');
         inspect(fn).wasCalledOnce();
-        inspect(test.left.response.body).isEql({
-          foo: 'bla'
-        });
+        inspect(test.left.response.body).isEql('{foo:"bla"}');
       });
     });
   });

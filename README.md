@@ -455,9 +455,34 @@ module.exports = {
 };
 ```
 
+#### Transformations
+
+A `transform()` method can be used to transform the response before it gets stored or used for a diff. The transform method is a static method and contains the response object as first argument.
+
+```js
+module.exports = {
+  defaults: {
+    // ...
+  },
+  routes: [
+    {
+      url: '/my-first-route',
+      left: {
+        tranform(res) {
+          // wrap a data level around body response
+          res.body = JSON.stringify({ data: JSON.parse(res.body) });
+          return res;
+        }
+      }
+    },
+    // ...
+  ]
+};
+```
+
 #### Ignoring properties
 
-Sometimes, you don't care about certain header or body properties and want to ignore them. Use `ignoreHeader` and `ignoreBody` for that. 
+Sometimes, you don't care about certain header or body properties and want to ignore them. Use `ignoreHeader` and `ignoreBody` for that.
 
 ```json
 {

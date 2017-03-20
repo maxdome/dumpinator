@@ -42,9 +42,9 @@ class Test {
       yield this.callHook('before');
 
       for (const side of ['left', 'right']) {
-        const response = yield this[side].load();
+        let response = yield this[side].load();
         if (typeof this[side].transform === 'function') {
-          response.body = this[side].transform(response.body);
+          response = this[side].transform(response);
         }
 
         this[side].response = response;
