@@ -112,7 +112,7 @@ module.exports = {
   afterEach() {
     console.log('After each');  // eslint-disable-line no-console
   },
-  transform(data, mode) {
+  transform(data) {
     return data;
   }
 };
