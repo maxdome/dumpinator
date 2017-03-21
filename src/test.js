@@ -42,7 +42,11 @@ class Test {
       yield this.callHook('before');
 
       for (const side of ['left', 'right']) {
-        const response = yield this[side].load();
+        let response = yield this[side].load();
+        if (typeof this[side].transform === 'function') {
+          response = this[side].transform(response);
+        }
+
         this[side].response = response;
 
         if (this[side].state === 'download-failed') {
