@@ -14,6 +14,7 @@ class Test {
     this.left = new Route(conf.left);
     this.right = new Route(conf.right);
     this.state = 'pending';
+    this.verbose = conf.verbose;
 
     this.createId(conf);
     this.createName();

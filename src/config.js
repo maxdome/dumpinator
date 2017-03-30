@@ -41,7 +41,6 @@ class Config {
     // TODO: Rename file(name) related variables here
     let filenames = [];
     let conf;
-    let error;
 
     if (file) {
       filenames.push(file.substr(0, 1) === '/' ? file : path.join(process.cwd(), file));
@@ -50,19 +49,17 @@ class Config {
     }
 
     filenames.some((configFile) => {
-      error = false;
       try {
         conf = require(configFile); // eslint-disable-line global-require,import/no-dynamic-require
         return !!conf;
       } catch (e) {
-        error = new Error(`Cannot find config "${configFile}"`);
-      }
-      return error;
-    });
+        if (e.code === 'ENOENT' && e.path === configFile) {
+          throw new Error(`Cannot find config "${configFile}"`);
+        }
 
-    if (error) {
-      throw error;
-    }
+        throw new Error(`Parse error of config file: "${configFile}"\n${e.stack}`);
+      }
+    });
 
     this.parseJSON(conf);
   }
@@ -162,7 +159,7 @@ class Config {
     const ALLOWED_SITE_KEYS = [
       'method',
       'hostname', 'url', 'header',
-      'query', 'status', 'transform'
+      'query', 'body', 'status', 'transform'
     ];
 
     const ALLOWED_ROUTE_KEYS = [
@@ -241,7 +238,7 @@ class Config {
     });
 
     // set optional site properties
-    ['status', 'header', 'query', 'transform'].forEach((prop) => {
+    ['status', 'header', 'query', 'body', 'transform'].forEach((prop) => {
       if (!newRoute.left[prop]) {
         const param = this.getParam(route, 'left', prop);
         if (param) {

@@ -48,6 +48,7 @@ class Session extends EventEmitter {
         const git = new GitHelper();
         yield git.clone(this.gitTags);
       }
+
       if (this.before) {
         if (this.verbose) {
           console.log('[DEBUG] call before all callback'); // eslint-disable-line no-console
