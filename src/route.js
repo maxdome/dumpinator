@@ -8,6 +8,7 @@ class Route {
   constructor(conf) {
     Object.assign(this, conf);
     this.state = 'pending';
+    this.verbose = conf.verbose || false;
   }
 
   load() {
@@ -21,6 +22,7 @@ class Route {
         method: this.method,
         url: this.url,
         query: this.query,
+        body: this.body,
         header: this.header
       };
 

@@ -49,8 +49,12 @@ class CLIReporter {
       if (extended) {
         msg.nl().txt(' ');
         ['left', 'right'].forEach((side) => {
-          const time = test[side].response.meta.responseTime;
-          msg.grey(`${side}:`).llgrey('⌛').grey(`${time || 0}ms`);
+          if (test[side].response) {
+            const time = test[side].response.meta.responseTime;
+            msg.grey(`${side}:`).llgrey('⌛').grey(`${time || 0}ms`);
+          } else {
+            msg.grey(`${side}:`).llgrey('⌛').grey('--');
+          }
         });
       }
 

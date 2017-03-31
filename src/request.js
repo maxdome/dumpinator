@@ -9,7 +9,10 @@ class Request {
     this.verbose = config.verbose || false;
     this.timeout = config.timeout || 10000;
     this.defaults = {
-      method: 'GET'
+      method: config.method || 'GET',
+      body: config.body,
+      query: config.query,
+      headers: config.headers
     };
   }
 
@@ -26,10 +29,18 @@ class Request {
           .set('User-Agent', 'Dumpinator');
 
       if (options.query) {
+        if (this.verbose) {
+          console.log('[DEBUG] send query:', options.query); // eslint-disable-line no-console
+        }
+
         this.req.query(options.query);
       }
 
       if (options.body) {
+        if (this.verbose) {
+          console.log('[DEBUG] send data:', options.body); // eslint-disable-line no-console
+        }
+
         this.req.send(options.body);
       }
 
