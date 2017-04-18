@@ -52,7 +52,7 @@ const newConfig = {
   routes: [{
     left: {
       url: 'http://left',
-      headers: {
+      header: {
         accept: 'application/json'
       }
     },

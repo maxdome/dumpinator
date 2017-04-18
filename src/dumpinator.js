@@ -100,7 +100,7 @@ class Dumpinator extends Utils {
       return stash.fetch();
     })).then((res) => {
       const diff = new Diff();
-      const headerDiff = diff.compare(res[0].headers, res[1].headers, test.ignoreHeader, true);
+      const headerDiff = diff.compare(res[0].header, res[1].header, test.ignoreHeader, true);
       if (!headerDiff) {
         return 'Headers don\'t match';
       }
@@ -147,7 +147,7 @@ class Dumpinator extends Utils {
       return {
         type: 'diff',
         bodyDiff: yield diff.diff(left.body, right.body, options.showIgnored ? null : left.ignoreBody),
-        headerDiff: yield diff.diff(left.headers, right.headers, options.showIgnored ? null : left.ignoreHeader),
+        headerDiff: yield diff.diff(left.header, right.header, options.showIgnored ? null : left.ignoreHeader),
         meta: {
           left: left.meta,
           right: right.meta

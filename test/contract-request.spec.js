@@ -2,29 +2,17 @@
 
 const inspect = require('inspect.js');
 const sinon = require('sinon');
-const nock = require('nock');
-const Request = require('../src/request');
-const bananaResponse = require('./fixtures/v1/banana.json');
+const ContractRequest = require('../src/contract-request');
 
 inspect.useSinon(sinon);
 
-describe('Request', () => {
-  before(() => {
-    nock('https://api.github.com')
-    .get('/users/maxdome/repos')
-    .reply(200, bananaResponse);
-  });
-
-  after(() => {
-    nock.restore();
-  });
-
+describe('ContractRequest', () => {
   describe('load()', () => {
-    it('returns a correct output', function () {
+    it('returns a contract response', function () {
       this.timeout(5000);
-      const req = new Request();
+      const req = new ContractRequest();
       const options = {
-        url: 'https://api.github.com/users/maxdome/repos'
+        contractFile: '../test/contracts/v1/banana.json'
       };
 
       return req.load(options)

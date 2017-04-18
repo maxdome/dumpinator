@@ -12,7 +12,7 @@ class Request {
       method: config.method || 'GET',
       body: config.body,
       query: config.query,
-      headers: config.headers
+      header: config.header
     };
   }
 
@@ -66,7 +66,7 @@ class Request {
         return resolve({
           meta,
           request: options,
-          headers: res.header,
+          header: res.header,
           body: /^application.+json/.test(res.type) ? res.body : JSON.stringify(res.text)
         });
       });

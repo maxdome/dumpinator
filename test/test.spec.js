@@ -2,10 +2,12 @@
 
 const inspect = require('inspect.js');
 const sinon = require('sinon');
+const nock = require('nock');
 
 inspect.useSinon(sinon);
 
 const Test = require('../src/test');
+const bananaResponse = require('./fixtures/v1/banana.json');
 
 describe('Test', () => {
   describe('class', () => {
@@ -14,6 +16,7 @@ describe('Test', () => {
         left: { url: '/foo' },
         right: { url: '/foo' }
       });
+
       inspect(test).isObject();
       inspect(test).hasKeys([
         'left',
@@ -25,15 +28,27 @@ describe('Test', () => {
 
   describe('run', () => {
     let test;
+
+    before(() => {
+      nock('https://api.github.com')
+      .get('/users/maxdome/repos')
+      .times(99)
+      .reply(200, 'bananaResponse');
+    });
+
+    after(() => {
+      nock.restore();
+    });
+
     beforeEach(() => {
       test = new Test({
         left: {
           method: 'GET',
-          url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/banana.json'
+          url: 'https://api.github.com/users/maxdome/repos'
         },
         right: {
           method: 'GET',
-          url: 'https://raw.githubusercontent.com/maxdome/dumpinator/develop/test/fixtures/v1/banana.json'
+          url: 'https://api.github.com/users/maxdome/repos'
         },
         ignoreHeader: [
           'x-fastly-request-id',
@@ -57,7 +72,7 @@ describe('Test', () => {
       inspect(p).isPromise();
       return p.then(() => {
         if (test.state === 'failed') {
-          inspect(test.left.response.headers).isEql(test.right.response.headers);
+          inspect(test.left.response.header).isEql(test.right.response.header);
           inspect(test.left.response.body).isEql(test.right.response.body);
         }
 
@@ -77,7 +92,7 @@ describe('Test', () => {
       inspect(p).isPromise();
       return p.then(() => {
         if (test.state === 'failed') {
-          inspect(test.left.response.headers).isEql(test.right.response.headers);
+          inspect(test.left.response.header).isEql(test.right.response.header);
         }
 
         inspect(test.state).isEql('failed');

@@ -119,13 +119,13 @@ class Session extends EventEmitter {
       }));
 
       this.test.left.response = {
-        headers: left.headers,
+        header: left.header,
         body: left.body,
         meta: left.meta
       };
 
       this.test.right.response = {
-        headers: right.headers,
+        header: right.header,
         body: right.body,
         meta: right.meta
       };

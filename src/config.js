@@ -158,7 +158,7 @@ class Config {
   validate(validateionData) {
     const ALLOWED_SITE_KEYS = [
       'method',
-      'hostname', 'url', 'header',
+      'hostname', 'url', 'contractFile', 'header',
       'query', 'body', 'status', 'transform'
     ];
 
@@ -238,7 +238,7 @@ class Config {
     });
 
     // set optional site properties
-    ['status', 'header', 'query', 'body', 'transform'].forEach((prop) => {
+    ['status', 'header', 'query', 'body', 'transform', 'contractFile'].forEach((prop) => {
       if (!newRoute.left[prop]) {
         const param = this.getParam(route, 'left', prop);
         if (param) {
@@ -295,6 +295,10 @@ class Config {
   getUrl(route, site) {
     let routeHost;
     let routePath;
+
+    if (route[site] && ('contractFile' in route[site])) {
+      return null;
+    }
 
     if (route[site] && route[site].hostname) {
       routeHost = route[site].hostname.replace(/\/$/, '');

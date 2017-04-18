@@ -70,7 +70,7 @@ class Test {
 
       this.state = 'passed';
       const diff = new Diff();
-      const headerDiff = diff.compare(this.left.response.headers, this.right.response.headers, this.ignoreHeader, true);
+      const headerDiff = diff.compare(this.left.response.header, this.right.response.header, this.ignoreHeader, true);
       if (!headerDiff) {
         this.state = 'failed';
         this.message = 'Headers don\'t match';
@@ -94,7 +94,7 @@ class Test {
     return {
       type: 'diff',
       bodyDiff: diff.diff(this.left.response.body, this.right.response.body, this.ignoreBody),
-      headerDiff: diff.diff(this.left.response.headers, this.right.response.headers, this.ignoreHeader, true),
+      headerDiff: diff.diff(this.left.response.header, this.right.response.header, this.ignoreHeader, true),
       meta: {
         left: this.left.response.meta,
         right: this.right.response.meta

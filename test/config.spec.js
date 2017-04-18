@@ -402,11 +402,13 @@ describe('Config', () => {
       inspect(route).isEql({
         left: {
           url: 'http://dumpi.rocks/foo',
-          method: 'GET'
+          method: 'GET',
+          
         },
         right: {
           url: 'http://dumpi.rocks/bar',
-          method: 'GET'
+          method: 'GET',
+          
         }
       });
     });
@@ -649,6 +651,27 @@ describe('Config', () => {
           url: 'http://stage.dumpi.rocks/bar',
           method: 'GET',
           transform: fn
+        }
+      });
+    });
+
+    it('accepts a contractFile', () => {
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: { contractFile: './foo/bla.json' },
+        right: { url: 'bar' }
+      });
+
+      inspect(route).isEql({
+        left: {
+          contractFile: './foo/bla.json',
+          method: 'GET',
+          url: null
+        },
+        right: {
+          url: 'http://dumpi.rocks/bar',
+          method: 'GET',
+          contractFile: undefined
         }
       });
     });

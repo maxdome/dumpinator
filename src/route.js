@@ -3,6 +3,7 @@
 const co = require('co');
 
 const Request = require('./request');
+const ContractRequest = require('./contract-request');
 
 class Route {
   constructor(conf) {
@@ -13,14 +14,22 @@ class Route {
 
   load() {
     return co(function* loadGen() {
-      const request = new Request({
-        verbose: this.verbose,
-        timeout: 10000 || this.timeout
-      });
+      let request;
+      if (this.contract) {
+        request = new ContractRequest({
+          verbose: this.verbose
+        });
+      } else {
+        request = new Request({
+          verbose: this.verbose,
+          timeout: 10000 || this.timeout
+        });
+      }
 
       const route = {
         method: this.method,
         url: this.url,
+        contractFile: this.contractFile,
         query: this.query,
         body: this.body,
         header: this.header
