@@ -653,4 +653,31 @@ describe('Config', () => {
       });
     });
   });
+
+  describe('getUrl', () => {
+    it('returns the routeHost if routePath is empty', () => {
+      const fn = () => {};
+      const route = config.addRoute({
+        hostname: 'http://dumpi.rocks',
+        left: {
+          hostname: 'http://test.dumpi.rocks',
+          url: 'foo'
+        },
+        right: {
+          hostname: 'http://stage.dumpi.rocks'
+        }
+      });
+
+      inspect(route).hasProps({
+        left: {
+          url: 'http://test.dumpi.rocks/foo',
+          method: 'GET'
+        },
+        right: {
+          url: 'http://stage.dumpi.rocks',
+          method: 'GET'
+        }
+      });
+    });
+  });
 });

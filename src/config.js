@@ -304,8 +304,12 @@ class Config {
 
     if (route[site] && route[site].url) {
       routePath = route[site].url.replace(/^\//, '');
-    } else {
+    } else if (route.url) {
       routePath = route.url.replace(/^\//, '');
+    }
+
+    if (routeHost && !routePath) {
+      return routeHost;
     }
 
     return routeHost ? `${routeHost}/${routePath}` : routePath;
